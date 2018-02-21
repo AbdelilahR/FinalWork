@@ -48,6 +48,7 @@ import com.google.android.gms.tasks.Task;
 
 /**
  * An activity that displays a map showing the place at the device's current location.
+ * test
  */
 public class MapsActivityCurrentPlace extends AppCompatActivity
         implements OnMapReadyCallback, SensorEventListener {
