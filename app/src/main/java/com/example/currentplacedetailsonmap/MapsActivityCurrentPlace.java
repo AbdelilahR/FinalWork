@@ -66,7 +66,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     private FusedLocationProviderClient mFusedLocationProviderClient2;
 
     // A default location (Sydney, Australia) and default zoom to use when location permission is
-    // not granted.
+    // not granted. test
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
