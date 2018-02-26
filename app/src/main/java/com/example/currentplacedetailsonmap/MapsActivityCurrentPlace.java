@@ -19,16 +19,18 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.PlaceDetectionClient;
@@ -151,10 +153,13 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
 
         getDeviceLocation();
+
         btnStart.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
+
+                getLocationPermission();
 
                 if (firstTime == true) {
                     btnStart.setText("Stop");
@@ -261,8 +266,42 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         if (item.getItemId() == R.id.option_get_place) {
-            showCurrentPlace();
+
+            LayoutInflater inflater = LayoutInflater.from(this);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            LinearLayout layout = new LinearLayout(this);
+            builder.setTitle("Testing");
+
+            final View popup = inflater.inflate(R.layout.custom_popup,null);
+            final EditText input = (EditText) popup.findViewById(R.id.editText1);
+            final EditText input2 = (EditText) popup.findViewById(R.id.editText2);
+
+            final TextView txt1 = new TextView(this);
+            final TextView txt2 = new TextView(this);
+            txt1.setText("Point A");
+            txt2.setText("Point B");
+
+
+            builder.setView(popup);
+
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                   String m_Text = input.getText().toString();
+                    String m_Text2 = input2.getText().toString();
+
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+        builder.show();
         }
         return true;
     }
