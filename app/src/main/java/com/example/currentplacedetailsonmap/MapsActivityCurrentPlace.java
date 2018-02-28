@@ -30,13 +30,18 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBufferResponse;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -231,6 +236,9 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             }
 
         });
+
+
+
     }
 
     /**
@@ -267,6 +275,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+
         if (item.getItemId() == R.id.option_get_place) {
 
             LayoutInflater inflater = LayoutInflater.from(this);
@@ -274,6 +283,8 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LinearLayout layout = new LinearLayout(this);
             builder.setTitle("Testing");
+
+
 
             final View popup = inflater.inflate(R.layout.custom_popup,null);
             final EditText input = (EditText) popup.findViewById(R.id.editText1);
@@ -283,6 +294,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             final TextView txt2 = new TextView(this);
             txt1.setText("Point A");
             txt2.setText("Point B");
+
 
 
             builder.setView(popup);
@@ -301,7 +313,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                     dialog.cancel();
                 }
             });
-        builder.show();
+/*
+
+*/
+            builder.show();
         }
         return true;
     }
