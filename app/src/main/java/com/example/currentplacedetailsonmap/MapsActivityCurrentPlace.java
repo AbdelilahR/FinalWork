@@ -14,15 +14,22 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
@@ -33,6 +40,7 @@ import android.widget.TextView;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionClient;
@@ -112,6 +120,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     public float correctedDistance = 0;
     public TextView distance;
     public TextView calories;
+    public static View popup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +149,11 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
         updateLocationUI();
+        getLocationPermission();
+//        getDeviceLocation();
+
         //Start button
         final Button btnStart = (Button) findViewById(R.id.btn_start);
         //Chronometer
@@ -152,12 +165,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
         distance = (TextView) findViewById(R.id.distance);
         calories = (TextView) findViewById(R.id.calories);
-        getLocationPermission();
-
-        final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
-        getDeviceLocation();
+        // final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
@@ -165,10 +176,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             public void onClick(View view) {
 
                 getLocationPermission();
-
+                getDeviceLocation();
                 if (firstTime == true) {
                     btnStart.setText("Stop");
-                  //  distance.setText("0 m");
+                    //  distance.setText("0 m");
                     getDeviceLocation();
 
                     chrono.start();
@@ -178,43 +189,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                 } else {
 
 
-                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, new LocationListener() {
-                        @Override
-                        public void onLocationChanged(Location location) {
-                           /* getDeviceLocation();
-                            oldPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                            newPosition = new LatLng(location.getLatitude(), location.getLongitude());
-
-                            Location.distanceBetween(oldPosition.latitude, oldPosition.longitude, newPosition.latitude, newPosition.longitude, results);
-                            if (results[0] > correctedDistance)
-                            {
-                                correctedDistance = results[0];
-                            }
-                            else
-                            {
-                                correctedDistance += results[0];
-                            }
-                            distance.setText(Float.toString(correctedDistance) + " m");*/
-                        }
-
-                        @Override
-                        public void onProviderDisabled(String provider) {
-                            // TODO Auto-generated method stub
-                        }
-
-                        @Override
-                        public void onProviderEnabled(String provider) {
-                            // TODO Auto-generated method stub
-                        }
-
-                        @Override
-                        public void onStatusChanged(String provider, int status,
-                                                    Bundle extras) {
-                            // TODO Auto-generated method stub
-                        }
-
-                    });
-//
                     chrono.stop();
 
 
@@ -236,7 +210,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             }
 
         });
-
 
 
     }
@@ -274,7 +247,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
+boolean firstrun = true;
 
         if (item.getItemId() == R.id.option_get_place) {
 
@@ -285,25 +258,74 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             builder.setTitle("Testing");
 
 
+            try {
 
-            final View popup = inflater.inflate(R.layout.custom_popup,null);
-            final EditText input = (EditText) popup.findViewById(R.id.editText1);
-            final EditText input2 = (EditText) popup.findViewById(R.id.editText2);
+
+
+                    popup = inflater.inflate(R.layout.custom_popup, layout);
+
+
+
+
+
+            } catch (InflateException e) {
+                e.getMessage();
+
+            }
+            // final EditText input = (EditText) popup.findViewById(R.id.editText1);
+            //final EditText input2 = (EditText) popup.findViewById(R.id.editText2);
 
             final TextView txt1 = new TextView(this);
             final TextView txt2 = new TextView(this);
             txt1.setText("Point A");
             txt2.setText("Point B");
 
+            PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                    getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
+            AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                    .build();
+            autocompleteFragment.setFilter(typeFilter);
+            autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                @Override
+                public void onPlaceSelected(final Place place) {
+                    Log.i(TAG, "Place: " + place.getName());//get place details here
+
+                    txt1.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            txt1.setText(place.getName());
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            txt1.setText(place.getName());
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(Status status) {
+                    Log.i(TAG, "An error occurred: " + status);
+                }
+            });
+
+            if (popup.getParent() != null)
+                ((ViewGroup) popup.getParent()).removeView(popup);
 
             builder.setView(popup);
 
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                   String m_Text = input.getText().toString();
-                    String m_Text2 = input2.getText().toString();
+                    // String m_Text = input.getText().toString();
+                    //String m_Text2 = input2.getText().toString();
 
                 }
             });
@@ -311,13 +333,16 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();
+
                 }
             });
 /*
 
 */
             builder.show();
+
         }
+
         return true;
     }
 
@@ -623,8 +648,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
     //get distance in kilometers
     public float getDistanceRun(long steps) {
-        float distance = ((float) (steps * 78) / (float) 100000)*1000;
+        float distance = ((float) (steps * 78) / (float) 100000) * 1000;
         //int round =(int) distance;
         return distance;
     }
+
+
 }
