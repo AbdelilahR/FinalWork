@@ -3,6 +3,8 @@ package com.example.currentplacedetailsonmap;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,6 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
@@ -37,9 +40,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
@@ -59,6 +66,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 /**
@@ -144,15 +153,19 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        mFusedLocationProviderClient2 = LocationServices.getFusedLocationProviderClient(this);
+        // mFusedLocationProviderClient2 = LocationServices.getFusedLocationProviderClient(this);
 
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        updateLocationUI();
-        getLocationPermission();
-//        getDeviceLocation();
+        //Check if GPS is enabled
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            buildAlertMessageNoGps();
+        }
+        //      updateLocationUI();
+//        getLocationPermission();
 
         //Start button
         final Button btnStart = (Button) findViewById(R.id.btn_start);
@@ -169,18 +182,20 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
         // final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+//        onMapReady(mMap);
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
-
-                getLocationPermission();
+                if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                    buildAlertMessageNoGps();
+                }
                 getDeviceLocation();
                 if (firstTime == true) {
                     btnStart.setText("Stop");
                     //  distance.setText("0 m");
-                    getDeviceLocation();
+
 
                     chrono.start();
 
@@ -247,7 +262,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-boolean firstrun = true;
+        boolean firstrun = true;
 
         if (item.getItemId() == R.id.option_get_place) {
 
@@ -261,11 +276,7 @@ boolean firstrun = true;
             try {
 
 
-
-                    popup = inflater.inflate(R.layout.custom_popup, layout);
-
-
-
+                popup = inflater.inflate(R.layout.custom_popup, layout);
 
 
             } catch (InflateException e) {
@@ -291,23 +302,8 @@ boolean firstrun = true;
                 @Override
                 public void onPlaceSelected(final Place place) {
                     Log.i(TAG, "Place: " + place.getName());//get place details here
+                    mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
 
-                    txt1.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            txt1.setText(place.getName());
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            txt1.setText(place.getName());
-                        }
-                    });
                 }
 
                 @Override
@@ -387,7 +383,8 @@ boolean firstrun = true;
         updateLocationUI();
 
         // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
+
+//        getDeviceLocation();
     }
 
     /**
@@ -653,5 +650,44 @@ boolean firstrun = true;
         return distance;
     }
 
+    //GPSTracker.java
+    /**
+     * Function to check if best network provider
+     * @return boolean
+     * */
 
+
+    /**
+     * Function to show settings alert dialog
+     */
+    public void buildAlertMessageNoGps() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+        // Setting Dialog Title
+        alertDialog.setTitle("GPS is settings");
+
+        // Setting Dialog Message
+        alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");
+
+        // Setting Icon to Dialog
+        //alertDialog.setIcon(R.drawable.delete);
+
+        // On pressing Settings button
+        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+        });
+
+        // on pressing cancel button
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Showing Alert Message
+        alertDialog.show();
+    }
 }
