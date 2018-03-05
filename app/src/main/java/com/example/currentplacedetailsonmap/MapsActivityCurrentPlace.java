@@ -65,6 +65,9 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -130,6 +133,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     public TextView distance;
     public TextView calories;
     public static View popup;
+    public LatLng myCurrentPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,17 +157,25 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        // mFusedLocationProviderClient2 = LocationServices.getFusedLocationProviderClient(this);
+
 
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         //Check if GPS is enabled
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
+            getDeviceLocation();
+            // Set current location
+         //   myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+
+        } else {
+
         }
+
+
         //      updateLocationUI();
 //        getLocationPermission();
 
@@ -183,15 +195,20 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         // final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 //        onMapReady(mMap);
+        // Set current location
+        getDeviceLocation();
+        getLocationPermission();
+//        myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View view) {
-                if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                     buildAlertMessageNoGps();
-                }
-                getDeviceLocation();
+                else
+                    getDeviceLocation();
+
                 if (firstTime == true) {
                     btnStart.setText("Stop");
                     //  distance.setText("0 m");
@@ -274,10 +291,8 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
 
             try {
-
-
                 popup = inflater.inflate(R.layout.custom_popup, layout);
-
+                getDeviceLocation();
 
             } catch (InflateException e) {
                 e.getMessage();
@@ -298,11 +313,19 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                     .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
                     .build();
             autocompleteFragment.setFilter(typeFilter);
+            mMap.clear();
             autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(final Place place) {
                     Log.i(TAG, "Place: " + place.getName());//get place details here
+                    getDeviceLocation();
+                    myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
+
+                    mMap.addMarker(new MarkerOptions().position(myCurrentPosition));
                     mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
+
+                    PolygonOptions options = new PolygonOptions().add(myCurrentPosition).add(place.getLatLng());
+                    Polygon polygon = mMap.addPolygon(options);
 
                 }
 
@@ -650,7 +673,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         return distance;
     }
 
-    //GPSTracker.java
     /**
      * Function to check if best network provider
      * @return boolean
@@ -677,6 +699,8 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
+
+
             }
         });
 
