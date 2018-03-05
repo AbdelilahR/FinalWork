@@ -1,5 +1,7 @@
 package com.example.currentplacedetailsonmap;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -12,13 +14,12 @@ import java.util.List;
 
 /**
  * Created by anupamchugh on 27/11/15.
- * source --> https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
  */
 
 public class DirectionsJSONParser {
 
     /** Receives a JSONObject and returns a list of lists containing latitude and longitude */
-    public List<List<HashMap>> parse(JSONObject jObject){
+    public List<List<HashMap<String,String>>> parse(JSONObject jObject){
 
         List<List<HashMap<String, String>>> routes = new ArrayList<List<HashMap<String,String>>>() ;
         JSONArray jRoutes = null;
