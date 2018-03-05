@@ -147,7 +147,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         }
 
         // Retrieve the content view that renders the map.
-        setContentView(R.layout.activity_maps); //
+        setContentView(R.layout.activity_maps);
 
         // Construct a GeoDataClient.
         mGeoDataClient = Places.getGeoDataClient(this, null);
@@ -646,7 +646,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
 
             steps++;
-            distance.setText(Float.toString(getDistanceRun(steps)));
+            distance.setText(Double.toString(getDistanceRun(steps)));
         }
     }
 
@@ -666,11 +666,12 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         sManager.unregisterListener(this, stepSensor);
     }
 
-    //get distance in kilometers
-    public float getDistanceRun(long steps) {
-        float distance = ((float) (steps * 78) / (float) 100000) * 1000;
+    //get distance in meters
+    public double getDistanceRun(long steps) {
+        //float distance = ((float) (steps * 78) / (float) 100000) * 1000;
         //int round =(int) distance;
-        return distance;
+        return steps * 0.762;
+
     }
 
     /**
