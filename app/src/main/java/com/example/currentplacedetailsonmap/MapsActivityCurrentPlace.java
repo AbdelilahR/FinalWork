@@ -60,6 +60,7 @@ import com.google.android.gms.tasks.Task;
 
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -279,7 +280,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         boolean firstrun = true;
 
         if (item.getItemId() == R.id.option_get_place) {
-
+            getDeviceLocation();
             LayoutInflater inflater = LayoutInflater.from(this);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -289,7 +290,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
             try {
                 popup = inflater.inflate(R.layout.custom_popup, layout);
-                getDeviceLocation();
+
 
             } catch (InflateException e) {
                 e.getMessage();
@@ -317,9 +318,9 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                     Log.i(TAG, "Place: " + place.getName());//get place details here
                     getDeviceLocation();
                     myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                    String url = getDirectionsUrl(myCurrentPosition,place.getLatLng());
-                    DownloadTask downloadTask = new DownloadTask();
-                    downloadTask.doInBackground(url);
+                    String url = getDirectionsUrl(myCurrentPosition, place.getLatLng());
+                    DownloadTask downloadTask = (DownloadTask) new DownloadTask().execute(url);
+                    //downloadTask.doInBackground(url);
                     /*
                     mMap.addMarker(new MarkerOptions().position(myCurrentPosition));
                     mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
@@ -715,20 +716,22 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     }
 
     //Private Class ==> https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
-    private class DownloadTask extends AsyncTask {
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
 
         @Override
-        public String doInBackground(Object... url) {
-
+        public String doInBackground(String... url) {
             String data = "";
 
             try {
-                data = downloadUrl((String) url[0]);
+                data = downloadUrl(url[0]);
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
             return data;
         }
+
+
 
 
         public void onPostExecute(String result) {
@@ -824,38 +827,48 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         return url;
     }
 
-    private String downloadUrl(String strUrl) throws IOException {
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        try {
-            URL url = new URL(strUrl);
+    private String downloadUrl(final String strUrl) throws IOException {
 
-            urlConnection = (HttpURLConnection) url.openConnection();
 
-            urlConnection.connect();// not working?
+                String data = "";
 
-            iStream = urlConnection.getInputStream();
+                InputStream iStream = null;
+                HttpURLConnection urlConnection = null;
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));//iStream null
+                try {
+                    URL url = new URL(strUrl);
 
-            StringBuffer sb = new StringBuffer();
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setAllowUserInteraction(false);
 
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
+                    urlConnection.connect();// not working?
+                    if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK)
+                        Log.i(TAG, "connection ok");
+                    iStream = urlConnection.getInputStream();
 
-            data = sb.toString();
+                    BufferedReader br = new BufferedReader(new InputStreamReader(iStream));//iStream null
 
-            br.close();
+                    StringBuffer sb = new StringBuffer();
 
-        } catch (Exception e) {
-            Log.d("Exception", e.toString());
-        } finally {
-            iStream.close();
-            urlConnection.disconnect();
-        }
+                    String line = "";
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+
+                    data = sb.toString();
+
+                    br.close();
+
+                } catch (Exception e) {
+                    Log.d(TAG, "Exception" + e.toString());
+                } finally {
+                    try {
+                        iStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    urlConnection.disconnect();
+                }
         return data;
     }
 }
