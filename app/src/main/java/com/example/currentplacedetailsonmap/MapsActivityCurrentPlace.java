@@ -54,8 +54,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -168,7 +166,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             buildAlertMessageNoGps();
             getDeviceLocation();
             // Set current location
-         //   myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+            //   myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
         } else {
 
@@ -318,14 +316,17 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                 public void onPlaceSelected(final Place place) {
                     Log.i(TAG, "Place: " + place.getName());//get place details here
                     getDeviceLocation();
-                    myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(),mLastKnownLocation.getLongitude());
-
+                    myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                    String url = getDirectionsUrl(myCurrentPosition,place.getLatLng());
+                    DownloadTask downloadTask = new DownloadTask();
+                    downloadTask.doInBackground(url);
+                    /*
                     mMap.addMarker(new MarkerOptions().position(myCurrentPosition));
                     mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
 
                     PolygonOptions options = new PolygonOptions().add(myCurrentPosition).add(place.getLatLng());
                     Polygon polygon = mMap.addPolygon(options);
-
+                    */
                 }
 
                 @Override
@@ -699,8 +700,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
-
-
             }
         });
 
@@ -716,6 +715,34 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     }
 
     //Private Class ==> https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
+    private class DownloadTask extends AsyncTask {
+
+        @Override
+        public String doInBackground(Object... url) {
+
+            String data = "";
+
+            try {
+                data = downloadUrl((String) url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+
+        public void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+
+
+            parserTask.execute(result);
+
+        }
+    }
+
+
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         // Parsing the data in non-ui thread
@@ -770,6 +797,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         }
     }
 
+
     private String getDirectionsUrl(LatLng origin, LatLng dest) {
 
         // Origin of route
@@ -805,11 +833,11 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
             urlConnection = (HttpURLConnection) url.openConnection();
 
-            urlConnection.connect();
+            urlConnection.connect();// not working?
 
             iStream = urlConnection.getInputStream();
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));//iStream null
 
             StringBuffer sb = new StringBuffer();
 
