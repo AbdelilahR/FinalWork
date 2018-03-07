@@ -277,7 +277,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean firstrun = true;
+
 
         if (item.getItemId() == R.id.option_get_place) {
             getDeviceLocation();
