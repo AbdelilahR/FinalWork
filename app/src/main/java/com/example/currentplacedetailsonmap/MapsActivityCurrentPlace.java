@@ -142,6 +142,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                 //Todo implement fragments
 
                 case R.id.navigation_home:
+                    HomeFragment homeFragment = new HomeFragment();
 
                     return true;
                 case R.id.navigation_dashboard:
@@ -188,10 +189,12 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
             getDeviceLocation();
+            updateLocationUI();
             // Set current location
             //   myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
         } else {
+            getLocationPermission();
 
         }
 
