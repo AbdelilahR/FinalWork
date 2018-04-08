@@ -19,6 +19,9 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -61,7 +64,6 @@ import com.google.android.gms.tasks.Task;
 
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,10 +78,10 @@ import java.util.List;
  * An activity that displays a map showing the place at the device's current location.
  * test
  */
-public class MapsActivityCurrentPlace extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements OnMapReadyCallback, SensorEventListener {
 
-    private static final String TAG = MapsActivityCurrentPlace.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
 
@@ -119,7 +121,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     public Sensor stepSensor;
     private long steps = 0;
 
-
     //Custom
     int time = 0;
     double mCalories = 0;
@@ -142,7 +143,15 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                 //Todo implement fragments
 
                 case R.id.navigation_home:
+
+                   // android.support.v4.app.Fragment fragmentTransaction = getSupportFragmentManager().findFragmentById(R.id.main_content);
+                    UserFragment userFragment = new UserFragment();
                     HomeFragment homeFragment = new HomeFragment();
+                    GoogleMapsFragment googleMapsFragment = new GoogleMapsFragment();
+
+                    FragmentManager fm = getSupportFragmentManager();
+                   // fm.beginTransaction().replace(R.id.main_map,googleMapsFragment,googleMapsFragment.getTag()).commit();
+                    //fm.beginTransaction().replace(R.id.main_content,homeFragment,homeFragment.getTag()).commit();
 
                     return true;
                 case R.id.navigation_dashboard:
@@ -156,6 +165,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         }
     };
 
+    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,7 +178,8 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         }
 
         // Retrieve the content view that renders the map.
-        setContentView(R.layout.activity_maps);
+        //TODO fix this
+        setContentView(R.layout.activity_main);
 
         // Construct a GeoDataClient.
         mGeoDataClient = Places.getGeoDataClient(this, null);
@@ -181,8 +192,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
 
 
         // Build the map.
+       //Todo set this into nested child fragment
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync((OnMapReadyCallback) this);
 
         //Check if GPS is enabled
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -741,7 +754,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     }
 
     //Private Class ==> https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
-    private class DownloadTask extends AsyncTask<String, Void, String> {
+    public class DownloadTask extends AsyncTask<String, Void, String> {
 
 
         @Override
@@ -771,7 +784,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     }
 
 
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    public class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         // Parsing the data in non-ui thread
         @Override

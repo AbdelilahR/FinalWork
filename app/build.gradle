@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.example.currentplacedetailsonmap"
         minSdkVersion 15
-        targetSdkVersion 16
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -35,7 +35,11 @@ dependencies {
     //noinspection GradleCompatible fix this
     implementation 'com.android.support:design:25.4.0'
     implementation 'com.android.support:support-v4:25.4.0'
+    //implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    //noinspection GradleCompatible fix this
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.firebase:firebase-auth:11.2.0'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
