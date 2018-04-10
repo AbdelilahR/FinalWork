@@ -6,24 +6,25 @@
     android:layout_height="wrap_content"
     tools:context="com.example.currentplacedetailsonmap.MainActivity">
 
-<!--
-    <fragment
+    <FrameLayout
         android:id="@+id/main_content"
         android:layout_width="match_parent"
-        android:layout_height="222dp"
+        android:layout_height="match_parent"></FrameLayout>
+<!--
+    <FrameLayout
+        android:id="@+id/user_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
 
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"></FrameLayout>
 
 
-    </fragment>
-
-    <fragment
+    <FrameLayout
         android:id="@+id/main_map"
         android:layout_width="match_parent"
         android:layout_height="226dp"
-        android:layout_above="@+id/navigation"
-        ></fragment>
--->
+        android:layout_above="@+id/navigation"></FrameLayout>
+    -->
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
