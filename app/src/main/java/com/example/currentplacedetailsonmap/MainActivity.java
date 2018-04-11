@@ -140,9 +140,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationView bottomNavigationView = (BottomNavigationView)
-                findViewById(R.id.navigation);
 
+        // code used from this site:
+        // https://segunfamisa.com/posts/bottom-navigation-view-android
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
             @Override
             public void onNavigationItemReselected(@NonNull MenuItem item) {
@@ -152,8 +153,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.navigation_home:
                         GoogleMapsFragment googleMapsFragment = new GoogleMapsFragment();
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.main_content,googleMapsFragment);
+                        transaction.replace(R.id.main_content, googleMapsFragment);
                         transaction.commit();
+
                          /*
                         // android.support.v4.app.Fragment fragmentTransaction = getSupportFragmentManager().findFragmentById(R.id.main_content);
                         UserFragment userFragment = new UserFragment();
@@ -170,9 +172,9 @@ public class MainActivity extends AppCompatActivity {
 
                         break;
                     case R.id.navigation_notifications:
-                    UserFragment userFragment = new UserFragment();
+                        UserFragment userFragment = new UserFragment();
                         FragmentTransaction transaction2 = getSupportFragmentManager().beginTransaction();
-                        transaction2.replace(R.id.main_content,userFragment,userFragment.getTag());
+                        transaction2.replace(R.id.main_content, userFragment, userFragment.getTag());
                         transaction2.commit();
                         break;
                 }

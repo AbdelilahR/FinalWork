@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -147,42 +148,6 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback, 
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        return view;
-    }
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //https://stackoverflow.com/questions/30847096/android-getmenuinflater-in-a-fragment-subclass-cannot-resolve-method
-        //https://stackoverflow.com/questions/15653737/oncreateoptionsmenu-inside-fragments
-        inflater.inflate(R.menu.current_place_menu, menu);
-        super.onCreateOptionsMenu(menu,inflater);
-        //return true;
-    }
-    @SuppressLint("ResourceType")
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        // Retrieve location and camera position from saved instance state.
-        if (savedInstanceState != null) {
-            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            mNewLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
-        }
-
-        // Retrieve the content view that renders the map.
-        //TODO fix this
-        //getActivity().setContentView(R.layout.activity_main);
-
-        // Construct a GeoDataClient.
-        mGeoDataClient = Places.getGeoDataClient(getActivity(), null);
-
-        // Construct a PlaceDetectionClient.
-        mPlaceDetectionClient = Places.getPlaceDetectionClient(getActivity(), null);
-
-        // Construct a FusedLocationProviderClient.
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-
         //Check if GPS is enabled
         final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -192,34 +157,27 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback, 
             // Set current location
             //   myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
-        } else {
-            //getLocationPermission();
-
         }
 
-
-        //      updateLocationUI();
-//        getLocationPermission();
-
         //Start button
-        final Button btnStart = (Button) getActivity().findViewById(R.id.btn_start);
+        final Button btnStart = (Button) view.findViewById(R.id.btn_start);
         //Chronometer
-        final Chronometer chrono = (Chronometer) getActivity().findViewById(R.id.chronometer);
+        final Chronometer chrono = (Chronometer) view.findViewById(R.id.chronometer);
 
         //speedometer
         sManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         stepSensor = sManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
-        distance = (TextView) getActivity().findViewById(R.id.distance);
-        calories = (TextView) getActivity().findViewById(R.id.calories);
+        distance = (TextView) view.findViewById(R.id.distance);
+        calories = (TextView) view.findViewById(R.id.calories);
 
         // final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 //        onMapReady(mMap);
         // Set current location
-        getDeviceLocation();
-        getLocationPermission();
+       // getDeviceLocation();
+
 //        myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-/*
+
         btnStart.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
             @Override
@@ -257,7 +215,50 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback, 
 
             }
 
-        }); */
+        });
+
+        return view;
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        //https://stackoverflow.com/questions/30847096/android-getmenuinflater-in-a-fragment-subclass-cannot-resolve-method
+        //https://stackoverflow.com/questions/15653737/oncreateoptionsmenu-inside-fragments
+        inflater.inflate(R.menu.current_place_menu, menu);
+        super.onCreateOptionsMenu(menu,inflater);
+        //return true;
+    }
+    @SuppressLint("ResourceType")
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        // Retrieve location and camera position from saved instance state.
+        if (savedInstanceState != null) {
+            mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            mNewLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+        }
+
+        // Retrieve the content view that renders the map.
+        //TODO fix this
+        //getActivity().setContentView(R.layout.activity_main);
+
+        // Construct a GeoDataClient.
+        mGeoDataClient = Places.getGeoDataClient(getActivity(), null);
+
+        // Construct a PlaceDetectionClient.
+        mPlaceDetectionClient = Places.getPlaceDetectionClient(getActivity(), null);
+
+        // Construct a FusedLocationProviderClient.
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+
+
+
+
+        //      updateLocationUI();
+//        getLocationPermission();
+
 
 
     }
