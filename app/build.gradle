@@ -11,7 +11,10 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resValue "string", "google_maps_key", (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
-        multiDexEnabled true
+        multiDexEnabled  true
+    }
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
     buildTypes {
         debug {

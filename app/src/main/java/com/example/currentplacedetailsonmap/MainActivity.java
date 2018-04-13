@@ -1,7 +1,6 @@
 package com.example.currentplacedetailsonmap;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -85,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Intent intent = new Intent(this,AuthenticationActivity.class);
-        startActivity(intent);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

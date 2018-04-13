@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 /*
 Bron:
 https://www.androidhive.info/2016/06/android-getting-started-firebase-simple-login-registration-auth/
-*/
+**/
 public class LoginActivity extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword;
@@ -43,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar);
 
         inputEmail = (EditText) findViewById(R.id.email);
         inputPassword = (EditText) findViewById(R.id.password);
