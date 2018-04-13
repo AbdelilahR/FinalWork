@@ -37,12 +37,14 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
             @Override
             public void onNavigationItemReselected(@NonNull MenuItem item) {
+                UserFragment userFragment = new UserFragment();
+                HomeFragment homeFragment = new HomeFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
                 switch (item.getItemId()) {
                     //Todo implement fragments
 
                     case R.id.navigation_home:
-                        HomeFragment homeFragment = new HomeFragment();
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.main_content, homeFragment);
                         transaction.commit();
 
@@ -62,10 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
                         break;
                     case R.id.navigation_notifications:
-                        UserFragment userFragment = new UserFragment();
-                        FragmentTransaction transaction2 = getSupportFragmentManager().beginTransaction();
-                        transaction2.replace(R.id.main_content, userFragment, userFragment.getTag());
-                        transaction2.commit();
+                        transaction.replace(R.id.main_content, userFragment, userFragment.getTag());
+                        transaction.commit();
                         break;
                 }
 
