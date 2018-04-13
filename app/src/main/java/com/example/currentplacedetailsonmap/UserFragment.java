@@ -12,6 +12,12 @@ import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * A simple {@link Fragment} subclass.
+ * Links used
+ * https://stackoverflow.com/questions/44286535/how-to-get-all-users-data-from-firebase-database-in-custom-listview-in-android
+ * https://www.quora.com/How-do-I-show-list-of-other-logged-in-users-to-a-user-when-he-she-logs-in-to-the-app-in-firebase-Android
+ * https://github.com/chat-sdk/chat-sdk-android
+ *
+ * https://github.com/AleBarreto/FirebaseAndroidChat
  */
 public class UserFragment extends Fragment {
 

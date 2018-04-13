@@ -1,78 +1,25 @@
 package com.example.currentplacedetailsonmap;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.InflateException;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Chronometer;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionClient;
-import com.google.android.gms.location.places.PlaceLikelihood;
-import com.google.android.gms.location.places.PlaceLikelihoodBufferResponse;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -138,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Intent intent = new Intent(this,AuthenticationActivity.class);
+        startActivity(intent);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -151,19 +100,19 @@ public class MainActivity extends AppCompatActivity {
                     //Todo implement fragments
 
                     case R.id.navigation_home:
-                        GoogleMapsFragment googleMapsFragment = new GoogleMapsFragment();
+                        HomeFragment homeFragment = new HomeFragment();
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.main_content, googleMapsFragment);
+                        transaction.replace(R.id.main_content, homeFragment);
                         transaction.commit();
 
                          /*
                         // android.support.v4.app.Fragment fragmentTransaction = getSupportFragmentManager().findFragmentById(R.id.main_content);
                         UserFragment userFragment = new UserFragment();
+                        StatsFragment homeFragment = new StatsFragment();
                         HomeFragment homeFragment = new HomeFragment();
-                        GoogleMapsFragment googleMapsFragment = new GoogleMapsFragment();
 
                         FragmentManager fm = getSupportFragmentManager();
-                        // fm.beginTransaction().replace(R.id.main_map,googleMapsFragment,googleMapsFragment.getTag()).commit();
+                        // fm.beginTransaction().replace(R.id.main_map,homeFragment,homeFragment.getTag()).commit();
                         //fm.beginTransaction().replace(R.id.main_content,homeFragment,homeFragment.getTag()).commit();
                         */
 
@@ -192,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
 
                         // android.support.v4.app.Fragment fragmentTransaction = getSupportFragmentManager().findFragmentById(R.id.main_content);
                         UserFragment userFragment = new UserFragment();
-                        HomeFragment homeFragment = new HomeFragment();
-                        GoogleMapsFragment googleMapsFragment = new GoogleMapsFragment();
+                        StatsFragment homeFragment = new StatsFragment();
+                        HomeFragment googleMapsFragment = new HomeFragment();
 
                         FragmentManager fm = getSupportFragmentManager();
                         // fm.beginTransaction().replace(R.id.main_map,googleMapsFragment,googleMapsFragment.getTag()).commit();
