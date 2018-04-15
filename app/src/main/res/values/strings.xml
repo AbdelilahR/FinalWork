@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">FriendlyFit</string>
+    <string name="gender">Gender</string>
     <string name="action_sign_in_short">Register</string>
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
@@ -35,5 +36,8 @@
     <string name="default_info_snippet">No places found, because location permission is disabled.</string>
     <string name="option_get_place">Get place</string>
     <string name="pick_place">Choose a place</string>
+    <string name="lastname">Last name</string>
+    <string name="firstname">First name</string>
+    <string name="Adress">Adress</string>
 </resources>
 
