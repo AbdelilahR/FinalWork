@@ -8,7 +8,9 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,99 +37,139 @@ import java.util.Map;
  * <p>
  * https://github.com/AleBarreto/FirebaseAndroidChat
  */
-public class UserFragment extends ListFragment
-{
+public class UserFragment extends ListFragment {
     //Test this --> https://stackoverflow.com/questions/32886546/how-to-get-all-child-list-from-firebase-android
     private FirebaseAuth mAuth;
+    private String lastId;
+    private ArrayAdapter<User> adapter = null;
+    private int preLast;
     public ListView userListView = null;
     public ArrayList<User> userList = new ArrayList<>();
+    public User myUser = new User();
+    public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
 
-    public UserFragment()
-    {
+    public UserFragment() {
         // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
+                             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_user, container, false);
         return rootView;
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState)
-    {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         userListView = getListView();
         /* https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
         //ArrayList<User> userArrayList = new ArrayList<>();
 
-
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-// Inflate the layout for this fragment
 
-        //userListView = getListView();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
-
-        ref.addListenerForSingleValueEvent(new ValueEventListener()
-        {
+       /*https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
+        ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
 
                 //Map<String,Object> td = (((HashMap<String, Object>) dataSnapshot.getValue()));
 
                 //userList = getAllUsers((Map<String, Object>) dataSnapshot.getValue());
-                for (DataSnapshot dsp : dataSnapshot.getChildren())
-                {
-                    User myUser = dsp.getValue(User.class);
-
-                    userList.add(myUser);
+                for (DataSnapshot dsp : dataSnapshot.getChildren()) {
+                    //dsp.getChildrenCount();
+                    myUser = dsp.getValue(User.class);
+                    lastId = dsp.getKey();
+                 //   if (dsp.getKey() != lastId)
+                        userList.add(myUser);
                 }
-                ArrayAdapter<User> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+              /*  adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+
+                userListView.setAdapter(adapter);/*
+                /*https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa*/
+                userListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+                    private int currentVisibleItemCount;
+                    private int currentScrollState;
+                    private int currentFirstVisibleItem;
+                    private int totalItem;
+                    private int lastItem;
+
+
+                    @Override
+                    public void onScrollStateChanged(AbsListView view, int scrollState) {
+                        this.currentScrollState = scrollState;
+                        //https://stackoverflow.com/questions/23708271/count-total-number-of-list-items-in-a-listview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                        //this.currentFirstVisibleItem = userListView.getAdapter().getCount();
+                        this.currentFirstVisibleItem = getListView().getFirstVisiblePosition();
+                        this.isScrollCompleted();
+                    }
+
+                    @Override
+                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                        //view = getListView();
+                        this.currentFirstVisibleItem = firstVisibleItem;
+                        this.currentVisibleItemCount = visibleItemCount;
+                        this.totalItem = totalItemCount;
+                        //https://stackoverflow.com/questions/5123675/find-out-if-listview-is-scrolled-to-the-bottom
+                        lastItem = firstVisibleItem + visibleItemCount;
+                        visibleItemCount = view.getLastVisiblePosition();
+
+                    }
+
+                    private void isScrollCompleted() {
+                        if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
+                                && this.currentScrollState == SCROLL_STATE_IDLE) {
+
+                            ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    for (DataSnapshot dsp : dataSnapshot.getChildren()) {
+                                        myUser = dsp.getValue(User.class);
+                                        lastId = dsp.getKey();
+                                        //if ( )
+                                            userList.add(myUser);
+
+                                    }
+
+                                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+
+                                    userListView.setAdapter(adapter);
+                                    // currentFirstVisibleItem = userList.;
+/*                                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+                                    userListView.setAdapter(adapter);
+*/
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+
+                            });
+                        }
+                    }
+                });
+                adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+
                 userListView.setAdapter(adapter);
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
 
 
-
         });
 
-
     }
-
-    private ArrayList<String> getAllUsers(Map<String, Object> users)
-    {
-
-        ArrayList<String> userList = new ArrayList<>();
-
-        //iterate through each user, ignoring their UID
-        for (Map.Entry<String, Object> entry : users.entrySet())
-        {
-
-            //Get user map
-            Map singleUser = (Map) entry.getValue();
-            //Get phone field and append to list
-            userList.add((String) singleUser.get("User"));
-        }
-
-        System.out.println(userList.toString());
-        return userList;
-    }
-
 }

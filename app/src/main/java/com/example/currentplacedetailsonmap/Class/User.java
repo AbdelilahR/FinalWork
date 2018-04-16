@@ -31,6 +31,8 @@ public class User
     @Override
     public String toString()
     {
+        return email + " ";
+        /*
         return "User{" +
                 "userId='" + userId + '\'' +
                 ", achternaam='" + achternaam + '\'' +
@@ -39,6 +41,6 @@ public class User
                 ", email='" + email + '\'' +
                 ", wachtwoord='" + wachtwoord + '\'' +
                 ", adress=" + adress +
-                '}';
+                '}';*/
     }
 }
