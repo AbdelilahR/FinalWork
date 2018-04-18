@@ -1,20 +1,20 @@
 package com.example.currentplacedetailsonmap;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.currentplacedetailsonmap.Class.User;
+import com.example.currentplacedetailsonmap.Class.UserAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,9 +23,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -37,10 +34,11 @@ import java.util.Map;
  * <p>
  * https://github.com/AleBarreto/FirebaseAndroidChat
  */
-public class UserFragment extends ListFragment {
+public class UserFragment extends Fragment {
     //Test this --> https://stackoverflow.com/questions/32886546/how-to-get-all-child-list-from-firebase-android
     private FirebaseAuth mAuth;
     private String lastId;
+    private UserAdapter userAdapter = null;
     private ArrayAdapter<User> adapter = null;
     private int preLast;
     public ListView userListView = null;
@@ -62,9 +60,8 @@ public class UserFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        userListView = getListView();
+        userListView = (ListView) view.findViewById(R.id.userList);
         /* https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
-        //ArrayList<User> userArrayList = new ArrayList<>();
 
     }
 
@@ -78,48 +75,34 @@ public class UserFragment extends ListFragment {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-
-                //Map<String,Object> td = (((HashMap<String, Object>) dataSnapshot.getValue()));
-
-                //userList = getAllUsers((Map<String, Object>) dataSnapshot.getValue());
                 for (DataSnapshot dsp : dataSnapshot.getChildren()) {
-                    //dsp.getChildrenCount();
+
                     myUser = dsp.getValue(User.class);
                     lastId = dsp.getKey();
-                 //   if (dsp.getKey() != lastId)
-                        userList.add(myUser);
-                }
-              /*  adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
 
-                userListView.setAdapter(adapter);/*
+                    userList.add(myUser);
+                }
                 /*https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa*/
                 userListView.setOnScrollListener(new AbsListView.OnScrollListener() {
                     private int currentVisibleItemCount;
                     private int currentScrollState;
                     private int currentFirstVisibleItem;
                     private int totalItem;
-                    private int lastItem;
 
 
                     @Override
                     public void onScrollStateChanged(AbsListView view, int scrollState) {
                         this.currentScrollState = scrollState;
                         //https://stackoverflow.com/questions/23708271/count-total-number-of-list-items-in-a-listview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                        //this.currentFirstVisibleItem = userListView.getAdapter().getCount();
-                        this.currentFirstVisibleItem = getListView().getFirstVisiblePosition();
+                        this.currentFirstVisibleItem = view.getFirstVisiblePosition();
                         this.isScrollCompleted();
                     }
 
                     @Override
                     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                        //view = getListView();
                         this.currentFirstVisibleItem = firstVisibleItem;
                         this.currentVisibleItemCount = visibleItemCount;
                         this.totalItem = totalItemCount;
-                        //https://stackoverflow.com/questions/5123675/find-out-if-listview-is-scrolled-to-the-bottom
-                        lastItem = firstVisibleItem + visibleItemCount;
-                        visibleItemCount = view.getLastVisiblePosition();
 
                     }
 
@@ -134,18 +117,12 @@ public class UserFragment extends ListFragment {
                                     for (DataSnapshot dsp : dataSnapshot.getChildren()) {
                                         myUser = dsp.getValue(User.class);
                                         lastId = dsp.getKey();
-                                        //if ( )
-                                            userList.add(myUser);
-
+                                        userList.add(myUser);
                                     }
 
-                                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
-
-                                    userListView.setAdapter(adapter);
-                                    // currentFirstVisibleItem = userList.;
-/*                                    adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
-                                    userListView.setAdapter(adapter);
-*/
+                                    //adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+                                    userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
+                                    userListView.setAdapter(userAdapter);
                                 }
 
                                 @Override
@@ -157,18 +134,23 @@ public class UserFragment extends ListFragment {
                         }
                     }
                 });
-                adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+                //adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+                userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
+                userListView.setAdapter(userAdapter);
 
-                userListView.setAdapter(adapter);
-
+                userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                       Intent  intent = new Intent(getActivity(),ChatActivity.class);
+                       startActivity(intent);
+                    }
+                });
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-
-
         });
 
     }
