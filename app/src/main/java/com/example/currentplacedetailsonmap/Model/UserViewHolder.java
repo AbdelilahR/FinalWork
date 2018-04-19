@@ -1,4 +1,4 @@
-package com.example.currentplacedetailsonmap.Class;
+package com.example.currentplacedetailsonmap.Model;
 
 import android.widget.ImageView;
 import android.widget.TextView;

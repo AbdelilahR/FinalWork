@@ -39,5 +39,7 @@
     <string name="lastname">Last name</string>
     <string name="firstname">First name</string>
     <string name="Adress">Adress</string>
+    <string name="bt_sent">Send</string>
+    <string name="text_item">Message</string>
 </resources>
 

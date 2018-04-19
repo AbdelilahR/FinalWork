@@ -1,4 +1,4 @@
-package com.example.currentplacedetailsonmap;
+package com.example.currentplacedetailsonmap.Fragment;
 
 
 import android.annotation.SuppressLint;
@@ -36,6 +36,9 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.currentplacedetailsonmap.MainActivity;
+import com.example.currentplacedetailsonmap.Model.DirectionsJSONParser;
+import com.example.currentplacedetailsonmap.R;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;

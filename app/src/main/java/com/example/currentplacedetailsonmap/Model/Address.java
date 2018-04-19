@@ -1,6 +1,8 @@
-package com.example.currentplacedetailsonmap.Class;
+package com.example.currentplacedetailsonmap.Model;
 
-public class Address
+import java.io.Serializable;
+
+public class Address implements Serializable
 {
     public double latitude;
     public double longitude;

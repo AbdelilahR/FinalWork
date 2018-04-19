@@ -1,9 +1,8 @@
-package com.example.currentplacedetailsonmap.Class;
+package com.example.currentplacedetailsonmap.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -13,10 +12,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.currentplacedetailsonmap.Model.User;
+import com.example.currentplacedetailsonmap.Model.UserViewHolder;
 import com.example.currentplacedetailsonmap.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Abdel-Portable on 18-04-18.

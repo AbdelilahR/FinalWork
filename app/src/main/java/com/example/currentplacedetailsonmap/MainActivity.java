@@ -1,7 +1,6 @@
 package com.example.currentplacedetailsonmap;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,7 +8,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.currentplacedetailsonmap.Fragment.HomeFragment;
+import com.example.currentplacedetailsonmap.Fragment.UserFragment;
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         // code used from this site:
         // https://segunfamisa.com/posts/bottom-navigation-view-android
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        final BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
 
         bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                     //Todo implement fragments
 
                     case R.id.navigation_home:
-                        transaction.replace(R.id.main_content, homeFragment);
+                       transaction.replace(R.id.main_content, homeFragment);
                         transaction.commit();
 
                          /*
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.navigation_notifications:
                         transaction.replace(R.id.main_content, userFragment, userFragment.getTag());
+
                         transaction.commit();
                         break;
                 }

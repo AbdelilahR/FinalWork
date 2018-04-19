@@ -1,8 +1,8 @@
-package com.example.currentplacedetailsonmap.Class;
+package com.example.currentplacedetailsonmap.Model;
 
-import com.google.android.gms.maps.model.LatLng;
+import java.io.Serializable;
 
-public class User
+public class User implements Serializable
 {
 
     public String userId;
