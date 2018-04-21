@@ -116,7 +116,7 @@
                 android:hint="@string/Adress"
                 android:paddingTop="5dip"
                 android:imeOptions="actionUnspecified"
-                android:inputType="textPassword"
+                android:inputType="none"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textSize="18sp" />

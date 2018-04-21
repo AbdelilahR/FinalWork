@@ -10,6 +10,7 @@ import android.view.MenuItem;
 
 import com.example.currentplacedetailsonmap.Fragment.HomeFragment;
 import com.example.currentplacedetailsonmap.Fragment.UserFragment;
+import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * An activity that displays a map showing the place at the device's current location.
@@ -73,6 +74,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //TODO Remove this line when the tests are done
-        //FirebaseAuth.getInstance().signOut();
+        FirebaseAuth.getInstance().signOut();
     }
 }

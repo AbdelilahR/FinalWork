@@ -52,7 +52,7 @@
         <!-- The API key for Google Maps-based APIs. -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="AIzaSyDeJmkrr2r98LTKBUuu_MzvsTt0HxCTMxs" />
 
         <activity
             android:name=".Activity.LoginActivity"

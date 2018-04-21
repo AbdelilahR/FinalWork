@@ -62,19 +62,19 @@ public class ChatActivity extends Activity {
          * Firebase - Inicialize
          */
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        mFirebaseRef = database.getReference().child("user").child(selectedUser.getUserId());
+        mFirebaseRef = database.getReference().child("User").child(selectedUser.getUserId()).child("chat");
 
 
         mbtSent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String message = metText.getText().toString();
-
+                String chatId = mFirebaseRef.push().getKey();
                 if (!message.isEmpty()) {
                     /**
                      * Firebase - Send message
                      */
-                    mFirebaseRef.setValue(new Chat(message, selectedUser.getEmail()));
+                    mFirebaseRef.setValue(new Chat(message,chatId));
                 }
 
                 metText.setText("");
