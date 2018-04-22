@@ -104,32 +104,8 @@ public class ChatActivity extends AppCompatActivity
                 input.setText("");
             }
         });
-        displayChats();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SIGN_IN_REQUEST_CODE)
-        {
-            if (resultCode == RESULT_OK)
-            {
-                Toast.makeText(this,
-                        "Successfully signed in. Welcome!",
-                        Toast.LENGTH_LONG)
-                        .show();
-
-                displayChats();
-            } else
-            {
-                Toast.makeText(this,
-                        "We couldn't sign you in. Please try again later.",
-                        Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-        }
+        displayChatSender();
+        displayChatsReceiver();
     }
 
     /*
@@ -161,14 +137,13 @@ public class ChatActivity extends AppCompatActivity
     }
 */
 
-    private void displayChats()
+    private void displayChatSender()
     {
         ListView listOfMessages = (ListView) findViewById(R.id.list_of_messages);
         //mDatabase = FirebaseDatabase.getInstance().getReference("User").child(selectedUser.getUserId()).child("Chat");
         adapter = new FirebaseListAdapter<Chat>(this, Chat.class, R.layout.message,
-                mDatabase)
-
-                //FirebaseDatabase.getInstance().getReference("User").child(currentUserID).child("Chat"))
+                //mDatabase)
+                FirebaseDatabase.getInstance().getReference("User").child(currentUserID).child("Chat"))
                 //FirebaseDatabase.getInstance().getReference("User").child(selectedUser.getUserId()).child("Chat"))
         {
             @Override
@@ -189,4 +164,33 @@ public class ChatActivity extends AppCompatActivity
 
         listOfMessages.setAdapter(adapter);
     }
+    private void displayChatsReceiver()
+    {
+        ListView listOfMessages = (ListView) findViewById(R.id.list_of_messages);
+        //mDatabase = FirebaseDatabase.getInstance().getReference("User").child(selectedUser.getUserId()).child("Chat");
+        adapter = new FirebaseListAdapter<Chat>(this, Chat.class, R.layout.message,
+                //mDatabase)
+                FirebaseDatabase.getInstance().getReference("User").child(selectedUser.getUserId()).child("Chat"))
+                //FirebaseDatabase.getInstance().getReference("User").child(selectedUser.getUserId()).child("Chat"))
+        {
+            @Override
+            protected void populateView(View v, Chat model, int position)
+            {
+                // Get references to the views of message.xml
+                TextView messageText = (TextView) v.findViewById(R.id.message_text);
+                TextView messageUser = (TextView) v.findViewById(R.id.message_user);
+                TextView messageTime = (TextView) v.findViewById(R.id.message_time);
+
+                // Set their text
+                messageText.setText(model.getMessageText());
+                messageUser.setText(model.getMessageUser());
+                messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)",
+                        model.getMessageTime()));
+            }
+        };
+
+        listOfMessages.setAdapter(adapter);
+    }
+
+
 }
