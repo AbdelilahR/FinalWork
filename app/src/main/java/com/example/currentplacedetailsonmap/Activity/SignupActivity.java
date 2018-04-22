@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -125,7 +126,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                 final String myGender = String.valueOf(inputGeslacht.getSelectedItem());
                 final String email = inputEmail.getText().toString().trim();
                 final String password = inputPassword.getText().toString().trim();
-                final Address address = new Address(inputAdress.latitude,inputAdress.longitude);
+                final Address address = new Address(inputAdress.latitude, inputAdress.longitude);
 
                 if (TextUtils.isEmpty(email))
                 {
@@ -164,11 +165,12 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                                             Toast.LENGTH_SHORT).show();
                                 } else
                                 {
-                                    mDatabaseReference = database.getReference("User");
-                                    userId = mDatabaseReference.push().getKey();
+                                    FirebaseUser current_user = FirebaseAuth.getInstance().getCurrentUser();
+                                    userId = current_user.getUid();
+                                    mDatabaseReference = database.getReference("User").child(userId);
 
-                                    User user = new User(userId,lastName, firstName, myGender, email, password, address);
-                                    mDatabaseReference.child(userId).setValue(user);
+                                    User user = new User(userId, lastName, firstName, myGender, email, password, address);
+                                    mDatabaseReference.setValue(user);
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                     finish();
                                 }

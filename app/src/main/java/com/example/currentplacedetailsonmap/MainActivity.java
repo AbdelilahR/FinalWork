@@ -74,6 +74,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //TODO Remove this line when the tests are done
-        FirebaseAuth.getInstance().signOut();
+      //FirebaseAuth.getInstance().signOut();
     }
 }

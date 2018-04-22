@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -36,7 +37,7 @@ import java.util.ArrayList;
  * <p>
  * https://github.com/AleBarreto/FirebaseAndroidChat
  */
-public class UserFragment extends Fragment {
+public class UserFragment extends Fragment implements Serializable{
     //Test this --> https://stackoverflow.com/questions/32886546/how-to-get-all-child-list-from-firebase-android
     private FirebaseAuth mAuth;
     private String lastId;
@@ -148,6 +149,7 @@ public class UserFragment extends Fragment {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                            mAuth = FirebaseAuth.getInstance();
                             Intent intent = new Intent(getActivity(), ChatActivity.class);
                             User selectedUser = (User) parent.getAdapter().getItem(position);
                             intent.putExtra("selectedUser", selectedUser);
