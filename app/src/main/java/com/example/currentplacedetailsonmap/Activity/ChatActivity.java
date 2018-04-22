@@ -54,7 +54,7 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * https://github.com/akshayejh/Lapit---Android-Firebase-Chat-App
+ * source -> https://github.com/akshayejh/Lapit---Android-Firebase-Chat-App
  */
 public class ChatActivity extends AppCompatActivity
 {
