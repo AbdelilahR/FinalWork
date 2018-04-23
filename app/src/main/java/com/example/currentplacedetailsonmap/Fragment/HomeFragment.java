@@ -92,7 +92,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private FusedLocationProviderClient mFusedLocationProviderClient2;
 
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted. test
@@ -138,6 +137,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
     public HomeFragment() {
         // Required empty public constructor
+    getDeviceLocation();
     }
 
     @Override
