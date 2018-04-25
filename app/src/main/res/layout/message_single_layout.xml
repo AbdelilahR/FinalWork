@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:padding="10dp"
     android:weightSum="10">
-
+<!--
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/message_profile_layout"
         android:layout_width="36dp"
@@ -61,6 +61,6 @@
         android:layout_toEndOf="@+id/message_profile_layout"
         android:padding="0dp"
         android:scaleType="centerCrop" />
-
+-->
 
 </RelativeLayout>

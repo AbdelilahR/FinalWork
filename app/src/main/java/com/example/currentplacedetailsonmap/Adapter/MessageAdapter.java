@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Message;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,9 +59,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.message_single_layout, parent, false);
+        //int layout = R.layout.list_item_chat_end;
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_end, parent, false);
 
         return new MessageViewHolder(v);
 
@@ -124,7 +124,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
      */
     private String getDate(String timeStampStr) {
         try {
-            DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+            DateFormat sdf = new SimpleDateFormat("HH:mm");
             Date netDate = (new Date(Long.parseLong(timeStampStr)));
             return sdf.format(netDate);
         } catch (Exception ignored) {
@@ -150,7 +150,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageText = (TextView) view.findViewById(R.id.message_text_layout);
             profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
             displayName = (TextView) view.findViewById(R.id.name_text_layout);
-            messageImage = (ImageView) view.findViewById(R.id.message_image_layout);
+            messageImage = (ImageView) view.findViewById(R.id.message_profile_layout);
             displayTime = (TextView) view.findViewById(R.id.time_text_layout);
 
 

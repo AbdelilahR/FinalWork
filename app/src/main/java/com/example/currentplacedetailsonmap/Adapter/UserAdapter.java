@@ -26,6 +26,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static android.content.Context.LOCATION_SERVICE;
 
 /**
@@ -57,7 +59,7 @@ public class UserAdapter extends ArrayAdapter<User> {
             userVH = new UserViewHolder();
             userVH.pseudo = (TextView) convertView.findViewById(R.id.pseudo);
             userVH.text = (TextView) convertView.findViewById(R.id.text);
-            userVH.avatar = (ImageView) convertView.findViewById(R.id.avatar);
+            userVH.avatar = (CircleImageView) convertView.findViewById(R.id.avatar);
             convertView.setTag(userVH);
         }
         User user = getItem(position);

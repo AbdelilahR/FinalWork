@@ -304,7 +304,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             LinearLayout layout = new LinearLayout(getActivity());
-            builder.setTitle("Testing");
+            builder.setTitle("Chose your end Goal");
 
 
             try {
