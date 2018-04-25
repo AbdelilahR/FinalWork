@@ -3,9 +3,13 @@ package com.example.currentplacedetailsonmap.Fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -35,6 +39,8 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +49,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 
 /**
@@ -65,11 +74,20 @@ public class UserFragment extends Fragment implements Serializable
     public ListView userListView = null;
     public ArrayList<User> userList = new ArrayList<>();
     public User myUser = new User();
+    public String loggedUser = "fail";
     public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
     private String mCurrentUserId;
+    Boolean One_km = false;
+    private LocationManager mLocationManager;
+    private float radius;
+    private float distance;
+    private Location userLocation = new Location("");
+    private Location currentLocation = new Location("");
+    private Menu optionMenu;
 
     public UserFragment()
     {
+        // this.radius = Float.MAX_VALUE;
         // Required empty public constructor
     }
 
@@ -79,6 +97,8 @@ public class UserFragment extends Fragment implements Serializable
                              Bundle savedInstanceState)
     {
         View rootView = inflater.inflate(R.layout.fragment_user, container, false);
+
+
         return rootView;
     }
 
@@ -87,6 +107,7 @@ public class UserFragment extends Fragment implements Serializable
     {
         super.onViewCreated(view, savedInstanceState);
         userListView = (ListView) view.findViewById(R.id.userList);
+
         /* https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
 
     }
@@ -97,20 +118,141 @@ public class UserFragment extends Fragment implements Serializable
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserId = mAuth.getCurrentUser().getUid();
+        currentLocation = getLastKnownLocation();
+        //public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
+
         /*https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
+        loadUserList();
+
+        if (getActivity() != null)
+            userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
+
+        if (userListView != null)
+        {
+            userListView.setAdapter(userAdapter);
+
+            userListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+            {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                {
+                    //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                    mAuth = FirebaseAuth.getInstance();
+                    Intent intent = new Intent(getActivity(), ChatActivity.class);
+                    User selectedUser = (User) parent.getAdapter().getItem(position);
+                    intent.putExtra("selectedUser", selectedUser);
+                    startActivity(intent);
+
+                }
+            });
+        }
+        setHasOptionsMenu(true);
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        //https://stackoverflow.com/questions/30847096/android-getmenuinflater-in-a-fragment-subclass-cannot-resolve-method
+        //https://stackoverflow.com/questions/15653737/oncreateoptionsmenu-inside-fragments
+        inflater.inflate(R.menu.settings, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        //return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+
+
+        if (item.getItemId() == R.id.profile_picture)
+        {
+            Toast.makeText(getContext(), "what?", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (item.getItemId() == R.id.distance_any)
+        {
+            userListView.setAdapter(null);
+            setRadius(Float.MAX_VALUE);
+            loadUserList();
+            return super.onOptionsItemSelected(item);
+        } else if (item.getItemId() == R.id.distance_1km)
+
+        {
+            userListView.setAdapter(null);
+            setRadius(1000);
+            loadUserList();
+            item.setChecked(true);
+
+            return super.onOptionsItemSelected(item);
+        } else if (item.getItemId() == R.id.distance_10km)
+        {
+            setRadius(10000);
+            loadUserList();
+
+            return super.onOptionsItemSelected(item);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private Location getLastKnownLocation()
+    {
+        mLocationManager = (LocationManager) getContext().getApplicationContext().getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers)
+        {
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null)
+            {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
+            {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
+    }
+
+    public float getRadius()
+    {
+        return radius;
+    }
+
+    public void setRadius(float radius)
+    {
+        this.radius = radius;
+    }
+
+    public void loadUserList()
+    {
         ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
         {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+                String achternaam = dataSnapshot.child(mCurrentUserId).child("achternaam").getValue().toString();
+                String voornaam = dataSnapshot.child(mCurrentUserId).child("voornaam").getValue().toString();
+                loggedUser = voornaam + " " + achternaam;
+                getActivity().setTitle(loggedUser);
+
                 for (DataSnapshot dsp : dataSnapshot.getChildren())
                 {
 
                     myUser = dsp.getValue(User.class);
                     lastId = dsp.getKey();
                     if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
-                        userList.add(myUser);
+                    {
+                        userLocation.setLatitude(myUser.getAdress().getLatitude());
+                        userLocation.setLongitude(myUser.getAdress().getLongitude());
+                        distance = currentLocation.distanceTo(userLocation);
+
+                        if (distance <= getRadius())
+                            userList.add(myUser);
+                    }
                 }
                 /*https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa*/
                 if (userListView != null)
@@ -158,7 +300,12 @@ public class UserFragment extends Fragment implements Serializable
                                             myUser = dsp.getValue(User.class);
                                             lastId = dsp.getKey();
                                             if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
-                                                userList.add(myUser);
+                                            {
+                                                distance = currentLocation.distanceTo(userLocation);
+                                                if (distance <= getRadius())
+                                                    userList.add(myUser);
+
+                                            }
                                         }
 
                                         userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
@@ -176,28 +323,7 @@ public class UserFragment extends Fragment implements Serializable
                         }
                     });
 
-                if (getActivity() != null)
-                    userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
 
-                if (userListView != null)
-                {
-                    userListView.setAdapter(userAdapter);
-
-                    userListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-                    {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                        {
-                            //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                            mAuth = FirebaseAuth.getInstance();
-                            Intent intent = new Intent(getActivity(), ChatActivity.class);
-                            User selectedUser = (User) parent.getAdapter().getItem(position);
-                            intent.putExtra("selectedUser", selectedUser);
-                            startActivity(intent);
-
-                        }
-                    });
-                }
             }
 
             @Override
@@ -206,31 +332,5 @@ public class UserFragment extends Fragment implements Serializable
 
             }
         });
-
-        setHasOptionsMenu(true);
-
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        //https://stackoverflow.com/questions/30847096/android-getmenuinflater-in-a-fragment-subclass-cannot-resolve-method
-        //https://stackoverflow.com/questions/15653737/oncreateoptionsmenu-inside-fragments
-        inflater.inflate(R.menu.settings, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-        //return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-
-
-        if (item.getItemId() == R.id.profile_picture)
-        {
-            Toast.makeText(getContext(), "what?", Toast.LENGTH_SHORT).show();
-        }
-
-        return true;
     }
 }

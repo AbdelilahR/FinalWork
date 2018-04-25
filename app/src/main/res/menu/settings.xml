@@ -4,4 +4,15 @@
         android:id="@+id/profile_picture"
         android:title="Profile Picture"
         />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/distance_any"
+            android:title="Any distance"></item>
+        <item
+            android:id="@+id/distance_1km"
+            android:title="1 kilometer"></item>
+        <item
+            android:id="@+id/distance_10km"
+            android:title="10 kilometer"></item>
+    </group>
 </menu>

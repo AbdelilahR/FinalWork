@@ -108,7 +108,7 @@ public class ChatActivity extends AppCompatActivity
         mCurrentUserId = mAuth.getCurrentUser().getUid();
         User selectedUser = (User) getIntent().getExtras().getSerializable("selectedUser");
         mChatUser = selectedUser.getUserId();
-        String userName = getIntent().getStringExtra("user_name");
+        String userName = selectedUser.getVoornaam() + " " + selectedUser.getAchternaam();
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
@@ -165,7 +165,7 @@ public class ChatActivity extends AppCompatActivity
 
                     long lastTime = Long.parseLong(online);
 
-                    String lastSeenTime = getTimeAgo.getTimeAgo(lastTime, getApplicationContext());
+                    String lastSeenTime = GetTimeAgo.getTimeAgo(lastTime, getApplicationContext());
 
                     mLastSeenView.setText(lastSeenTime);
 
