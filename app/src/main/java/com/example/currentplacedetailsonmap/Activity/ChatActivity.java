@@ -125,7 +125,7 @@ public class ChatActivity extends AppCompatActivity
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
 
-        mAdapter = new MessageAdapter(messagesList);
+        mAdapter = new MessageAdapter(messagesList,mChatUser,mCurrentUserId);
 
         mMessagesList = (RecyclerView) findViewById(R.id.messages_list);
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.message_swipe_layout);
@@ -139,21 +139,21 @@ public class ChatActivity extends AppCompatActivity
         //------- IMAGE STORAGE ---------
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
-        //mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
+        mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
 
         loadMessages();
 
 
         mTitleView.setText(userName);
 
-        mRootRef.child("Users").child(mChatUser).addValueEventListener(new ValueEventListener()
+        mRootRef.child("User").child(mChatUser).addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-/*
+
                 String online = dataSnapshot.child("online").getValue().toString();
-                String image = dataSnapshot.child("image").getValue().toString();
+                //String image = dataSnapshot.child("image").getValue().toString();
 
                 if(online.equals("true")) {
 
@@ -170,7 +170,7 @@ public class ChatActivity extends AppCompatActivity
                     mLastSeenView.setText(lastSeenTime);
 
                 }
-*/
+
             }
 
             @Override

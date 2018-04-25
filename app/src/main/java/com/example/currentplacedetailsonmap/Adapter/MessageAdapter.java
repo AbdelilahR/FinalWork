@@ -23,6 +23,9 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -32,25 +35,29 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * https://github.com/akshayejh/Lapit---Android-Firebase-Chat-App
  */
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>
-{
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
 
     public FirebaseAuth mAuth = FirebaseAuth.getInstance();
     public String currentUserID = mAuth.getCurrentUser().getUid();
     private List<Messages> mMessageList;
     private DatabaseReference mUserDatabase;
+    private SimpleDateFormat dateFormat;
+    private String millisInString;
+    private String selectedUserId;
+    private String mCurrentUserId;
 
-    public MessageAdapter(List<Messages> mMessageList)
-    {
+    private DatabaseReference mRootRef;
+
+    public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId) {
 
         this.mMessageList = mMessageList;
-
+        this.selectedUserId = selectedUserId;
+        this.mCurrentUserId = mCurrentUserId;
     }
 
     @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-    {
+    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.message_single_layout, parent, false);
@@ -60,49 +67,46 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public void onBindViewHolder(final MessageViewHolder viewHolder, int i)
-    {
+    public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
 
         Messages c = mMessageList.get(i);
 
         String from_user = c.getFrom();
         String message_type = c.getType();
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        millisInString = dateFormat.format(new Date());
 
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference("User").child(from_user);
-        //mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
-        mUserDatabase.addValueEventListener(new ValueEventListener()
-        {
+        mRootRef = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId).child(selectedUserId);
+        mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String firstName = dataSnapshot.child("voornaam").getValue().toString();
-
+                String lastName = dataSnapshot.child("achternaam").getValue().toString();
+                //String childKey = dataSnapshot.getChildren().iterator().next().getKey();
                 // String image = dataSnapshot.child("thumb_image").getValue().toString();
 
-                viewHolder.displayName.setText(firstName);
+                viewHolder.displayName.setText(firstName + " " + lastName);
 
                 //Picasso.with(viewHolder.profileImage.getContext()).load(image).placeholder(R.drawable.default_avatar).into(viewHolder.profileImage);
-
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-
-        if (message_type.equals("text"))
-        {
-
+        if (message_type.equals("text")) {
+//
             viewHolder.messageText.setText(c.getMessage());
+            viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
+
             viewHolder.messageImage.setVisibility(View.INVISIBLE);
 
 
-        } else
-        {
+        } else {
 
             viewHolder.messageText.setVisibility(View.INVISIBLE);
             Picasso.with(viewHolder.profileImage.getContext()).load(c.getMessage())
@@ -112,30 +116,47 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     }
 
+    /**
+     * source: https://stackoverflow.com/questions/13241251/timestamp-to-string-date?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+     *
+     * @param timeStampStr
+     * @return
+     */
+    private String getDate(String timeStampStr) {
+        try {
+            DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+            Date netDate = (new Date(Long.parseLong(timeStampStr)));
+            return sdf.format(netDate);
+        } catch (Exception ignored) {
+            return "xx";
+        }
+    }
+
     @Override
-    public int getItemCount()
-    {
+    public int getItemCount() {
         return mMessageList.size();
     }
 
-    public class MessageViewHolder extends RecyclerView.ViewHolder
-    {
+    public class MessageViewHolder extends RecyclerView.ViewHolder {
 
         public TextView messageText;
         public CircleImageView profileImage;
         public TextView displayName;
+        public TextView displayTime;
         public ImageView messageImage;
 
-        public MessageViewHolder(View view)
-        {
+        public MessageViewHolder(View view) {
             super(view);
-
             messageText = (TextView) view.findViewById(R.id.message_text_layout);
             profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
             displayName = (TextView) view.findViewById(R.id.name_text_layout);
             messageImage = (ImageView) view.findViewById(R.id.message_image_layout);
+            displayTime = (TextView) view.findViewById(R.id.time_text_layout);
+
 
         }
+
+
     }
 
 
