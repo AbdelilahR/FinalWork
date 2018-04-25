@@ -66,6 +66,7 @@ public class UserFragment extends Fragment implements Serializable
     public ArrayList<User> userList = new ArrayList<>();
     public User myUser = new User();
     public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
+    private String mCurrentUserId;
 
     public UserFragment()
     {
@@ -94,8 +95,8 @@ public class UserFragment extends Fragment implements Serializable
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-
+        mAuth = FirebaseAuth.getInstance();
+        mCurrentUserId = mAuth.getCurrentUser().getUid();
         /*https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
         ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
         {
@@ -108,8 +109,8 @@ public class UserFragment extends Fragment implements Serializable
 
                     myUser = dsp.getValue(User.class);
                     lastId = dsp.getKey();
-
-                    userList.add(myUser);
+                    if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
+                        userList.add(myUser);
                 }
                 /*https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa*/
                 if (userListView != null)
@@ -156,10 +157,10 @@ public class UserFragment extends Fragment implements Serializable
                                         {
                                             myUser = dsp.getValue(User.class);
                                             lastId = dsp.getKey();
-                                            userList.add(myUser);
+                                            if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
+                                                userList.add(myUser);
                                         }
 
-                                        //adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
                                         userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
                                         userListView.setAdapter(userAdapter);
                                     }
@@ -174,9 +175,10 @@ public class UserFragment extends Fragment implements Serializable
                             }
                         }
                     });
-                //adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, userList);
+
                 if (getActivity() != null)
                     userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
+
                 if (userListView != null)
                 {
                     userListView.setAdapter(userAdapter);
