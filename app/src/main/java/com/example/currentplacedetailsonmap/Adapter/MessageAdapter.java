@@ -1,10 +1,8 @@
 package com.example.currentplacedetailsonmap.Adapter;
 
-import android.content.Context;
-import android.graphics.Color;
+import android.app.Notification;
 import android.os.Message;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +19,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import com.squareup.picasso.OkHttpDownloader;
-import com.squareup.picasso.Picasso;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,9 +31,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * https://github.com/akshayejh/Lapit---Android-Firebase-Chat-App
  */
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
-
-
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>
+{
+    private static final int VIEW_TYPE_MESSAGE_SENT = 1;
+    private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
     public FirebaseAuth mAuth = FirebaseAuth.getInstance();
     public String currentUserID = mAuth.getCurrentUser().getUid();
     private List<Messages> mMessageList;
@@ -50,7 +46,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     private DatabaseReference mRootRef;
 
-    public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId) {
+    public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId)
+    {
 
         this.mMessageList = mMessageList;
         this.selectedUserId = selectedUserId;
@@ -58,16 +55,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //int layout = R.layout.list_item_chat_end;
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_end, parent, false);
-
+    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
+        View v;
+        if (viewType == VIEW_TYPE_MESSAGE_SENT)
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_send, parent, false);
+        else
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_receive, parent, false);
         return new MessageViewHolder(v);
 
     }
 
     @Override
-    public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
+    public void onBindViewHolder(final MessageViewHolder viewHolder, int i)
+    {
 
         Messages c = mMessageList.get(i);
 
@@ -79,9 +80,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference("User").child(from_user);
         mRootRef = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId).child(selectedUserId);
-        mUserDatabase.addValueEventListener(new ValueEventListener() {
+        mUserDatabase.addValueEventListener(new ValueEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
 
                 String firstName = dataSnapshot.child("voornaam").getValue().toString();
                 String lastName = dataSnapshot.child("achternaam").getValue().toString();
@@ -94,19 +97,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
 
             }
         });
-        if (message_type.equals("text")) {
-//
+        if (message_type.equals("text"))
+        {
             viewHolder.messageText.setText(c.getMessage());
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
+            //viewHolder.messageImage.setVisibility(View.INVISIBLE);
 
-            viewHolder.messageImage.setVisibility(View.INVISIBLE);
 
-
-        } else {
+        } else
+        {
 
             viewHolder.messageText.setVisibility(View.INVISIBLE);
             Picasso.with(viewHolder.profileImage.getContext()).load(c.getMessage())
@@ -116,28 +120,44 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     }
 
+    @Override
+    public int getItemViewType(int position)
+    {
+        Messages message = mMessageList.get(position);
+        if (message.getFrom() == mCurrentUserId)
+            return VIEW_TYPE_MESSAGE_SENT;
+        else
+            return VIEW_TYPE_MESSAGE_RECEIVED;
+
+    }
+
     /**
      * source: https://stackoverflow.com/questions/13241251/timestamp-to-string-date?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
      *
      * @param timeStampStr
      * @return
      */
-    private String getDate(String timeStampStr) {
-        try {
+    private String getDate(String timeStampStr)
+    {
+        try
+        {
             DateFormat sdf = new SimpleDateFormat("HH:mm");
             Date netDate = (new Date(Long.parseLong(timeStampStr)));
             return sdf.format(netDate);
-        } catch (Exception ignored) {
+        } catch (Exception ignored)
+        {
             return "xx";
         }
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return mMessageList.size();
     }
 
-    public class MessageViewHolder extends RecyclerView.ViewHolder {
+    public class MessageViewHolder extends RecyclerView.ViewHolder
+    {
 
         public TextView messageText;
         public CircleImageView profileImage;
@@ -145,12 +165,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public TextView displayTime;
         public ImageView messageImage;
 
-        public MessageViewHolder(View view) {
+        public MessageViewHolder(View view)
+        {
             super(view);
             messageText = (TextView) view.findViewById(R.id.message_text_layout);
-            profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
+            //profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
             displayName = (TextView) view.findViewById(R.id.name_text_layout);
-            messageImage = (ImageView) view.findViewById(R.id.message_profile_layout);
+            //messageImage = (ImageView) view.findViewById(R.id.message_profile_layout);
             displayTime = (TextView) view.findViewById(R.id.time_text_layout);
 
 
