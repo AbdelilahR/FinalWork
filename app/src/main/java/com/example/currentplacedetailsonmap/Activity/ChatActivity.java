@@ -56,8 +56,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * source -> https://github.com/akshayejh/Lapit---Android-Firebase-Chat-App
  */
-public class ChatActivity extends AppCompatActivity
-{
+public class ChatActivity extends AppCompatActivity {
 
     private static final int TOTAL_ITEMS_TO_LOAD = 10;
     private static final int GALLERY_PICK = 1;
@@ -90,8 +89,7 @@ public class ChatActivity extends AppCompatActivity
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
@@ -125,7 +123,7 @@ public class ChatActivity extends AppCompatActivity
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
 
-        mAdapter = new MessageAdapter(messagesList,mChatUser,mCurrentUserId);
+        mAdapter = new MessageAdapter(messagesList, mChatUser, mCurrentUserId);
 
         mMessagesList = (RecyclerView) findViewById(R.id.messages_list);
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.message_swipe_layout);
@@ -134,6 +132,9 @@ public class ChatActivity extends AppCompatActivity
         mMessagesList.setHasFixedSize(true);
         mMessagesList.setLayoutManager(mLinearLayout);
 
+
+        mAdapter.setViewType(1);
+        mAdapter.notifyDataSetChanged();
         mMessagesList.setAdapter(mAdapter);
 
         //------- IMAGE STORAGE ---------
@@ -141,21 +142,19 @@ public class ChatActivity extends AppCompatActivity
 
         mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
 
+        mAdapter.notifyDataSetChanged();
         loadMessages();
-
 
         mTitleView.setText(userName);
 
-        mRootRef.child("User").child(mChatUser).addValueEventListener(new ValueEventListener()
-        {
+        mRootRef.child("User").child(mChatUser).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String online = dataSnapshot.child("online").getValue().toString();
                 //String image = dataSnapshot.child("image").getValue().toString();
 
-                if(online.equals("true")) {
+                if (online.equals("true")) {
 
                     mLastSeenView.setText("Online");
 
@@ -174,21 +173,17 @@ public class ChatActivity extends AppCompatActivity
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
 
 
-        mRootRef.child("Chat").child(mCurrentUserId).addValueEventListener(new ValueEventListener()
-        {
+        mRootRef.child("Chat").child(mCurrentUserId).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                if (!dataSnapshot.hasChild(mChatUser))
-                {
+                if (!dataSnapshot.hasChild(mChatUser)) {
 
                     Map chatAddMap = new HashMap();
                     chatAddMap.put("seen", false);
@@ -198,14 +193,11 @@ public class ChatActivity extends AppCompatActivity
                     chatUserMap.put("Chat/" + mCurrentUserId + "/" + mChatUser, chatAddMap);
                     chatUserMap.put("Chat/" + mChatUser + "/" + mCurrentUserId, chatAddMap);
 
-                    mRootRef.updateChildren(chatUserMap, new DatabaseReference.CompletionListener()
-                    {
+                    mRootRef.updateChildren(chatUserMap, new DatabaseReference.CompletionListener() {
                         @Override
-                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
-                        {
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
 
-                            if (databaseError != null)
-                            {
+                            if (databaseError != null) {
 
                                 Log.d("CHAT_LOG", databaseError.getMessage().toString());
 
@@ -219,18 +211,15 @@ public class ChatActivity extends AppCompatActivity
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
 
 
-        mChatSendBtn.setOnClickListener(new View.OnClickListener()
-        {
+        mChatSendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
 
                 sendMessage();
 
@@ -238,11 +227,9 @@ public class ChatActivity extends AppCompatActivity
         });
 
 
-        mChatAddBtn.setOnClickListener(new View.OnClickListener()
-        {
+        mChatAddBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
 
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
@@ -254,18 +241,17 @@ public class ChatActivity extends AppCompatActivity
         });
 
 
-        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
-        {
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onRefresh()
-            {
+            public void onRefresh() {
 
                 mCurrentPage++;
 
                 itemPos = 0;
 
-                loadMoreMessages();
 
+                mAdapter.notifyDataSetChanged();
+                loadMoreMessages();
 
             }
         });
@@ -275,12 +261,10 @@ public class ChatActivity extends AppCompatActivity
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GALLERY_PICK && resultCode == RESULT_OK)
-        {
+        if (requestCode == GALLERY_PICK && resultCode == RESULT_OK) {
 
             Uri imageUri = data.getData();
 
@@ -295,14 +279,11 @@ public class ChatActivity extends AppCompatActivity
 
             StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
 
-            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>()
-            {
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task)
-                {
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
-                    if (task.isSuccessful())
-                    {
+                    if (task.isSuccessful()) {
 
                         String download_url = task.getResult().getDownloadUrl().toString();
 
@@ -320,14 +301,11 @@ public class ChatActivity extends AppCompatActivity
 
                         mChatMessageView.setText("");
 
-                        mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
-                        {
+                        mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                             @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
-                            {
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
 
-                                if (databaseError != null)
-                                {
+                                if (databaseError != null) {
 
                                     Log.d("CHAT_LOG", databaseError.getMessage().toString());
 
@@ -346,38 +324,32 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
-    private void loadMoreMessages()
-    {
+    private void loadMoreMessages() {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
 
         Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
 
-        messageQuery.addChildEventListener(new ChildEventListener()
-        {
+        messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
 
                 Messages message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
 
-                if (!mPrevKey.equals(messageKey))
-                {
+                if (!mPrevKey.equals(messageKey)) {
 
                     messagesList.add(itemPos++, message);
 
-                } else
-                {
+                } else {
 
                     mPrevKey = mLastKey;
 
                 }
 
 
-                if (itemPos == 1)
-                {
+                if (itemPos == 1) {
 
                     mLastKey = messageKey;
 
@@ -385,8 +357,16 @@ public class ChatActivity extends AppCompatActivity
 
 
                 Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
+                String push_value = dataSnapshot.getKey();
+                String from = dataSnapshot.child(push_value).child("from").getValue().toString();
+                if (from == mCurrentUserId) {
+                    mAdapter.setViewType(1);
+                    mAdapter.notifyDataSetChanged();
+                } else {
+                    mAdapter.setViewType(2);
 
-                mAdapter.notifyDataSetChanged();
+                    mAdapter.notifyDataSetChanged();
+                }
 
                 mRefreshLayout.setRefreshing(false);
 
@@ -395,52 +375,44 @@ public class ChatActivity extends AppCompatActivity
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
 
     }
 
-    private void loadMessages()
-    {
+    private void loadMessages() {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
 
         Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
 
 
-        messageQuery.addChildEventListener(new ChildEventListener()
-        {
+        messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
                 Messages message = dataSnapshot.getValue(Messages.class);
 
                 itemPos++;
 
-                if (itemPos == 1)
-                {
+                if (itemPos == 1) {
 
                     String messageKey = dataSnapshot.getKey();
 
@@ -450,7 +422,23 @@ public class ChatActivity extends AppCompatActivity
                 }
 
                 messagesList.add(message);
-                mAdapter.notifyDataSetChanged();
+
+                String push_value = dataSnapshot.getKey();
+
+                for (DataSnapshot childSnapshot : dataSnapshot.child(push_value).getChildren()) {
+                    Messages mMessage  = childSnapshot.getValue(Messages.class);
+                    if (mMessage.getFrom() == mCurrentUserId) {
+                        mAdapter.setViewType(1);
+                        mAdapter.notifyDataSetChanged();
+                    } else {
+                        mAdapter.setViewType(2);
+
+                        mAdapter.notifyDataSetChanged();
+                    }
+
+                }
+
+
 
                 mMessagesList.scrollToPosition(messagesList.size() - 1);
 
@@ -459,40 +447,34 @@ public class ChatActivity extends AppCompatActivity
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
 
     }
 
-    private void sendMessage()
-    {
+    private void sendMessage() {
 
 
         String message = mChatMessageView.getText().toString();
 
-        if (!TextUtils.isEmpty(message))
-        {
+        if (!TextUtils.isEmpty(message)) {
 
             String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
             String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
@@ -521,14 +503,11 @@ public class ChatActivity extends AppCompatActivity
             mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("seen").setValue(false);
             mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
-            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
-            {
+            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                 @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
-                {
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
 
-                    if (databaseError != null)
-                    {
+                    if (databaseError != null) {
 
                         Log.d("CHAT_LOG", databaseError.getMessage().toString());
 

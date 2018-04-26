@@ -43,7 +43,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private String millisInString;
     private String selectedUserId;
     private String mCurrentUserId;
-
+    private int viewType;
     private DatabaseReference mRootRef;
 
     public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId)
@@ -54,11 +54,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         this.mCurrentUserId = mCurrentUserId;
     }
 
+    public int getViewType() {
+        return viewType;
+    }
+
+    public void setViewType(int viewType) {
+        this.viewType = viewType;
+    }
+
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View v;
-        if (viewType == VIEW_TYPE_MESSAGE_SENT)
+        if (getViewType() == VIEW_TYPE_MESSAGE_SENT)
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_send, parent, false);
         else
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_receive, parent, false);
