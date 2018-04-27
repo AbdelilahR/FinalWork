@@ -24,7 +24,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!--     <uses-permission android:name="android.permission.LOCATION_HARDWARE" /> -->
+    <!-- <uses-permission android:name="android.permission.LOCATION_HARDWARE" /> -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -80,7 +80,7 @@
         </activity>
         <activity
             android:name=".Activity.ChatActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activity.AuthenticationActivity"
             android:label="@string/title_activity_profile"
@@ -93,7 +93,7 @@
             android:name=".Activity.ResetPasswordActivity"
             android:label="@string/title_activity_reset_password"
             android:theme="@style/AppTheme.NoActionBar" />
-
+        <activity android:name=".Activity.FullScreenActivity"></activity>
     </application>
 
 </manifest>

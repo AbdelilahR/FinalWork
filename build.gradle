@@ -8,22 +8,26 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.0'
 
-
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
         classpath 'com.google.gms:google-services:3.2.0'
+
+        classpath 'com.github.bumptech.glide:glide:4.7.1'
+        classpath 'com.github.bumptech.glide:compiler:4.7.1'
 
     }
 }
 
 allprojects {
     repositories {
-        maven {
-            url  "https://dl.bintray.com/android/android-tools"
-        }
+        maven {url "https://dl.bintray.com/android/android-tools"}
+        maven {url 'https://jitpack.io' }
         jcenter()
         google()
+        mavenCentral()
+        maven { url 'https://maven.google.com' }
     }
+
 }
 
 task clean(type: Delete) {
