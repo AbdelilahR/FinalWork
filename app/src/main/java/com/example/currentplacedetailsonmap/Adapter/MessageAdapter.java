@@ -59,7 +59,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
 
     private String my_url;
-    private Messages c;
+
     private int teller = 0;
 
     public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId)
@@ -95,7 +95,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     {
         boolean isImageFitToScreen;
 
-        c = mMessageList.get(i);
+        Messages c = mMessageList.get(i);
         String from_user = c.getFrom();
         String message_type = c.getType();
 
@@ -103,11 +103,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         millisInString = dateFormat.format(new Date());
         getItemViewType(i);
         mUserDatabase = FirebaseDatabase.getInstance().getReference("User").child(from_user);
+        viewHolder.displayName.setText("");
 
         if (message_type.equals("text"))
         {
-            viewHolder.displayName.setText("");
-            viewHolder.messageText.setText(c.getMessage());
+            if (!c.getMessage().equals(""))
+                viewHolder.messageText.setText(c.getMessage());
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
 
             viewHolder.messageImage.setVisibility(View.INVISIBLE);
@@ -115,13 +116,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             viewHolder.messageImage.setClickable(false);
         } else
         {
-            viewHolder.displayName.setVisibility(View.INVISIBLE);
+
             viewHolder.messageText.setVisibility(View.INVISIBLE);
             viewHolder.messageImage.setClickable(true);
-            setMy_url(c.getMessage());
+            viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
             Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 0).into(viewHolder.messageImage);
-
-            //Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).placeholder(R.drawable.default_avatar).into(viewHolder.messageImage);
 
 
             viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
@@ -132,7 +131,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 {
                     int position = viewHolder.getAdapterPosition();
                     new PhotoFullPopupWindow(view.getContext(), R.layout.popup_photo_full, viewHolder.messageImage, mMessageList.get(position).getMessage(), null);
-                    notifyDataSetChanged();
+
                 }
             });
         }

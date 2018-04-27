@@ -133,7 +133,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesList.setLayoutManager(mLinearLayout);
 
 
-        mAdapter.notifyDataSetChanged();
+
         mMessagesList.setAdapter(mAdapter);
 
         //------- IMAGE STORAGE ---------
@@ -141,7 +141,7 @@ public class ChatActivity extends AppCompatActivity {
 
         mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
 
-        mAdapter.notifyDataSetChanged();
+
         loadMessages();
 
         mTitleView.setText(selectedUser_userame);
@@ -249,7 +249,6 @@ public class ChatActivity extends AppCompatActivity {
                 itemPos = 0;
 
 
-                mAdapter.notifyDataSetChanged();
                 loadMoreMessages();
 
             }
@@ -356,7 +355,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
                 Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
-
+                mAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
 
                 mLinearLayout.scrollToPositionWithOffset(10, 0);
@@ -412,14 +411,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 messagesList.add(message);
 
-                String push_value = dataSnapshot.getKey();
-
-                for (DataSnapshot childSnapshot : dataSnapshot.child(push_value).getChildren()) {
-                    Messages mMessage  = childSnapshot.getValue(Messages.class);
-
-                }
-
-
+                mAdapter.notifyDataSetChanged();
 
                 mMessagesList.scrollToPosition(messagesList.size() - 1);
 
