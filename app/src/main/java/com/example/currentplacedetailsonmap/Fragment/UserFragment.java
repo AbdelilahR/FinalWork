@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.currentplacedetailsonmap.Activity.ChatActivity;
+import com.example.currentplacedetailsonmap.Activity.LoginActivity;
 import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.Adapter.UserAdapter;
 import com.example.currentplacedetailsonmap.R;
@@ -165,6 +166,13 @@ public class UserFragment extends Fragment implements Serializable {
             item.setChecked(true);
 
             return super.onOptionsItemSelected(item);
+        }
+
+        if (item.getItemId() == R.id.Logout) {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

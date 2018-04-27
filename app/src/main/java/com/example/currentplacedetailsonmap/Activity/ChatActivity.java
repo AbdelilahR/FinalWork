@@ -133,7 +133,6 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesList.setLayoutManager(mLinearLayout);
 
 
-        mAdapter.setViewType(1);
         mAdapter.notifyDataSetChanged();
         mMessagesList.setAdapter(mAdapter);
 
@@ -359,14 +358,6 @@ public class ChatActivity extends AppCompatActivity {
                 Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
                 String push_value = dataSnapshot.getKey();
                 String from = dataSnapshot.child(push_value).child("from").getValue().toString();
-                if (from == mCurrentUserId) {
-                    mAdapter.setViewType(1);
-                    mAdapter.notifyDataSetChanged();
-                } else {
-                    mAdapter.setViewType(2);
-
-                    mAdapter.notifyDataSetChanged();
-                }
 
                 mRefreshLayout.setRefreshing(false);
 
@@ -427,14 +418,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 for (DataSnapshot childSnapshot : dataSnapshot.child(push_value).getChildren()) {
                     Messages mMessage  = childSnapshot.getValue(Messages.class);
-                    if (mMessage.getFrom() == mCurrentUserId) {
-                        mAdapter.setViewType(1);
-                        mAdapter.notifyDataSetChanged();
-                    } else {
-                        mAdapter.setViewType(2);
-
-                        mAdapter.notifyDataSetChanged();
-                    }
 
                 }
 

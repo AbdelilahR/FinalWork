@@ -15,4 +15,8 @@
             android:id="@+id/distance_10km"
             android:title="10 kilometer"></item>
     </group>
+    <item
+        android:id="@+id/Logout"
+        android:title="Logout"
+        />
 </menu>

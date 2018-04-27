@@ -31,8 +31,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * https://github.com/akshayejh/Lapit---Android-Firebase-Chat-App
  */
 
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>
-{
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
     public FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -43,40 +42,35 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private String millisInString;
     private String selectedUserId;
     private String mCurrentUserId;
-    private int viewType;
+
     private DatabaseReference mRootRef;
 
-    public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId)
-    {
+    public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId) {
 
         this.mMessageList = mMessageList;
         this.selectedUserId = selectedUserId;
         this.mCurrentUserId = mCurrentUserId;
     }
 
-    public int getViewType() {
-        return viewType;
-    }
-
-    public void setViewType(int viewType) {
-        this.viewType = viewType;
-    }
 
     @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-    {
-        View v;
-        if (getViewType() == VIEW_TYPE_MESSAGE_SENT)
-            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_send, parent, false);
-        else
-            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_receive, parent, false);
-        return new MessageViewHolder(v);
-
+    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
+        if (viewType == VIEW_TYPE_MESSAGE_SENT) {
+            {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_send, parent, false);
+                return new MessageViewHolder(view);
+            }
+        } else if (viewType == VIEW_TYPE_MESSAGE_RECEIVED) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_receive, parent, false);
+            return new MessageViewHolder(view);
+        }
+        return null;
     }
 
+
     @Override
-    public void onBindViewHolder(final MessageViewHolder viewHolder, int i)
-    {
+    public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
 
         Messages c = mMessageList.get(i);
 
@@ -84,41 +78,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         String message_type = c.getType();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         millisInString = dateFormat.format(new Date());
-
-
+        getItemViewType(i);
         mUserDatabase = FirebaseDatabase.getInstance().getReference("User").child(from_user);
         mRootRef = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId).child(selectedUserId);
-        mUserDatabase.addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
+        if (message_type.equals("text")) {
 
-                String firstName = dataSnapshot.child("voornaam").getValue().toString();
-                String lastName = dataSnapshot.child("achternaam").getValue().toString();
-                //String childKey = dataSnapshot.getChildren().iterator().next().getKey();
-                // String image = dataSnapshot.child("thumb_image").getValue().toString();
-
-                viewHolder.displayName.setText(firstName + " " + lastName);
-
-                //Picasso.with(viewHolder.profileImage.getContext()).load(image).placeholder(R.drawable.default_avatar).into(viewHolder.profileImage);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-
-            }
-        });
-        if (message_type.equals("text"))
-        {
             viewHolder.messageText.setText(c.getMessage());
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
+
             //viewHolder.messageImage.setVisibility(View.INVISIBLE);
 
 
-        } else
-        {
+        } else {
 
             viewHolder.messageText.setVisibility(View.INVISIBLE);
             Picasso.with(viewHolder.profileImage.getContext()).load(c.getMessage())
@@ -129,10 +100,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public int getItemViewType(int position)
-    {
+    public int getItemViewType(int position) {
         Messages message = mMessageList.get(position);
-        if (message.getFrom() == mCurrentUserId)
+        if (message.getFrom().equals(mCurrentUserId))
             return VIEW_TYPE_MESSAGE_SENT;
         else
             return VIEW_TYPE_MESSAGE_RECEIVED;
@@ -145,27 +115,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
      * @param timeStampStr
      * @return
      */
-    private String getDate(String timeStampStr)
-    {
-        try
-        {
+    private String getDate(String timeStampStr) {
+        try {
             DateFormat sdf = new SimpleDateFormat("HH:mm");
             Date netDate = (new Date(Long.parseLong(timeStampStr)));
             return sdf.format(netDate);
-        } catch (Exception ignored)
-        {
+        } catch (Exception ignored) {
             return "xx";
         }
     }
 
     @Override
-    public int getItemCount()
-    {
+    public int getItemCount() {
         return mMessageList.size();
     }
 
-    public class MessageViewHolder extends RecyclerView.ViewHolder
-    {
+    public class MessageViewHolder extends RecyclerView.ViewHolder {
 
         public TextView messageText;
         public CircleImageView profileImage;
@@ -173,8 +138,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public TextView displayTime;
         public ImageView messageImage;
 
-        public MessageViewHolder(View view)
-        {
+        public MessageViewHolder(View view) {
             super(view);
             messageText = (TextView) view.findViewById(R.id.message_text_layout);
             //profileImage = (CircleImageView) view.findViewById(R.id.message_profile_layout);
