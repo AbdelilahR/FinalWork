@@ -356,9 +356,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
                 Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
-                String push_value = dataSnapshot.getKey();
-                String from = dataSnapshot.child(push_value).child("from").getValue().toString();
-     
+
                 mRefreshLayout.setRefreshing(false);
 
                 mLinearLayout.scrollToPositionWithOffset(10, 0);
