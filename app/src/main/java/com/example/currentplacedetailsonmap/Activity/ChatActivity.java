@@ -106,7 +106,7 @@ public class ChatActivity extends AppCompatActivity {
         mCurrentUserId = mAuth.getCurrentUser().getUid();
         User selectedUser = (User) getIntent().getExtras().getSerializable("selectedUser");
         mChatUser = selectedUser.getUserId();
-        String userName = selectedUser.getVoornaam() + " " + selectedUser.getAchternaam();
+        String selectedUser_userame = selectedUser.getVoornaam() + " " + selectedUser.getAchternaam();
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
@@ -144,7 +144,7 @@ public class ChatActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
         loadMessages();
 
-        mTitleView.setText(userName);
+        mTitleView.setText(selectedUser_userame);
 
         mRootRef.child("User").child(mChatUser).addValueEventListener(new ValueEventListener() {
             @Override
@@ -358,7 +358,7 @@ public class ChatActivity extends AppCompatActivity {
                 Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
                 String push_value = dataSnapshot.getKey();
                 String from = dataSnapshot.child(push_value).child("from").getValue().toString();
-
+     
                 mRefreshLayout.setRefreshing(false);
 
                 mLinearLayout.scrollToPositionWithOffset(10, 0);

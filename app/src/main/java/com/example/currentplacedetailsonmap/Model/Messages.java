@@ -7,7 +7,6 @@ package com.example.currentplacedetailsonmap.Model;
 
 public class Messages
 {
-
     private String message, type;
     private long time;
     private boolean seen;
@@ -25,12 +24,14 @@ public class Messages
         this.type = type;
         this.time = time;
         this.seen = seen;
+
     }
 
     public Messages()
     {
 
     }
+
 
     public String getFrom()
     {

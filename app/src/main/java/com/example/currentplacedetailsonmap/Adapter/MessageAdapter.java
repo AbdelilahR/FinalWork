@@ -73,16 +73,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
 
         Messages c = mMessageList.get(i);
-
         String from_user = c.getFrom();
         String message_type = c.getType();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         millisInString = dateFormat.format(new Date());
         getItemViewType(i);
         mUserDatabase = FirebaseDatabase.getInstance().getReference("User").child(from_user);
-        mRootRef = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrentUserId).child(selectedUserId);
-        if (message_type.equals("text")) {
 
+        if (message_type.equals("text")) {
+            viewHolder.displayName.setText("");
             viewHolder.messageText.setText(c.getMessage());
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
 

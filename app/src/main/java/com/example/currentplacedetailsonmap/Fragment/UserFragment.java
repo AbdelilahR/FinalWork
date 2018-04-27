@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.currentplacedetailsonmap.Activity.ChatActivity;
 import com.example.currentplacedetailsonmap.Activity.LoginActivity;
+import com.example.currentplacedetailsonmap.Model.GetTimeAgo;
 import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.Adapter.UserAdapter;
 import com.example.currentplacedetailsonmap.R;
@@ -169,8 +170,12 @@ public class UserFragment extends Fragment implements Serializable {
         }
 
         if (item.getItemId() == R.id.Logout) {
-            FirebaseAuth.getInstance().signOut();
+
+            String userId = FirebaseAuth.getInstance().getUid();
+
             Intent intent = new Intent(getActivity(), LoginActivity.class);
+            FirebaseDatabase.getInstance().getReference().child("User").child(userId).child("online").setValue(false);
+            FirebaseAuth.getInstance().signOut();
             startActivity(intent);
             return true;
         }
