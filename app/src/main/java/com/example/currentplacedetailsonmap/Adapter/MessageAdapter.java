@@ -1,33 +1,19 @@
 package com.example.currentplacedetailsonmap.Adapter;
 
-import android.app.Dialog;
-import android.app.Notification;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Message;
-import android.support.constraint.ConstraintLayout;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
-import com.example.currentplacedetailsonmap.Activity.FullScreenActivity;
 import com.example.currentplacedetailsonmap.Model.Messages;
 import com.example.currentplacedetailsonmap.PhotoFullPopupWindow;
 import com.example.currentplacedetailsonmap.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -103,39 +89,48 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         millisInString = dateFormat.format(new Date());
         getItemViewType(i);
         mUserDatabase = FirebaseDatabase.getInstance().getReference("User").child(from_user);
+
         viewHolder.displayName.setText("");
 
         if (message_type.equals("text"))
         {
-            if (!c.getMessage().equals(""))
-                viewHolder.messageText.setText(c.getMessage());
+
+            viewHolder.messageText.setText(c.getMessage());
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
-
             viewHolder.messageImage.setVisibility(View.INVISIBLE);
-
             viewHolder.messageImage.setClickable(false);
         } else
         {
 
-            viewHolder.messageText.setVisibility(View.INVISIBLE);
+            //viewHolder.messageText.setVisibility(View.INVISIBLE);
             viewHolder.messageImage.setClickable(true);
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
             Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 0).into(viewHolder.messageImage);
 
 
-            viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
+        }
+        viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(final View view)
             {
 
-                @Override
-                public void onClick(View view)
+                Handler handler = new Handler();
+                handler.post(new Runnable()
                 {
-                    int position = viewHolder.getAdapterPosition();
-                    new PhotoFullPopupWindow(view.getContext(), R.layout.popup_photo_full, viewHolder.messageImage, mMessageList.get(position).getMessage(), null);
+                    @Override
+                    public void run()
+                    {
+                        int position = viewHolder.getAdapterPosition();
+                        new PhotoFullPopupWindow(view.getContext(), R.layout.popup_photo_full, viewHolder.messageImage, mMessageList.get(position).getMessage(), null);
 
-                }
-            });
-        }
+                    }
+                });
 
+
+            }
+        });
     }
 
     @Override

@@ -63,7 +63,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
-        btnSignIn = (Button) findViewById(R.id.sign_in_button);
+        //btnSignIn = (Button) findViewById(R.id.sign_in_button);
         btnSignUp = (Button) findViewById(R.id.sign_up_button);
 
         //place data in variables

@@ -17,7 +17,7 @@
         android:layout_marginBottom="34dp"
 
         android:layout_marginStart="16dp"
-        android:text="John Doe"
+
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -30,7 +30,7 @@
         android:background="@drawable/rounded_rectangle_orange"
         android:maxWidth="240dp"
         android:padding="8dp"
-        android:text="hi man, how are you?"
+
         android:textColor="#ffffff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
-
+        android:background="@drawable/rounded_rectangle_orange"
         android:maxWidth="1000dp"
         android:padding="8dp"
         android:text="hi man, how are you?"

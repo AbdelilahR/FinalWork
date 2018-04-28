@@ -93,7 +93,6 @@
             android:name=".Activity.ResetPasswordActivity"
             android:label="@string/title_activity_reset_password"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Activity.FullScreenActivity"></activity>
     </application>
 
 </manifest>
