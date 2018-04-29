@@ -118,16 +118,13 @@ public class ChatActivity extends AppCompatActivity
             myLocation = getLastKnownLocation(this);
             //sendLocation(myLocation);
 
-            String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg&\n" +
-                    "markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222";
+            //String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
 
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.setData(Uri.parse(url));
-            sendIntent.putExtra(Intent.EXTRA_STREAM, url);
+
             sendIntent.setType("image/*");
 
-            sendIntent.setData(Uri.parse(url));
             onActivityResult(SEND_LOCATION, RESULT_OK, sendIntent);
 
         }
@@ -199,7 +196,7 @@ public class ChatActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot)
             {
 
-                String online = dataSnapshot.child("online").getValue().toString();
+                String online = dataSnapshot.child("status").getValue().toString();
                 //String image = dataSnapshot.child("image").getValue().toString();
 
                 if (online.equals("true"))
@@ -466,7 +463,6 @@ public class ChatActivity extends AppCompatActivity
         if (requestCode == SEND_LOCATION && resultCode == RESULT_OK)
         {
 
-            Uri imageUri = data.getData();
 
             final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
             final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;

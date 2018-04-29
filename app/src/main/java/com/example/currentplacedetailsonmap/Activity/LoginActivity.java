@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
 Bron:
@@ -110,6 +111,8 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                 } else {
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    FirebaseDatabase.getInstance().getReference().child("User").child(auth.getUid()).child("status").setValue(true);
+
                                     startActivity(intent);
                                     finish();
                                 }

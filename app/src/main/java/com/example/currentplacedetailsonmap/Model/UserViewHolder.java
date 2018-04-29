@@ -13,4 +13,5 @@ public class UserViewHolder {
     public TextView pseudo;
     public TextView text;
     public CircleImageView avatar;
+    public ImageView status;
 }

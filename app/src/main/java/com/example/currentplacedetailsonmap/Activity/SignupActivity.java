@@ -32,11 +32,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-/*
+/**
 Bron:
 https://www.androidhive.info/2016/06/android-getting-started-firebase-simple-login-registration-auth/
 https://www.androidhive.info/2016/10/android-working-with-firebase-realtime-database/
-*/
+ https://www.androidhive.info/2016/10/android-working-with-firebase-realtime-database/
+
+ */
 public class SignupActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
 
@@ -44,11 +46,10 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
 
     private LatLng inputAdress;
     private Spinner inputGeslacht;
-    private Button btnSignIn, btnSignUp, btnResetPassword;
+    private Button  btnSignUp;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     private FirebaseDatabase database;
-    //https://www.androidhive.info/2016/10/android-working-with-firebase-realtime-database/
     private DatabaseReference mDatabaseReference;
     private String userId;
     private String geslacht;
@@ -95,25 +96,9 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         });
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        btnResetPassword = (Button) findViewById(R.id.btn_reset_password);
 
-        btnResetPassword.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                startActivity(new Intent(SignupActivity.this, ResetPasswordActivity.class));
-            }
-        });
 
-        btnSignIn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                finish();
-            }
-        });
+
 
         btnSignUp.setOnClickListener(new View.OnClickListener()
         {
@@ -169,7 +154,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                                     userId = current_user.getUid();
                                     mDatabaseReference = database.getReference("User").child(userId);
 
-                                    User user = new User(userId, lastName, firstName, myGender, email, password, address);
+                                    User user = new User(userId, lastName, firstName, myGender, email, password, address,true);
                                     mDatabaseReference.setValue(user);
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                     finish();

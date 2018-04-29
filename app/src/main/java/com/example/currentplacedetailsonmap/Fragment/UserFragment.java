@@ -174,7 +174,7 @@ public class UserFragment extends Fragment implements Serializable {
             String userId = FirebaseAuth.getInstance().getUid();
 
             Intent intent = new Intent(getActivity(), LoginActivity.class);
-            FirebaseDatabase.getInstance().getReference().child("User").child(userId).child("online").setValue(false);
+            FirebaseDatabase.getInstance().getReference().child("User").child(userId).child("status").setValue(false);
             FirebaseAuth.getInstance().signOut();
             startActivity(intent);
             return true;

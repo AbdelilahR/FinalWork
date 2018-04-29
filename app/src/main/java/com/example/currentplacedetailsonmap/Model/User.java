@@ -12,12 +12,12 @@ public class User implements Serializable
     public String email;
     public String wachtwoord;
     public Address adress;
-
+    public Boolean status;
     public User()
     {
     }
 
-    public User(String userId,String achternaam, String voornaam, String geslacht, String email, String wachtwoord, Address adress)
+    public User(String userId,String achternaam, String voornaam, String geslacht, String email, String wachtwoord, Address adress,Boolean status)
     {
         this.userId = userId;
         this.achternaam = achternaam;
@@ -26,6 +26,17 @@ public class User implements Serializable
         this.email = email;
         this.wachtwoord = wachtwoord;
         this.adress = adress;
+        this.status = status;
+    }
+
+    public Boolean getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(Boolean online)
+    {
+        this.status = online;
     }
 
     public String getUserId() {

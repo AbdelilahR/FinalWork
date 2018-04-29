@@ -29,37 +29,46 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.content.Context.LOCATION_SERVICE;
+import static com.example.currentplacedetailsonmap.R.drawable.online_icon;
 
 /**
  * Created by Abdel-Portable on 18-04-18.
  * source: http://tutos-android-france.com/listview-afficher-une-liste-delements/
  */
-public class UserAdapter extends ArrayAdapter<User> {
+public class UserAdapter extends ArrayAdapter<User>
+{
 
 
     public String metric_symbol = "m";
     public Location myLocation = new Location("");
     public Location userLocation = new Location("");
     private LocationManager mLocationManager;
+    private ArrayList<User> users ;
 
-    public UserAdapter(@NonNull Context context, ArrayList<User> users) {
+    public UserAdapter(@NonNull Context context, ArrayList<User> users)
+    {
         super(context, 0, users);
-
+        this.users = users;
 
     }
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
+    {
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_user_listview, parent, false);
 
         UserViewHolder userVH = (UserViewHolder) convertView.getTag();
-        if (userVH == null) {
+        if (userVH == null)
+        {
             userVH = new UserViewHolder();
             userVH.pseudo = (TextView) convertView.findViewById(R.id.pseudo);
             userVH.text = (TextView) convertView.findViewById(R.id.text);
             userVH.avatar = (CircleImageView) convertView.findViewById(R.id.avatar);
+            userVH.status = (ImageView) convertView.findViewById(R.id.status);
+
+
             convertView.setTag(userVH);
         }
         User user = getItem(position);
@@ -72,18 +81,26 @@ public class UserAdapter extends ArrayAdapter<User> {
 
         float distanceInMeters = myLocation.distanceTo(userLocation);
 
-        if (distanceInMeters > 1000) {
+        if (distanceInMeters > 1000)
+        {
             distanceInMeters = (distanceInMeters / 1000);
             metric_symbol = "km";
-        }
-        else{
+        } else
+        {
             metric_symbol = "m";
         }
         userVH.text.setText(Float.valueOf(round(distanceInMeters, 2)).toString() + " " + metric_symbol);
 
         userVH.pseudo.setText(user.getVoornaam() + " " + user.getAchternaam());
-        userVH.avatar.setImageDrawable(new ColorDrawable(Color.GREEN));
-        return convertView;
+        userVH.avatar.setImageResource(R.drawable.default_avatar);
+
+        Boolean online = user.getStatus();
+        if (online)
+            userVH.status.setImageResource(R.drawable.online_icon);
+
+        else
+            userVH.status.setImageResource(R.drawable.offline_icon);
+            return convertView;
     }
 
     /**
@@ -93,7 +110,8 @@ public class UserAdapter extends ArrayAdapter<User> {
      * @param decimalPlace
      * @return
      */
-    private static float round(float d, int decimalPlace) {
+    private static float round(float d, int decimalPlace)
+    {
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
@@ -103,16 +121,20 @@ public class UserAdapter extends ArrayAdapter<User> {
      * Source
      * https://stackoverflow.com/questions/20438627/getlastknownlocation-returns-null?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
      */
-    private Location getLastKnownLocation() {
+    private Location getLastKnownLocation()
+    {
         mLocationManager = (LocationManager) getContext().getApplicationContext().getSystemService(LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
         Location bestLocation = null;
-        for (String provider : providers) {
+        for (String provider : providers)
+        {
             Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null) {
+            if (l == null)
+            {
                 continue;
             }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
+            {
                 // Found best last known location: %s", l);
                 bestLocation = l;
             }
