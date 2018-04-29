@@ -1,7 +1,9 @@
 package com.example.currentplacedetailsonmap.Adapter;
 
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,6 +34,7 @@ import static android.content.Context.LOCATION_SERVICE;
 /**
  * Created by AkshayeJH on 24/07/17.
  * https://github.com/akshayejh/Lapit---Android-Firebase-Chat-App
+ * https://stackoverflow.com/questions/3990110/how-to-show-marker-in-maps-launched-by-geo-uri-intent
  */
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>
@@ -113,7 +116,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 viewHolder.messageImage.setClickable(true);
                 viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
-                Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 0).into(viewHolder.messageImage);
+                Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(400, 0).into(viewHolder.messageImage);
                 viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
                 {
 
@@ -143,13 +146,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         {
             viewHolder.messageImage.setClickable(true);
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
-            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 0).into(viewHolder.messageImage);
+            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(400, 0).into(viewHolder.messageImage);
             viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View view)
                 {
-                    //TODO google map intent
+
+                    Double myLatitude = chatActivity.myLocation.getLatitude();
+                    Double myLongitude = chatActivity.myLocation.getLongitude();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:<" + myLatitude  + ">,<" + myLongitude + ">?q=<" + myLatitude  + ">,<" + myLongitude + ">"));
+
+                    chatActivity.startActivity(intent);
                 }
             });
         }

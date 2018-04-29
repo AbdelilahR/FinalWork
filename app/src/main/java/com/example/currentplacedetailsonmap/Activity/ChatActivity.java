@@ -88,8 +88,8 @@ public class ChatActivity extends AppCompatActivity
 
     private String mLastKey = "";
     private String mPrevKey = "";
-    private LocationManager mLocationManager;
-    private Location myLocation = new Location("");
+    private static LocationManager mLocationManager;
+    public static Location myLocation = new Location("");
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -115,10 +115,11 @@ public class ChatActivity extends AppCompatActivity
 
         } else if (item.getItemId() == R.id.send_location)
         {
-            myLocation = getLastKnownLocation();
+            myLocation = getLastKnownLocation(this);
             //sendLocation(myLocation);
 
-            String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=200x200&sensor=true&format=jpg";
+            String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg&\n" +
+                    "markers=color:blue%7Clabel:S%7C11211%7C11206%7C11222";
 
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
@@ -655,10 +656,11 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
-    private Location getLastKnownLocation()
+    private static Location getLastKnownLocation(Context c)
     {
 
-        mLocationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+
+        mLocationManager = (LocationManager) c.getSystemService(LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
         Location bestLocation = null;
         for (String provider : providers)
