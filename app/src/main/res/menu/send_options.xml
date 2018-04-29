@@ -4,4 +4,8 @@
         android:id="@+id/send_location"
         android:title="Send Location"
         />
+    <item
+        android:id="@+id/send_image"
+        android:title="Send Image"
+        />
 </menu>

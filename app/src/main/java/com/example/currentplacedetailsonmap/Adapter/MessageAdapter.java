@@ -1,5 +1,7 @@
 package com.example.currentplacedetailsonmap.Adapter;
 
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.currentplacedetailsonmap.Activity.ChatActivity;
 import com.example.currentplacedetailsonmap.Model.Messages;
 import com.example.currentplacedetailsonmap.PhotoFullPopupWindow;
 import com.example.currentplacedetailsonmap.R;
@@ -22,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.content.Context.LOCATION_SERVICE;
 
 /**
  * Created by AkshayeJH on 24/07/17.
@@ -42,18 +48,21 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private String mCurrentUserId;
     private boolean zoomOut = false;
     private DatabaseReference mRootRef;
-
+    public ChatActivity chatActivity;
 
     private String my_url;
 
     private int teller = 0;
+    private Location myLocation = new Location("");
+    private LocationManager mLocationManager;
 
-    public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId)
+    public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId, ChatActivity chatActivity)
     {
 
         this.mMessageList = mMessageList;
         this.selectedUserId = selectedUserId;
         this.mCurrentUserId = mCurrentUserId;
+        this.chatActivity = chatActivity;
     }
 
 
@@ -99,39 +108,55 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
             viewHolder.messageImage.setVisibility(View.INVISIBLE);
             viewHolder.messageImage.setClickable(false);
-        } else
+        } else if (message_type.equals("image"))
         {
 
-            //viewHolder.messageText.setVisibility(View.INVISIBLE);
-            viewHolder.messageImage.setClickable(true);
-            viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
-            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 0).into(viewHolder.messageImage);
-
-
-        }
-        viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(final View view)
-            {
-
-                Handler handler = new Handler();
-                handler.post(new Runnable()
+                viewHolder.messageImage.setClickable(true);
+                viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
+                Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 0).into(viewHolder.messageImage);
+                viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
                 {
+
                     @Override
-                    public void run()
+                    public void onClick(final View view)
                     {
-                        int position = viewHolder.getAdapterPosition();
-                        new PhotoFullPopupWindow(view.getContext(), R.layout.popup_photo_full, viewHolder.messageImage, mMessageList.get(position).getMessage(), null);
+
+                        Handler handler = new Handler();
+                        handler.post(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                int position = viewHolder.getAdapterPosition();
+                                new PhotoFullPopupWindow(view.getContext(), R.layout.popup_photo_full, viewHolder.messageImage, mMessageList.get(position).getMessage(), null);
+
+                            }
+                        });
+
 
                     }
                 });
 
 
-            }
-        });
+        }
+        else
+        {
+            viewHolder.messageImage.setClickable(true);
+            viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
+            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 0).into(viewHolder.messageImage);
+            viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    //TODO google map intent
+                }
+            });
+        }
+
+
     }
+
 
     @Override
     public int getItemViewType(int position)

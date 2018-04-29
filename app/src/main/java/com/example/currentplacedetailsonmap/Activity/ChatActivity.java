@@ -2,9 +2,9 @@ package com.example.currentplacedetailsonmap.Activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -15,16 +15,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.currentplacedetailsonmap.Adapter.MessageAdapter;
 import com.example.currentplacedetailsonmap.Model.GetTimeAgo;
@@ -47,8 +45,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 //import com.theartofdev.edmodo.cropper.CropImage;
 
-import org.w3c.dom.Text;
-
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +61,7 @@ public class ChatActivity extends AppCompatActivity
 
     private static final int TOTAL_ITEMS_TO_LOAD = 10;
     private static final int GALLERY_PICK = 1;
+    private static final int SEND_LOCATION = 2;
     private final List<Messages> messagesList = new ArrayList<>();
     private String mChatUser;
     private Toolbar mChatToolbar;
@@ -90,15 +88,50 @@ public class ChatActivity extends AppCompatActivity
 
     private String mLastKey = "";
     private String mPrevKey = "";
+    private LocationManager mLocationManager;
+    private Location myLocation = new Location("");
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.send_location, menu);
+        inflater.inflate(R.menu.send_options, menu);
 
         return super.onCreateOptionsMenu(menu);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.send_image)
+        {
+            Intent galleryIntent = new Intent();
+            galleryIntent.setType("image/*");
+            galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+            startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
+
+
+        } else if (item.getItemId() == R.id.send_location)
+        {
+            myLocation = getLastKnownLocation();
+            //sendLocation(myLocation);
+
+            String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=200x200&sensor=true&format=jpg";
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.setData(Uri.parse(url));
+            sendIntent.putExtra(Intent.EXTRA_STREAM, url);
+            sendIntent.setType("image/*");
+
+            sendIntent.setData(Uri.parse(url));
+            onActivityResult(SEND_LOCATION, RESULT_OK, sendIntent);
+
+        }
+
+        return true;
     }
 
     @Override
@@ -137,7 +170,7 @@ public class ChatActivity extends AppCompatActivity
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
 
-        mAdapter = new MessageAdapter(messagesList, mChatUser, mCurrentUserId);
+        mAdapter = new MessageAdapter(messagesList, mChatUser, mCurrentUserId, this);
 
         mMessagesList = (RecyclerView) findViewById(R.id.messages_list);
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.message_swipe_layout);
@@ -258,12 +291,15 @@ public class ChatActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
+                openOptionsMenu();
+
+                /*
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
-
+*/
 
             }
         });
@@ -287,7 +323,76 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
-
+    /**
+     * protected void sendLocation(Location location)
+     * {
+     * <p>
+     * Double latitude = location.getLatitude();
+     * Double longitude = location.getLongitude();
+     * String strinurl = "http://maps.google.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=15&size=200x200&sensor=false";
+     * <p>
+     * Uri uploadUri = Uri.fromFile(new File())
+     * <p>
+     * final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
+     * final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
+     * <p>
+     * DatabaseReference user_message_push = mRootRef.child("messages")
+     * .child(mCurrentUserId).child(mChatUser).push();
+     * <p>
+     * final String push_id = user_message_push.getKey();
+     * <p>
+     * <p>
+     * StorageReference filepath = mImageStorage.child("message_maps");
+     * <p>
+     * filepath.putFile(url).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>()
+     * {
+     *
+     * @Override public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task)
+     * {
+     * <p>
+     * if (task.isSuccessful())
+     * {
+     * <p>
+     * String download_url = task.getResult().getDownloadUrl().toString();
+     * <p>
+     * <p>
+     * Map messageMap = new HashMap();
+     * messageMap.put("message", download_url);
+     * messageMap.put("seen", false);
+     * messageMap.put("type", "image");
+     * messageMap.put("time", ServerValue.TIMESTAMP);
+     * messageMap.put("from", mCurrentUserId);
+     * <p>
+     * Map messageUserMap = new HashMap();
+     * messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+     * messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+     * <p>
+     * mChatMessageView.setText("");
+     * <p>
+     * mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
+     * {
+     * @Override public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+     * {
+     * <p>
+     * if (databaseError != null)
+     * {
+     * <p>
+     * Log.d("CHAT_LOG", databaseError.getMessage().toString());
+     * <p>
+     * }
+     * <p>
+     * }
+     * });
+     * <p>
+     * <p>
+     * }
+     * <p>
+     * }
+     * });
+     * <p>
+     * <p>
+     * }
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -357,35 +462,91 @@ public class ChatActivity extends AppCompatActivity
             });
 
         }
+        if (requestCode == SEND_LOCATION && resultCode == RESULT_OK)
+        {
 
+            Uri imageUri = data.getData();
+
+            final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
+            final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
+
+            DatabaseReference user_message_push = mRootRef.child("messages")
+                    .child(mCurrentUserId).child(mChatUser).push();
+
+            final String push_id = user_message_push.getKey();
+
+
+           // StorageReference filepath = mImageStorage.child("message_maps").child(push_id + ".jpg ");
+
+            String download_url = data.getData().toString();
+
+
+            Map messageMap = new HashMap();
+            messageMap.put("message", download_url);
+            messageMap.put("seen", false);
+            messageMap.put("type", "map");
+            messageMap.put("time", ServerValue.TIMESTAMP);
+            messageMap.put("from", mCurrentUserId);
+
+            Map messageUserMap = new HashMap();
+            messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+            messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+            mChatMessageView.setText("");
+
+            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
+            {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+                {
+
+                    if (databaseError != null)
+                    {
+
+                        Log.d("CHAT_LOG", databaseError.getMessage().toString());
+
+                    }
+
+                }
+            });
+
+        }
+
+        refreshActivity();
     }
 
-    private void loadMoreMessages() {
+    private void loadMoreMessages()
+    {
 
         DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
 
         Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
 
-        messageQuery.addChildEventListener(new ChildEventListener() {
+        messageQuery.addChildEventListener(new ChildEventListener()
+        {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
 
 
                 Messages message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
 
-                if(!mPrevKey.equals(messageKey)){
+                if (!mPrevKey.equals(messageKey))
+                {
 
                     messagesList.add(itemPos++, message);
 
-                } else {
+                } else
+                {
 
                     mPrevKey = mLastKey;
 
                 }
 
 
-                if(itemPos == 1) {
+                if (itemPos == 1)
+                {
 
                     mLastKey = messageKey;
 
@@ -403,22 +564,26 @@ public class ChatActivity extends AppCompatActivity
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
 
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
 
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
 
             }
         });
@@ -490,6 +655,28 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
+    private Location getLastKnownLocation()
+    {
+
+        mLocationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers)
+        {
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null)
+            {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
+            {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
+    }
+
     private void sendMessage()
     {
 
@@ -544,5 +731,13 @@ public class ChatActivity extends AppCompatActivity
 
         }
 
+    }
+
+    public void refreshActivity()
+    {
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(getIntent());
+        overridePendingTransition(0, 0);
     }
 }

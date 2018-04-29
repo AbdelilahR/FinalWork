@@ -41,5 +41,6 @@
     <string name="Adress">Adress</string>
     <string name="bt_sent">Send</string>
     <string name="text_item">Message</string>
+    <string name="send_to">send</string>
 </resources>
 
