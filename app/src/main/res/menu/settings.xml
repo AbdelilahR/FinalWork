@@ -4,6 +4,10 @@
         android:id="@+id/profile_picture"
         android:title="Profile Picture"
         />
+    <item
+        android:title="test"
+        app:actionLayout="@layout/switch_layout"
+        app:showAsAction="always" />
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/distance_any"

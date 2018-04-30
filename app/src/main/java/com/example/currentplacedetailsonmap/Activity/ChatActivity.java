@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
+import com.firebase.client.ServerValue;
 import com.example.currentplacedetailsonmap.Adapter.MessageAdapter;
 import com.example.currentplacedetailsonmap.Model.GetTimeAgo;
 import com.example.currentplacedetailsonmap.Model.Messages;
@@ -38,7 +38,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ServerValue;
+
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -199,7 +199,7 @@ public class ChatActivity extends AppCompatActivity
                 String online = dataSnapshot.child("status").getValue().toString();
                 //String image = dataSnapshot.child("image").getValue().toString();
 
-                if (online.equals("true"))
+                if (online.equals("online"))
                 {
 
                     mLastSeenView.setText("Online");
@@ -209,8 +209,8 @@ public class ChatActivity extends AppCompatActivity
 
                     GetTimeAgo getTimeAgo = new GetTimeAgo();
 
-                    long lastTime = Long.parseLong(online);
-
+                    //long lastTime = Long.parseLong(online);
+                    long lastTime = Long.valueOf(online);
                     String lastSeenTime = GetTimeAgo.getTimeAgo(lastTime, getApplicationContext());
 
                     mLastSeenView.setText(lastSeenTime);
@@ -238,7 +238,7 @@ public class ChatActivity extends AppCompatActivity
 
                     Map chatAddMap = new HashMap();
                     chatAddMap.put("seen", false);
-                    chatAddMap.put("timestamp", ServerValue.TIMESTAMP);
+                    chatAddMap.put("timestamp", com.firebase.client.ServerValue.TIMESTAMP);
 
                     Map chatUserMap = new HashMap();
                     chatUserMap.put("Chat/" + mCurrentUserId + "/" + mChatUser, chatAddMap);
@@ -473,7 +473,7 @@ public class ChatActivity extends AppCompatActivity
             final String push_id = user_message_push.getKey();
 
 
-           // StorageReference filepath = mImageStorage.child("message_maps").child(push_id + ".jpg ");
+            // StorageReference filepath = mImageStorage.child("message_maps").child(push_id + ".jpg ");
 
             String download_url = data.getData().toString();
 

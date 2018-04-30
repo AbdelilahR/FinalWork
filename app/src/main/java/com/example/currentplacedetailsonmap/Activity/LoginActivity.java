@@ -111,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                 } else {
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    FirebaseDatabase.getInstance().getReference().child("User").child(auth.getUid()).child("status").setValue(true);
+                                    FirebaseDatabase.getInstance().getReference().child("User").child(auth.getUid()).child("status").setValue("online");
 
                                     startActivity(intent);
                                     finish();

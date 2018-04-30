@@ -31,13 +31,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 /**
-Bron:
-https://www.androidhive.info/2016/06/android-getting-started-firebase-simple-login-registration-auth/
-https://www.androidhive.info/2016/10/android-working-with-firebase-realtime-database/
- https://www.androidhive.info/2016/10/android-working-with-firebase-realtime-database/
-
+ * Bron:
+ * https://www.androidhive.info/2016/06/android-getting-started-firebase-simple-login-registration-auth/
+ * https://www.androidhive.info/2016/10/android-working-with-firebase-realtime-database/
+ * https://www.androidhive.info/2016/10/android-working-with-firebase-realtime-database/
  */
 public class SignupActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener
 {
@@ -46,7 +46,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
 
     private LatLng inputAdress;
     private Spinner inputGeslacht;
-    private Button  btnSignUp;
+    private Button btnSignUp;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     private FirebaseDatabase database;
@@ -96,8 +96,6 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         });
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-
-
 
 
         btnSignUp.setOnClickListener(new View.OnClickListener()
@@ -154,7 +152,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                                     userId = current_user.getUid();
                                     mDatabaseReference = database.getReference("User").child(userId);
 
-                                    User user = new User(userId, lastName, firstName, myGender, email, password, address,true);
+                                    User user = new User(userId, lastName, firstName, myGender, email, password, address, "online");
                                     mDatabaseReference.setValue(user);
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                     finish();

@@ -1,6 +1,7 @@
 package com.example.currentplacedetailsonmap.Model;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class User implements Serializable
 {
@@ -12,12 +13,11 @@ public class User implements Serializable
     public String email;
     public String wachtwoord;
     public Address adress;
-    public Boolean status;
-    public User()
-    {
-    }
+    public String online;
 
-    public User(String userId,String achternaam, String voornaam, String geslacht, String email, String wachtwoord, Address adress,Boolean status)
+    public Map<String, String> timestamp;
+
+    public User(String userId,String achternaam, String voornaam, String geslacht, String email, String wachtwoord, Address adress,String online)
     {
         this.userId = userId;
         this.achternaam = achternaam;
@@ -26,17 +26,33 @@ public class User implements Serializable
         this.email = email;
         this.wachtwoord = wachtwoord;
         this.adress = adress;
-        this.status = status;
+        this.online = online;
+        this.timestamp = timestamp;
     }
 
-    public Boolean getStatus()
+    public User()
     {
-        return status;
+
     }
 
-    public void setStatus(Boolean online)
+    public Map<String, String> getTimestamp()
     {
-        this.status = online;
+        return timestamp;
+    }
+
+    public void setTimestamp(Map<String, String> timestamp)
+    {
+        this.timestamp = timestamp;
+    }
+
+    public String getStatus()
+    {
+        return online;
+    }
+
+    public void setStatus(String online)
+    {
+        this.online = online;
     }
 
     public String getUserId() {

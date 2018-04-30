@@ -94,8 +94,8 @@ public class UserAdapter extends ArrayAdapter<User>
         userVH.pseudo.setText(user.getVoornaam() + " " + user.getAchternaam());
         userVH.avatar.setImageResource(R.drawable.default_avatar);
 
-        Boolean online = user.getStatus();
-        if (online)
+        String online = user.getStatus();
+        if (online.equals("online"))
             userVH.status.setImageResource(R.drawable.online_icon);
 
         else
