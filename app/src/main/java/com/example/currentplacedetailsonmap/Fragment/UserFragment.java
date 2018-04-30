@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -51,6 +52,7 @@ import static android.content.Context.LOCATION_SERVICE;
  * https://github.com/AleBarreto/FirebaseAndroidChat
  * https://zigazibert.wordpress.com/2014/03/19/using-android-togglebutton-inside-action-bar-2/
  * https://stackoverflow.com/questions/6159702/show-spinning-wheel-dialog-while-loading-data-on-android/6159735
+ * https://stackoverflow.com/questions/24294936/how-to-put-method-into-the-asynctask
  */
 public class UserFragment extends Fragment implements Serializable
 {
@@ -74,7 +76,6 @@ public class UserFragment extends Fragment implements Serializable
     private Location userLocation = new Location("");
     private Location currentLocation = new Location("");
     private Menu optionMenu;
-    private ProgressDialog dialog;
     private Switch _switch;
 
     public UserFragment()
@@ -114,7 +115,7 @@ public class UserFragment extends Fragment implements Serializable
         //public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         /*https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
-        dialog = new ProgressDialog(getActivity()); // this = YourActivity
+
         getActivity().setTitle("Users");
         loadUserList();
 
@@ -241,28 +242,32 @@ public class UserFragment extends Fragment implements Serializable
     public void loadUserList()
     {
 
-/*
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setMessage("Loading. Please wait...");
-        dialog.setIndeterminate(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-        Thread thread = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
 
+        class LoadDataUserList extends AsyncTask<String, Void, String>
+        {
+            private ProgressDialog dialog = new ProgressDialog(getActivity());
+
+            @Override
+            protected void onPreExecute()
+            {
+                dialog.setMessage("Loading. Please wait...");
+                dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                dialog.setIndeterminate(true);
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+
+                //  super.onPreExecute();
             }
-        });
-        thread.start();
-*/
-        ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
-        {
 
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
+            protected String doInBackground(String... strings)
             {
+                ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
+                {
+
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
                 /*
                 String achternaam = dataSnapshot.child(mCurrentUserId).child("achternaam").getValue().toString();
                 String voornaam = dataSnapshot.child(mCurrentUserId).child("voornaam").getValue().toString();
@@ -270,133 +275,145 @@ public class UserFragment extends Fragment implements Serializable
                 if (loggedUser != null)
                     getActivity().setTitle(loggedUser);
                 */
-                for (DataSnapshot dsp : dataSnapshot.getChildren())
-                {
-
-
-                    myUser = dsp.getValue(User.class);
-                    lastId = dsp.getKey();
-                    if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
-                    {
-                        userLocation.setLatitude(myUser.getAdress().getLatitude());
-                        userLocation.setLongitude(myUser.getAdress().getLongitude());
-                        distance = currentLocation.distanceTo(userLocation);
-
-                        if (online_only)
+                        for (DataSnapshot dsp : dataSnapshot.getChildren())
                         {
-                            if (distance <= getRadius() && myUser.getStatus().equals("online"))
-                                userList.add(myUser);
-                        } else
-                        {
-                            if (distance <= getRadius())
-                                userList.add(myUser);
-                        }
-                    }
-                }
-                /*https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa*/
-                if (userListView != null)
-                    userListView.setOnScrollListener(new AbsListView.OnScrollListener()
-                    {
-                        private int currentVisibleItemCount;
-                        private int currentScrollState;
-                        private int currentFirstVisibleItem;
-                        private int totalItem;
 
 
-                        @Override
-                        public void onScrollStateChanged(AbsListView view, int scrollState)
-                        {
-                            this.currentScrollState = scrollState;
-                            //https://stackoverflow.com/questions/23708271/count-total-number-of-list-items-in-a-listview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                            this.currentFirstVisibleItem = view.getFirstVisiblePosition();
-                            this.isScrollCompleted();
-                        }
-
-                        @Override
-                        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
-                        {
-                            this.currentFirstVisibleItem = firstVisibleItem;
-                            this.currentVisibleItemCount = visibleItemCount;
-                            this.totalItem = totalItemCount;
-
-                        }
-
-                        //stackoverflow.com/questions/39023945/how-to-get-data-from-real-time-database-in-firebase
-                        private void isScrollCompleted()
-                        {
-                            if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
-                                    && this.currentScrollState == SCROLL_STATE_IDLE)
+                            myUser = dsp.getValue(User.class);
+                            lastId = dsp.getKey();
+                            if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
                             {
+                                userLocation.setLatitude(myUser.getAdress().getLatitude());
+                                userLocation.setLongitude(myUser.getAdress().getLongitude());
+                                distance = currentLocation.distanceTo(userLocation);
 
-                                ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
+                                if (getOnline_only())
                                 {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot)
-                                    {
-
-                                        for (DataSnapshot dsp : dataSnapshot.getChildren())
-                                        {
-                                            myUser = dsp.getValue(User.class);
-                                            lastId = dsp.getKey();
-                                            if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
-                                            {
-                                                distance = currentLocation.distanceTo(userLocation);
-                                                if (distance <= getRadius())
-                                                    userList.add(myUser);
-
-                                            }
-                                        }
-
-                                        userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
-                                        userListView.setAdapter(userAdapter);
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError)
-                                    {
-
-                                    }
-
-                                });
+                                    if (distance <= getRadius() && myUser.getStatus().equals("online"))
+                                        userList.add(myUser);
+                                } else
+                                {
+                                    if (distance <= getRadius())
+                                        userList.add(myUser);
+                                }
                             }
                         }
-                    });
+                        /*https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa*/
+                        if (userListView != null)
+                            userListView.setOnScrollListener(new AbsListView.OnScrollListener()
+                            {
+                                private int currentVisibleItemCount;
+                                private int currentScrollState;
+                                private int currentFirstVisibleItem;
+                                private int totalItem;
 
-                if (getActivity() != null)
-                    userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
 
-                if (userListView != null)
-                {
-                    userListView.invalidateViews();
-                    userListView.setAdapter(userAdapter);
+                                @Override
+                                public void onScrollStateChanged(AbsListView view, int scrollState)
+                                {
+                                    this.currentScrollState = scrollState;
+                                    //https://stackoverflow.com/questions/23708271/count-total-number-of-list-items-in-a-listview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                                    this.currentFirstVisibleItem = view.getFirstVisiblePosition();
+                                    this.isScrollCompleted();
+                                }
 
-                    userListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-                    {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                                @Override
+                                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+                                {
+                                    this.currentFirstVisibleItem = firstVisibleItem;
+                                    this.currentVisibleItemCount = visibleItemCount;
+                                    this.totalItem = totalItemCount;
+
+                                }
+
+                                //stackoverflow.com/questions/39023945/how-to-get-data-from-real-time-database-in-firebase
+                                private void isScrollCompleted()
+                                {
+                                    if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
+                                            && this.currentScrollState == SCROLL_STATE_IDLE)
+                                    {
+
+                                        ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
+                                        {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot)
+                                            {
+
+                                                for (DataSnapshot dsp : dataSnapshot.getChildren())
+                                                {
+                                                    myUser = dsp.getValue(User.class);
+                                                    lastId = dsp.getKey();
+                                                    if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
+                                                    {
+                                                        distance = currentLocation.distanceTo(userLocation);
+                                                        if (distance <= getRadius())
+                                                            userList.add(myUser);
+
+                                                    }
+                                                }
+
+                                                userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
+                                                userListView.setAdapter(userAdapter);
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError)
+                                            {
+
+                                            }
+
+                                        });
+                                    }
+                                }
+                            });
+
+                        if (getActivity() != null)
+                            userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
+
+                        if (userListView != null)
                         {
-                            //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                            mAuth = FirebaseAuth.getInstance();
-                            Intent intent = new Intent(getActivity(), ChatActivity.class);
-                            User selectedUser = (User) parent.getAdapter().getItem(position);
-                            intent.putExtra("selectedUser", selectedUser);
-                            startActivity(intent);
+                            userListView.invalidateViews();
+                            userListView.setAdapter(userAdapter);
 
+                            userListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                            {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                                {
+                                    //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                                    mAuth = FirebaseAuth.getInstance();
+                                    Intent intent = new Intent(getActivity(), ChatActivity.class);
+                                    User selectedUser = (User) parent.getAdapter().getItem(position);
+                                    intent.putExtra("selectedUser", selectedUser);
+                                    startActivity(intent);
+
+                                }
+                            });
                         }
-                    });
-                }
 
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+
+                    }
+                });
+
+                return "Executed";
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
+            protected void onPostExecute(String s)
             {
-
+                if (dialog.isShowing())
+                    dialog.dismiss();
+                // super.onPostExecute(s);
             }
-        });
+        }
 
-        //  dialog.dismiss();
 
+        new LoadDataUserList().execute("");
 
     }
 
