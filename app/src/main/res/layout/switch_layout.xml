@@ -6,7 +6,7 @@
     android:orientation="horizontal" >
     <Switch
         android:id="@+id/switchAB"
-        android:text="Show online_only only"
+        android:text="Show online only "
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/profile_picture"
-        android:title="Profile Picture"
-        />
+        android:title="Profile Picture" />
     <item
-        android:title="test"
-        app:actionLayout="@layout/switch_layout"
-        app:showAsAction="always" />
+        android:id="@+id/status_switch"
+        android:checkable="true"
+        android:title="Online only" />
+
+
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/distance_any"
@@ -21,6 +23,5 @@
     </group>
     <item
         android:id="@+id/Logout"
-        android:title="Logout"
-        />
+        android:title="Logout" />
 </menu>

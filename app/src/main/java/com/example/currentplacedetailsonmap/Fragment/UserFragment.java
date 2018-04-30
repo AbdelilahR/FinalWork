@@ -17,7 +17,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.currentplacedetailsonmap.Activity.ChatActivity;
@@ -73,6 +75,7 @@ public class UserFragment extends Fragment implements Serializable
     private Location currentLocation = new Location("");
     private Menu optionMenu;
     private ProgressDialog dialog;
+    private Switch _switch;
 
     public UserFragment()
     {
@@ -125,7 +128,10 @@ public class UserFragment extends Fragment implements Serializable
         //https://stackoverflow.com/questions/30847096/android-getmenuinflater-in-a-fragment-subclass-cannot-resolve-method
         //https://stackoverflow.com/questions/15653737/oncreateoptionsmenu-inside-fragments
         inflater.inflate(R.menu.settings, menu);
+
+
         super.onCreateOptionsMenu(menu, inflater);
+
         //return true;
     }
 
@@ -135,6 +141,22 @@ public class UserFragment extends Fragment implements Serializable
     {
 
 
+        if (item.getItemId() == R.id.status_switch)
+        {
+            if (item.isChecked())
+            {
+                setOnline_only(false);
+                userList = new ArrayList<>();
+                loadUserList();
+                item.setChecked(false);
+            } else if (!item.isChecked())
+            {
+                setOnline_only(true);
+                userList = new ArrayList<>();
+                loadUserList();
+                item.setChecked(true);
+            }
+        }
         if (item.getItemId() == R.id.profile_picture)
         {
             Toast.makeText(getContext(), "what?", Toast.LENGTH_SHORT).show();
@@ -262,12 +284,12 @@ public class UserFragment extends Fragment implements Serializable
 
                         if (online_only)
                         {
-                            if (distance <= getRadius() && myUser.getStatus().equals("online_only"))
+                            if (distance <= getRadius() && myUser.getStatus().equals("online"))
                                 userList.add(myUser);
                         } else
                         {
-                            if (distance <= getRadius()) 
-                            userList.add(myUser);
+                            if (distance <= getRadius())
+                                userList.add(myUser);
                         }
                     }
                 }
