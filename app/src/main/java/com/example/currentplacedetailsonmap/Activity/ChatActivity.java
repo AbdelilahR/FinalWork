@@ -472,11 +472,7 @@ public class ChatActivity extends AppCompatActivity
 
             final String push_id = user_message_push.getKey();
 
-
-            // StorageReference filepath = mImageStorage.child("message_maps").child(push_id + ".jpg ");
-
-            // String download_url = data.getData().toString();
-            String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
+      String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
 
 
             Map messageMap = new HashMap();
