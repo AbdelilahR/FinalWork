@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import com.firebase.client.ServerValue;
 import com.example.currentplacedetailsonmap.Adapter.MessageAdapter;
 import com.example.currentplacedetailsonmap.Model.GetTimeAgo;
@@ -118,7 +119,6 @@ public class ChatActivity extends AppCompatActivity
             myLocation = getLastKnownLocation(this);
             //sendLocation(myLocation);
 
-            //String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
 
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
@@ -475,11 +475,12 @@ public class ChatActivity extends AppCompatActivity
 
             // StorageReference filepath = mImageStorage.child("message_maps").child(push_id + ".jpg ");
 
-            String download_url = data.getData().toString();
+            // String download_url = data.getData().toString();
+            String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
 
 
             Map messageMap = new HashMap();
-            messageMap.put("message", download_url);
+            messageMap.put("message", url);
             messageMap.put("seen", false);
             messageMap.put("type", "map");
             messageMap.put("time", ServerValue.TIMESTAMP);
@@ -728,7 +729,7 @@ public class ChatActivity extends AppCompatActivity
             });
 
         }
-
+        refreshActivity();
     }
 
     public void refreshActivity()
