@@ -14,7 +14,7 @@ public class User implements Serializable
     public String email;
     public String wachtwoord;
     public Address adress;
-    public String online;
+    public String status;
     public String avatar;
 
 
@@ -31,7 +31,7 @@ public class User implements Serializable
         this.email = email;
         this.wachtwoord = wachtwoord;
         this.adress = adress;
-        this.online = online;
+        this.status = online;
         this.avatar = avatar;
 
     }
@@ -49,12 +49,12 @@ public class User implements Serializable
 
     public String getStatus()
     {
-        return online;
+        return status;
     }
 
     public void setStatus(String online)
     {
-        this.online = online;
+        this.status = online;
     }
 
     public String getUserId()
