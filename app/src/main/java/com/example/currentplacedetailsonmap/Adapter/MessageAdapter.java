@@ -44,8 +44,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 {
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
-    public FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    public String currentUserID = mAuth.getCurrentUser().getUid();
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
     private List<Messages> mMessageList;
     private DatabaseReference mUserDatabase;
     private SimpleDateFormat dateFormat;
@@ -54,13 +54,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private String mCurrentUserId;
     private boolean zoomOut = false;
     private DatabaseReference mRootRef;
-    public ChatActivity chatActivity;
+    private ChatActivity chatActivity;
 
     private String my_url;
-
-    private int teller = 0;
-    private Location myLocation = new Location("");
-    private LocationManager mLocationManager;
 
     public MessageAdapter(List<Messages> mMessageList, String selectedUserId, String mCurrentUserId, ChatActivity chatActivity)
     {
@@ -120,7 +116,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             viewHolder.messageImage.setClickable(true);
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
-            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(400, 0).into(viewHolder.messageImage);
+            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 300).into(viewHolder.messageImage);
             viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
             {
 
@@ -149,7 +145,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         {
             viewHolder.messageImage.setClickable(true);
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
-            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(400, 0).into(viewHolder.messageImage);
+            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 300).into(viewHolder.messageImage);
             viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -183,8 +179,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     /**
      * source: https://stackoverflow.com/questions/13241251/timestamp-to-string-date?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
      *
-     * @param timeStampStr
-     * @return
+     *
      */
     private String getDate(String timeStampStr)
     {
@@ -218,11 +213,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public class MessageViewHolder extends RecyclerView.ViewHolder
     {
 
-        public TextView messageText;
-        public CircleImageView profileImage;
-        public TextView displayName;
-        public TextView displayTime;
-        public ImageView messageImage;
+        private TextView messageText;
+        private CircleImageView profileImage;
+        private TextView displayName;
+        private TextView displayTime;
+        private ImageView messageImage;
 
         public MessageViewHolder(View view)
         {

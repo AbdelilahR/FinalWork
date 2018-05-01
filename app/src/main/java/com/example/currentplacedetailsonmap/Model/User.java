@@ -7,15 +7,15 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class User implements Serializable
 {
 
-    public String userId;
-    public String achternaam;
-    public String voornaam;
-    public String geslacht;
-    public String email;
-    public String wachtwoord;
-    public Address adress;
-    public String status;
-    public String avatar;
+    private String userId;
+    private String achternaam;
+    private String voornaam;
+    private String geslacht;
+    private String email;
+    private String wachtwoord;
+    private Address adress;
+    private String online;
+    private String avatar;
 
 
     public User()
@@ -31,7 +31,7 @@ public class User implements Serializable
         this.email = email;
         this.wachtwoord = wachtwoord;
         this.adress = adress;
-        this.status = online;
+        this.online = online;
         this.avatar = avatar;
 
     }
@@ -49,12 +49,12 @@ public class User implements Serializable
 
     public String getStatus()
     {
-        return status;
+        return online;
     }
 
     public void setStatus(String online)
     {
-        this.status = online;
+        this.online = online;
     }
 
     public String getUserId()

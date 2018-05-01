@@ -298,13 +298,6 @@ public class ChatActivity extends AppCompatActivity
             {
                 openOptionsMenu();
 
-                /*
-                Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-
-                startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
-*/
 
             }
         });
@@ -732,7 +725,6 @@ public class ChatActivity extends AppCompatActivity
             });
 
         }
-        refreshActivity();
     }
 
     public void refreshActivity()
