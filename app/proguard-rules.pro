@@ -11,6 +11,7 @@
 -keep public class * extends android.app.Activity
 -keep public class * extends android.app.Fragment
 -keep public class * extends android.support.v4.app.Fragment
+-keep class android.support.v7.widget.** { *; }
 # The Maps Android API uses custom parcelables.
 # Use this rule (which is slightly broader than the standard recommended one)
 # to avoid obfuscating them.

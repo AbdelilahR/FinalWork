@@ -21,6 +21,7 @@ import com.example.currentplacedetailsonmap.Model.UserViewHolder;
 import com.example.currentplacedetailsonmap.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.squareup.picasso.Picasso;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class UserAdapter extends ArrayAdapter<User>
     public Location myLocation = new Location("");
     public Location userLocation = new Location("");
     private LocationManager mLocationManager;
-    private ArrayList<User> users ;
+    private ArrayList<User> users;
 
     public UserAdapter(@NonNull Context context, ArrayList<User> users)
     {
@@ -92,7 +93,12 @@ public class UserAdapter extends ArrayAdapter<User>
         userVH.text.setText(Float.valueOf(round(distanceInMeters, 2)).toString() + " " + metric_symbol);
 
         userVH.pseudo.setText(user.getVoornaam() + " " + user.getAchternaam());
-        userVH.avatar.setImageResource(R.drawable.default_avatar);
+        //Todo create variable to retrieve Avatar
+        if (user.getAvatar().equals("default"))
+            userVH.avatar.setImageResource(R.drawable.default_avatar);
+        else
+            Picasso.with(userVH.avatar.getContext()).load(user.getAvatar()).resize(50, 50).into(userVH.avatar);
+//  Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(400, 0).into(viewHolder.messageImage);
 
         String online = user.getStatus();
         if (online.equals("online"))
@@ -100,7 +106,7 @@ public class UserAdapter extends ArrayAdapter<User>
 
         else
             userVH.status.setImageResource(R.drawable.offline_icon);
-            return convertView;
+        return convertView;
     }
 
     /**

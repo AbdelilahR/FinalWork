@@ -1,7 +1,8 @@
 package com.example.currentplacedetailsonmap.Model;
 
 import java.io.Serializable;
-import java.util.Map;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class User implements Serializable
 {
@@ -14,10 +15,14 @@ public class User implements Serializable
     public String wachtwoord;
     public Address adress;
     public String online;
+    public String avatar;
 
-    public Map<String, String> timestamp;
 
-    public User(String userId,String achternaam, String voornaam, String geslacht, String email, String wachtwoord, Address adress,String online)
+    public User()
+    {
+
+    }
+    public User(String userId, String achternaam, String voornaam, String geslacht, String email, String wachtwoord, Address adress, String online, String avatar)
     {
         this.userId = userId;
         this.achternaam = achternaam;
@@ -27,22 +32,19 @@ public class User implements Serializable
         this.wachtwoord = wachtwoord;
         this.adress = adress;
         this.online = online;
-        this.timestamp = timestamp;
-    }
-
-    public User()
-    {
+        this.avatar = avatar;
 
     }
 
-    public Map<String, String> getTimestamp()
+
+    public String getAvatar()
     {
-        return timestamp;
+        return avatar;
     }
 
-    public void setTimestamp(Map<String, String> timestamp)
+    public void setAvatar(String avatar)
     {
-        this.timestamp = timestamp;
+        this.avatar = avatar;
     }
 
     public String getStatus()
@@ -55,67 +57,75 @@ public class User implements Serializable
         this.online = online;
     }
 
-    public String getUserId() {
+    public String getUserId()
+    {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(String userId)
+    {
         this.userId = userId;
     }
 
-    public String getAchternaam() {
+    public String getAchternaam()
+    {
         return achternaam;
     }
 
-    public void setAchternaam(String achternaam) {
+    public void setAchternaam(String achternaam)
+    {
         this.achternaam = achternaam;
     }
 
-    public String getVoornaam() {
+    public String getVoornaam()
+    {
         return voornaam;
     }
 
-    public void setVoornaam(String voornaam) {
+    public void setVoornaam(String voornaam)
+    {
         this.voornaam = voornaam;
     }
 
-    public String getGeslacht() {
+    public String getGeslacht()
+    {
         return geslacht;
     }
 
-    public void setGeslacht(String geslacht) {
+    public void setGeslacht(String geslacht)
+    {
         this.geslacht = geslacht;
     }
 
-    public String getEmail() {
+    public String getEmail()
+    {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(String email)
+    {
         this.email = email;
     }
 
-    public Address getAdress() {
+    public Address getAdress()
+    {
         return adress;
     }
 
-    public void setAdress(Address adress) {
+    public void setAdress(Address adress)
+    {
         this.adress = adress;
     }
 
-    @Override
-    public String toString()
+    public String getWachtwoord()
     {
-        return email + " ";
-        /*
-        return "User{" +
-                "userId='" + userId + '\'' +
-                ", achternaam='" + achternaam + '\'' +
-                ", voornaam='" + voornaam + '\'' +
-                ", geslacht='" + geslacht + '\'' +
-                ", email='" + email + '\'' +
-                ", wachtwoord='" + wachtwoord + '\'' +
-                ", adress=" + adress +
-                '}';*/
+        return wachtwoord;
     }
+
+    public void setWachtwoord(String wachtwoord)
+    {
+        this.wachtwoord = wachtwoord;
+    }
+
+
 }

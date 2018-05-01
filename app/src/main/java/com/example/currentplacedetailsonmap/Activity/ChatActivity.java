@@ -44,6 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 //import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -177,6 +178,12 @@ public class ChatActivity extends AppCompatActivity
         mMessagesList.setHasFixedSize(true);
         mMessagesList.setLayoutManager(mLinearLayout);
 
+        //Set profiel image of selected user
+
+        if (selectedUser.getAvatar().equals("default"))
+            mProfileImage.setImageResource(R.drawable.default_avatar);
+        else
+            Picasso.with(mProfileImage.getContext()).load(selectedUser.getAvatar()).resize(36, 36).into(mProfileImage);
 
         mMessagesList.setAdapter(mAdapter);
 
@@ -472,7 +479,7 @@ public class ChatActivity extends AppCompatActivity
 
             final String push_id = user_message_push.getKey();
 
-      String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
+            String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
 
 
             Map messageMap = new HashMap();

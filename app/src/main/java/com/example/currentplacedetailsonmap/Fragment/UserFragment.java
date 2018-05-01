@@ -18,11 +18,11 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.example.currentplacedetailsonmap.Activity.AuthenticationActivity;
 import com.example.currentplacedetailsonmap.Activity.ChatActivity;
 import com.example.currentplacedetailsonmap.Activity.LoginActivity;
 import com.example.currentplacedetailsonmap.Model.User;
@@ -59,15 +59,14 @@ public class UserFragment extends Fragment implements Serializable
     public ListView userListView = null;
     public ArrayList<User> userList = new ArrayList<>();
     public User myUser = new User();
-    public String loggedUser = "fail";
+
     public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
-    Boolean One_km = false;
+
     //Test this --> https://stackoverflow.com/questions/32886546/how-to-get-all-child-list-from-firebase-android
     private FirebaseAuth mAuth;
     private String lastId;
     private UserAdapter userAdapter = null;
     private ArrayAdapter<User> adapter = null;
-    private int preLast;
     private String mCurrentUserId;
     private LocationManager mLocationManager;
     private float radius = Float.MAX_VALUE;
@@ -75,8 +74,8 @@ public class UserFragment extends Fragment implements Serializable
     private float distance;
     private Location userLocation = new Location("");
     private Location currentLocation = new Location("");
-    private Menu optionMenu;
-    private Switch _switch;
+    private String userId;
+
 
     public UserFragment()
     {
@@ -115,7 +114,7 @@ public class UserFragment extends Fragment implements Serializable
         //public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         /*https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
-
+        userId = FirebaseAuth.getInstance().getUid();
         getActivity().setTitle("Users");
         loadUserList();
 
@@ -161,6 +160,8 @@ public class UserFragment extends Fragment implements Serializable
         if (item.getItemId() == R.id.profile_picture)
         {
             Toast.makeText(getContext(), "what?", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(getActivity(), AuthenticationActivity.class);
+            startActivity(intent);
             return true;
         } else if (item.getItemId() == R.id.distance_any)
         {
@@ -194,7 +195,7 @@ public class UserFragment extends Fragment implements Serializable
         if (item.getItemId() == R.id.Logout)
         {
 
-            String userId = FirebaseAuth.getInstance().getUid();
+            
 
             Intent intent = new Intent(getActivity(), LoginActivity.class);
 
@@ -281,7 +282,7 @@ public class UserFragment extends Fragment implements Serializable
 
                             myUser = dsp.getValue(User.class);
                             lastId = dsp.getKey();
-                            if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
+                            if (!myUser.getUserId().equals(mCurrentUserId))
                             {
                                 userLocation.setLatitude(myUser.getAdress().getLatitude());
                                 userLocation.setLongitude(myUser.getAdress().getLongitude());

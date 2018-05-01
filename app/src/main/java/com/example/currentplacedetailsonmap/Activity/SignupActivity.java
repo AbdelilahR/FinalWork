@@ -32,6 +32,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Bron:
@@ -53,6 +56,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
     private DatabaseReference mDatabaseReference;
     private String userId;
     private String geslacht;
+    private CircleImageView avatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -78,7 +82,8 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.planets_array, android.R.layout.simple_spinner_dropdown_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         inputGeslacht.setAdapter(adapter);
-        //inputGeslacht.setOnItemClickListener((AdapterView.OnItemClickListener) this);
+        avatar = new CircleImageView(this);
+        avatar.setImageResource(R.drawable.default_avatar);
 
         paf.setOnPlaceSelectedListener(new PlaceSelectionListener()
         {
@@ -152,7 +157,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                                     userId = current_user.getUid();
                                     mDatabaseReference = database.getReference("User").child(userId);
 
-                                    User user = new User(userId, lastName, firstName, myGender, email, password, address, "online");
+                                    User user = new User(userId, lastName, firstName, myGender, email, password, address, "online", "default");
                                     mDatabaseReference.setValue(user);
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                     finish();

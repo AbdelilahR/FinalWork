@@ -18,8 +18,11 @@ import com.example.currentplacedetailsonmap.Model.Messages;
 import com.example.currentplacedetailsonmap.PhotoFullPopupWindow;
 import com.example.currentplacedetailsonmap.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -84,6 +87,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_chat_receive, parent, false);
             return new MessageViewHolder(view);
         }
+
         return null;
     }
 
@@ -91,7 +95,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public void onBindViewHolder(final MessageViewHolder viewHolder, int i)
     {
-        boolean isImageFitToScreen;
 
         Messages c = mMessageList.get(i);
         String from_user = c.getFrom();
@@ -101,6 +104,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         millisInString = dateFormat.format(new Date());
         getItemViewType(i);
         mUserDatabase = FirebaseDatabase.getInstance().getReference("User").child(from_user);
+
 
         viewHolder.displayName.setText("");
 
@@ -114,35 +118,34 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         } else if (message_type.equals("image"))
         {
 
-                viewHolder.messageImage.setClickable(true);
-                viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
-                Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(400, 0).into(viewHolder.messageImage);
-                viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
+            viewHolder.messageImage.setClickable(true);
+            viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
+            Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(400, 0).into(viewHolder.messageImage);
+            viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
+            {
+
+                @Override
+                public void onClick(final View view)
                 {
 
-                    @Override
-                    public void onClick(final View view)
+                    Handler handler = new Handler();
+                    handler.post(new Runnable()
                     {
-
-                        Handler handler = new Handler();
-                        handler.post(new Runnable()
+                        @Override
+                        public void run()
                         {
-                            @Override
-                            public void run()
-                            {
-                                int position = viewHolder.getAdapterPosition();
-                                new PhotoFullPopupWindow(view.getContext(), R.layout.popup_photo_full, viewHolder.messageImage, mMessageList.get(position).getMessage(), null);
+                            int position = viewHolder.getAdapterPosition();
+                            new PhotoFullPopupWindow(view.getContext(), R.layout.popup_photo_full, viewHolder.messageImage, mMessageList.get(position).getMessage(), null);
 
-                            }
-                        });
+                        }
+                    });
 
 
-                    }
-                });
+                }
+            });
 
 
-        }
-        else
+        } else
         {
             viewHolder.messageImage.setClickable(true);
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
@@ -155,7 +158,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                     Double myLatitude = chatActivity.myLocation.getLatitude();
                     Double myLongitude = chatActivity.myLocation.getLongitude();
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:<" + myLatitude  + ">,<" + myLongitude + ">?q=<" + myLatitude  + ">,<" + myLongitude + ">"));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:<" + myLatitude + ">,<" + myLongitude + ">?q=<" + myLatitude + ">,<" + myLongitude + ">"));
 
                     chatActivity.startActivity(intent);
                 }
@@ -225,7 +228,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         {
             super(view);
             messageText = (TextView) view.findViewById(R.id.message_text_layout);
-            // profileImage = (CircleImageView) view.findViewById(R.id.custom_bar_image);
+
             displayName = (TextView) view.findViewById(R.id.name_text_layout);
             messageImage = (ImageView) view.findViewById(R.id.message_image_layout);
             displayTime = (TextView) view.findViewById(R.id.time_text_layout);
@@ -235,4 +238,5 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
 
     }
+
 }

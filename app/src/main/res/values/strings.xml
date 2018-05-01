@@ -42,5 +42,6 @@
     <string name="bt_sent">Send</string>
     <string name="text_item">Message</string>
     <string name="send_to">send</string>
+    <string name="change_image">Change Image</string>
 </resources>
 
