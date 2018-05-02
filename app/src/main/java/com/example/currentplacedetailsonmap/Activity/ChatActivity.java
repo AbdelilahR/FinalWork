@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -321,331 +322,302 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
-    /**
-     * protected void sendLocation(Location location)
-     * {
-     * <p>
-     * Double latitude = location.getLatitude();
-     * Double longitude = location.getLongitude();
-     * String strinurl = "http://maps.google.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=15&size=200x200&sensor=false";
-     * <p>
-     * Uri uploadUri = Uri.fromFile(new File())
-     * <p>
-     * final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
-     * final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
-     * <p>
-     * DatabaseReference user_message_push = mRootRef.child("messages")
-     * .child(mCurrentUserId).child(mChatUser).push();
-     * <p>
-     * final String push_id = user_message_push.getKey();
-     * <p>
-     * <p>
-     * StorageReference filepath = mImageStorage.child("message_maps");
-     * <p>
-     * filepath.putFile(url).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>()
-     * {
-     *
-     * @Override public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task)
-     * {
-     * <p>
-     * if (task.isSuccessful())
-     * {
-     * <p>
-     * String download_url = task.getResult().getDownloadUrl().toString();
-     * <p>
-     * <p>
-     * Map messageMap = new HashMap();
-     * messageMap.put("message", download_url);
-     * messageMap.put("seen", false);
-     * messageMap.put("type", "image");
-     * messageMap.put("time", ServerValue.TIMESTAMP);
-     * messageMap.put("from", mCurrentUserId);
-     * <p>
-     * Map messageUserMap = new HashMap();
-     * messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-     * messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-     * <p>
-     * mChatMessageView.setText("");
-     * <p>
-     * mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
-     * {
-     * @Override public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
-     * {
-     * <p>
-     * if (databaseError != null)
-     * {
-     * <p>
-     * Log.d("CHAT_LOG", databaseError.getMessage().toString());
-     * <p>
-     * }
-     * <p>
-     * }
-     * });
-     * <p>
-     * <p>
-     * }
-     * <p>
-     * }
-     * });
-     * <p>
-     * <p>
-     * }
-     */
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GALLERY_PICK && resultCode == RESULT_OK)
+
+        class shareAsync extends AsyncTask<String, Void, String>
         {
-
-            Uri imageUri = data.getData();
-
-            final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
-            final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
-
-            DatabaseReference user_message_push = mRootRef.child("messages")
-                    .child(mCurrentUserId).child(mChatUser).push();
-
-            final String push_id = user_message_push.getKey();
-
-
-            StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
-
-            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>()
+            @Override
+            protected void onPostExecute(String s)
             {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task)
+                mChatMessageView.setText("");
+                super.onPostExecute(s);
+            }
+
+            @Override
+            protected String doInBackground(String... strings)
+            {
+
+                if (requestCode == GALLERY_PICK && resultCode == RESULT_OK)
                 {
 
-                    if (task.isSuccessful())
+                    Uri imageUri = data.getData();
+
+                    final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
+                    final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
+
+                    DatabaseReference user_message_push = mRootRef.child("messages")
+                            .child(mCurrentUserId).child(mChatUser).push();
+
+                    final String push_id = user_message_push.getKey();
+
+
+                    StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
+
+                    filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>()
                     {
-
-                        String download_url = task.getResult().getDownloadUrl().toString();
-
-
-                        Map messageMap = new HashMap();
-                        messageMap.put("message", download_url);
-                        messageMap.put("seen", false);
-                        messageMap.put("type", "image");
-                        messageMap.put("time", ServerValue.TIMESTAMP);
-                        messageMap.put("from", mCurrentUserId);
-
-                        Map messageUserMap = new HashMap();
-                        messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-                        messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-
-                        mChatMessageView.setText("");
-
-                        mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task)
                         {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+
+                            if (task.isSuccessful())
                             {
 
-                                if (databaseError != null)
+                                String download_url = task.getResult().getDownloadUrl().toString();
+
+
+                                Map messageMap = new HashMap();
+                                messageMap.put("message", download_url);
+                                messageMap.put("seen", false);
+                                messageMap.put("type", "image");
+                                messageMap.put("time", ServerValue.TIMESTAMP);
+                                messageMap.put("from", mCurrentUserId);
+
+                                Map messageUserMap = new HashMap();
+                                messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+                                messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+
+
+                                mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
                                 {
+                                    @Override
+                                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+                                    {
 
-                                    Log.d("CHAT_LOG", databaseError.getMessage().toString());
+                                        if (databaseError != null)
+                                        {
 
-                                }
+                                            Log.d("CHAT_LOG", databaseError.getMessage().toString());
+
+                                        }
+
+                                    }
+                                });
+
 
                             }
-                        });
 
-
-                    }
+                        }
+                    });
+                    refreshActivity();
 
                 }
-            });
-
-        }
-        if (requestCode == SEND_LOCATION && resultCode == RESULT_OK)
-        {
-
-
-            final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
-            final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
-
-            DatabaseReference user_message_push = mRootRef.child("messages")
-                    .child(mCurrentUserId).child(mChatUser).push();
-
-            final String push_id = user_message_push.getKey();
-
-            String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
-
-
-            Map messageMap = new HashMap();
-            messageMap.put("message", url);
-            messageMap.put("seen", false);
-            messageMap.put("type", "map");
-            messageMap.put("time", ServerValue.TIMESTAMP);
-            messageMap.put("from", mCurrentUserId);
-
-            Map messageUserMap = new HashMap();
-            messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-            messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-
-            mChatMessageView.setText("");
-
-            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
-            {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+                if (requestCode == SEND_LOCATION && resultCode == RESULT_OK)
                 {
 
-                    if (databaseError != null)
+
+                    final String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
+                    final String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
+
+                    DatabaseReference user_message_push = mRootRef.child("messages")
+                            .child(mCurrentUserId).child(mChatUser).push();
+
+                    final String push_id = user_message_push.getKey();
+
+                    String url = "http://maps.google.com/maps/api/staticmap?center=" + myLocation.getLatitude() + "," + myLocation.getLongitude() + "&zoom=15&size=400x400&sensor=true&format=jpg";
+
+
+                    Map messageMap = new HashMap();
+                    messageMap.put("message", url);
+                    messageMap.put("seen", false);
+                    messageMap.put("type", "map");
+                    messageMap.put("time", ServerValue.TIMESTAMP);
+                    messageMap.put("from", mCurrentUserId);
+
+                    Map messageUserMap = new HashMap();
+                    messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+                    messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+//                    mChatMessageView.setText("");
+
+                    mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
                     {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+                        {
 
-                        Log.d("CHAT_LOG", databaseError.getMessage().toString());
+                            if (databaseError != null)
+                            {
 
-                    }
+                                Log.d("CHAT_LOG", databaseError.getMessage().toString());
+
+                            }
+
+                        }
+                    });
 
                 }
-            });
 
+                return "Executed";
+            }
         }
-
+        new shareAsync().execute("");
         refreshActivity();
     }
 
     private void loadMoreMessages()
     {
 
-        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
-
-        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
-
-        messageQuery.addChildEventListener(new ChildEventListener()
+        class loadMoreMessagesAsync extends AsyncTask<String, Void, String>
         {
+
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            protected String doInBackground(String... strings)
             {
+                DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
 
+                Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
 
-                Messages message = dataSnapshot.getValue(Messages.class);
-                String messageKey = dataSnapshot.getKey();
-
-                if (!mPrevKey.equals(messageKey))
+                messageQuery.addChildEventListener(new ChildEventListener()
                 {
-
-                    messagesList.add(itemPos++, message);
-
-                } else
-                {
-
-                    mPrevKey = mLastKey;
-
-                }
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                    {
 
 
-                if (itemPos == 1)
-                {
+                        Messages message = dataSnapshot.getValue(Messages.class);
+                        String messageKey = dataSnapshot.getKey();
 
-                    mLastKey = messageKey;
+                        if (!mPrevKey.equals(messageKey))
+                        {
 
-                }
+                            messagesList.add(itemPos++, message);
+
+                        } else
+                        {
+
+                            mPrevKey = mLastKey;
+
+                        }
 
 
-                Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
+                        if (itemPos == 1)
+                        {
 
-                mAdapter.notifyDataSetChanged();
+                            mLastKey = messageKey;
 
-                mRefreshLayout.setRefreshing(false);
+                        }
 
-                mLinearLayout.scrollToPositionWithOffset(10, 0);
 
+                        Log.d("TOTALKEYS", "Last Key : " + mLastKey + " | Prev Key : " + mPrevKey + " | Message Key : " + messageKey);
+
+                        mAdapter.notifyDataSetChanged();
+
+                        mRefreshLayout.setRefreshing(false);
+
+                        mLinearLayout.scrollToPositionWithOffset(10, 0);
+
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s)
+                    {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot)
+                    {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s)
+                    {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+
+                    }
+                });
+
+                return "Executed";
             }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-
-            }
-        });
+        }
+        new loadMoreMessagesAsync().execute("");
 
     }
 
     private void loadMessages()
     {
 
-        DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
-
-        Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
-
-
-        messageQuery.addChildEventListener(new ChildEventListener()
+        class loadMessageAsync extends AsyncTask<String, Void, String>
         {
+
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            protected String doInBackground(String... strings)
             {
+                DatabaseReference messageRef = mRootRef.child("messages").child(mCurrentUserId).child(mChatUser);
 
-                Messages message = dataSnapshot.getValue(Messages.class);
+                Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
 
-                itemPos++;
 
-                if (itemPos == 1)
+                messageQuery.addChildEventListener(new ChildEventListener()
                 {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                    {
 
-                    String messageKey = dataSnapshot.getKey();
+                        Messages message = dataSnapshot.getValue(Messages.class);
 
-                    mLastKey = messageKey;
-                    mPrevKey = messageKey;
+                        itemPos++;
 
-                }
+                        if (itemPos == 1)
+                        {
 
-                messagesList.add(message);
+                            String messageKey = dataSnapshot.getKey();
 
-                mAdapter.notifyDataSetChanged();
+                            mLastKey = messageKey;
+                            mPrevKey = messageKey;
 
-                mMessagesList.scrollToPosition(messagesList.size() - 1);
+                        }
 
-                mRefreshLayout.setRefreshing(false);
+                        messagesList.add(message);
 
+                        mAdapter.notifyDataSetChanged();
+
+                        mMessagesList.scrollToPosition(messagesList.size() - 1);
+
+                        mRefreshLayout.setRefreshing(false);
+
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s)
+                    {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot)
+                    {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s)
+                    {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+
+                    }
+                });
+                return "Executed";
             }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-
-            }
-        });
+        }
+        new loadMessageAsync().execute("");
 
     }
 
@@ -675,56 +647,69 @@ public class ChatActivity extends AppCompatActivity
     private void sendMessage()
     {
 
-
-        String message = mChatMessageView.getText().toString();
-
-        if (!TextUtils.isEmpty(message))
+        class sendMessageAsync extends AsyncTask<String, Void, String>
         {
-
-            String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
-            String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
-
-            DatabaseReference user_message_push = mRootRef.child("messages")
-                    .child(mCurrentUserId).child(mChatUser).push();
-
-            String push_id = user_message_push.getKey();
-
-            Map messageMap = new HashMap();
-            messageMap.put("message", message);
-            messageMap.put("seen", false);
-            messageMap.put("type", "text");
-            messageMap.put("time", ServerValue.TIMESTAMP);
-            messageMap.put("from", mCurrentUserId);
-
-            Map messageUserMap = new HashMap();
-            messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-            messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-
-            mChatMessageView.setText("");
-
-            mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
-            mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("timestamp").setValue(ServerValue.TIMESTAMP);
-
-            mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("seen").setValue(false);
-            mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("timestamp").setValue(ServerValue.TIMESTAMP);
-
-            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
+            @Override
+            protected void onPostExecute(String s)
             {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+                mChatMessageView.setText("");
+            }
+
+            @Override
+            protected String doInBackground(String... strings)
+            {
+                String message = mChatMessageView.getText().toString();
+
+                if (!TextUtils.isEmpty(message))
                 {
 
-                    if (databaseError != null)
+                    String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
+                    String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
+
+                    DatabaseReference user_message_push = mRootRef.child("messages")
+                            .child(mCurrentUserId).child(mChatUser).push();
+
+                    String push_id = user_message_push.getKey();
+
+                    Map messageMap = new HashMap();
+                    messageMap.put("message", message);
+                    messageMap.put("seen", false);
+                    messageMap.put("type", "text");
+                    messageMap.put("time", ServerValue.TIMESTAMP);
+                    messageMap.put("from", mCurrentUserId);
+
+                    Map messageUserMap = new HashMap();
+                    messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+                    messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+
+                    mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("seen").setValue(true);
+                    mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+                    mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("seen").setValue(false);
+                    mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+
+                    mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
                     {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+                        {
 
-                        Log.d("CHAT_LOG", databaseError.getMessage().toString());
+                            if (databaseError != null)
+                            {
 
-                    }
+                                Log.d("CHAT_LOG", databaseError.getMessage().toString());
+
+                            }
+
+                        }
+                    });
 
                 }
-            });
-
+                return "Executed";
+            }
         }
+        new sendMessageAsync().execute("");
     }
 
     public void refreshActivity()

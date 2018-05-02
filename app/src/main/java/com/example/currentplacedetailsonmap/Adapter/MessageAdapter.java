@@ -106,14 +106,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if (message_type.equals("text"))
         {
-
+            viewHolder.messageText.setVisibility(View.VISIBLE);
             viewHolder.messageText.setText(c.getMessage());
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
-            viewHolder.messageImage.setVisibility(View.INVISIBLE);
+            viewHolder.messageImage.setVisibility(View.GONE);
             viewHolder.messageImage.setClickable(false);
         } else if (message_type.equals("image"))
         {
-
+            viewHolder.messageText.setVisibility(View.GONE);
+            viewHolder.messageImage.setVisibility(View.VISIBLE);
             viewHolder.messageImage.setClickable(true);
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
             Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 300).into(viewHolder.messageImage);
@@ -141,8 +142,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             });
 
 
-        } else
+        } else if (message_type.equals("map"))
         {
+            viewHolder.messageText.setVisibility(View.GONE);
+            viewHolder.messageImage.setVisibility(View.VISIBLE);
             viewHolder.messageImage.setClickable(true);
             viewHolder.displayTime.setText(getDate(String.valueOf(c.getTime())));
             Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(300, 300).into(viewHolder.messageImage);
@@ -178,8 +181,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     /**
      * source: https://stackoverflow.com/questions/13241251/timestamp-to-string-date?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-     *
-     *
      */
     private String getDate(String timeStampStr)
     {
