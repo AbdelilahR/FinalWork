@@ -43,5 +43,6 @@
     <string name="text_item">Message</string>
     <string name="send_to">send</string>
     <string name="change_image">Change Image</string>
+    <string name="Town">Town</string>
 </resources>
 

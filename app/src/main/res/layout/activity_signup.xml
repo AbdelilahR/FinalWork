@@ -113,7 +113,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusableInTouchMode="true"
-                android:hint="@string/Adress"
+                android:hint="@string/Town"
                 android:paddingTop="5dip"
                 android:imeOptions="actionUnspecified"
                 android:inputType="none"
