@@ -282,7 +282,7 @@ public class UserFragment extends Fragment implements Serializable
 
                             myUser = dsp.getValue(User.class);
                             lastId = dsp.getKey();
-                            if (!myUser.getUserId().equals(mCurrentUserId))
+                            if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
                             {
                                 userLocation.setLatitude(myUser.getAdress().getLatitude());
                                 userLocation.setLongitude(myUser.getAdress().getLongitude());

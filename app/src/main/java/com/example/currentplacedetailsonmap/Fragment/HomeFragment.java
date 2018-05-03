@@ -35,10 +35,14 @@ import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.currentplacedetailsonmap.MainActivity;
+import com.example.currentplacedetailsonmap.Model.Address;
 import com.example.currentplacedetailsonmap.Model.DirectionsJSONParser;
+import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.R;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -60,9 +64,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.android.gms.maps.model.TileProvider;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -74,12 +90,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment implements OnMapReadyCallback, SensorEventListener {
+public class HomeFragment extends Fragment implements OnMapReadyCallback, SensorEventListener
+{
 
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -134,15 +152,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     public TextView calories;
     public static View popup;
     public LatLng myCurrentPosition;
+    public ArrayList<LatLng> userlocations_list = new ArrayList<>();
+    private TileProvider mProvider;
+    private TileOverlay mOverlay;
 
-    public HomeFragment() {
+    public HomeFragment()
+    {
         // Required empty public constructor
-    getDeviceLocation();
+        getDeviceLocation();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState)
+    {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_google_maps, container, false);
         // Build the map.
@@ -153,7 +176,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
         //Check if GPS is enabled
         final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+        {
             buildAlertMessageNoGps();
             getDeviceLocation();
             updateLocationUI();
@@ -177,20 +201,23 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         // final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 //        onMapReady(mMap);
         // Set current location
-       // getDeviceLocation();
+        // getDeviceLocation();
 
 //        myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
 
-        btnStart.setOnClickListener(new View.OnClickListener() {
+        btnStart.setOnClickListener(new View.OnClickListener()
+        {
             @SuppressLint("MissingPermission")
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
                 if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                     buildAlertMessageNoGps();
                 else
                     getDeviceLocation();
 
-                if (firstTime == true) {
+                if (firstTime == true)
+                {
                     btnStart.setText("Stop");
                     //  distance.setText("0 m");
 
@@ -198,7 +225,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
                     firstTime = false;
                     onResume();
-                } else {
+                } else
+                {
                     chrono.stop();
 
                     time = (int) (SystemClock.elapsedRealtime() - chrono.getBase());
@@ -219,25 +247,86 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
             }
 
         });
+        addHeatMap();
 
         return view;
     }
+
+
+    private void addHeatMap()
+    {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("DataMap");
+        reference.addChildEventListener(new ChildEventListener()
+        {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+
+                Address user_location = dataSnapshot.getValue(Address.class);
+
+                // Get the data: latitude/longitude positions of all users.
+                LatLng location = new LatLng(user_location.getLatitude(), user_location.getLongitude());
+                userlocations_list.add(location);
+
+                if (userlocations_list != null && !userlocations_list.isEmpty())
+                {
+                    // Create a heat map tile provider, passing it the latlngs of the police stations.
+                    mProvider = new HeatmapTileProvider.Builder().data(userlocations_list).build();
+                    // Add a tile overlay to the map, using the heat map tile provider.
+                    mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+
+
+
+
+    }
+
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
         //https://stackoverflow.com/questions/30847096/android-getmenuinflater-in-a-fragment-subclass-cannot-resolve-method
         //https://stackoverflow.com/questions/15653737/oncreateoptionsmenu-inside-fragments
         inflater.inflate(R.menu.current_place_menu, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
         //return true;
     }
+
     @SuppressLint("ResourceType")
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         getActivity().setTitle("Home");
         // Retrieve location and camera position from saved instance state.
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null)
+        {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mNewLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
@@ -257,12 +346,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
 
-
-
-
         //      updateLocationUI();
 //        getLocationPermission();
-
 
 
     }
@@ -271,8 +356,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
      * Saves the state of the map when the activity is paused.
      */
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (mMap != null) {
+    public void onSaveInstanceState(Bundle outState)
+    {
+        if (mMap != null)
+        {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
             outState.putParcelable(KEY_LOCATION, mNewLocation);
@@ -288,7 +375,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
      */
 
 
-
     /**
      * Handles a click on the menu option to get a place.
      *
@@ -296,10 +382,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
      * @return Boolean.
      */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
 
 
-        if (item.getItemId() == R.id.option_get_place) {
+        if (item.getItemId() == R.id.option_get_place)
+        {
             getDeviceLocation();
             LayoutInflater inflater = LayoutInflater.from(getActivity());
 
@@ -308,11 +396,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
             builder.setTitle("Chose your end Goal");
 
 
-            try {
+            try
+            {
                 popup = inflater.inflate(R.layout.custom_popup, layout);
 
 
-            } catch (InflateException e) {
+            } catch (InflateException e)
+            {
                 e.getMessage();
 
             }
@@ -332,9 +422,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                     .build();
             autocompleteFragment.setFilter(typeFilter);
             mMap.clear();
-            autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener()
+            {
                 @Override
-                public void onPlaceSelected(final Place place) {
+                public void onPlaceSelected(final Place place)
+                {
                     Log.i(TAG, "Place: " + place.getName());//get place details here
                     getDeviceLocation();
                     myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
@@ -351,7 +443,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                 }
 
                 @Override
-                public void onError(Status status) {
+                public void onError(Status status)
+                {
                     Log.i(TAG, "An error occurred: " + status);
                 }
             });
@@ -361,17 +454,21 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
             builder.setView(popup);
 
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void onClick(DialogInterface dialog, int which)
+                {
                     // String m_Text = input.getText().toString();
                     //String m_Text2 = input2.getText().toString();
 
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+            {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
+                public void onClick(DialogInterface dialog, int which)
+                {
                     dialog.cancel();
 
                 }
@@ -391,21 +488,25 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
      * This callback is triggered when the map is ready to be used.
      */
     @Override
-    public void onMapReady(GoogleMap map) {
+    public void onMapReady(GoogleMap map)
+    {
         mMap = map;
 
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter()
+        {
 
             @Override
             // Return null here, so that getInfoContents() is called next.
-            public View getInfoWindow(Marker arg0) {
+            public View getInfoWindow(Marker arg0)
+            {
                 return null;
             }
 
             @Override
-            public View getInfoContents(Marker marker) {
+            public View getInfoContents(Marker marker)
+            {
                 // Inflate the layouts for the info window, title and snippet.
                 View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
                         (FrameLayout) getActivity().findViewById(R.id.map), false);
@@ -434,26 +535,33 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
-    public void getDeviceLocation() {
+    public void getDeviceLocation()
+    {
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
-        try {
-            if (mLocationPermissionGranted) {
+        try
+        {
+            if (mLocationPermissionGranted)
+            {
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
 
 
-                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
+                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>()
+                {
                     @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful()) {
+                    public void onComplete(@NonNull Task<Location> task)
+                    {
+                        if (task.isSuccessful())
+                        {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                        } else {
+                        } else
+                        {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
                             mMap.moveCamera(CameraUpdateFactory
@@ -465,7 +573,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
             }
 
-        } catch (SecurityException e) {
+        } catch (SecurityException e)
+        {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -473,7 +582,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     /**
      * Prompts the user for permission to use the device location.
      */
-    private void getLocationPermission() {
+    private void getLocationPermission()
+    {
         /*
          * Request location permission, so that we can get the location of the
          * device. The result of the permission request is handled by a callback,
@@ -481,9 +591,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
          */
         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+                == PackageManager.PERMISSION_GRANTED)
+        {
             mLocationPermissionGranted = true;
-        } else {
+        } else
+        {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -496,13 +608,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults)
+    {
         mLocationPermissionGranted = false;
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+        switch (requestCode)
+        {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
+            {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
                     mLocationPermissionGranted = true;
                 }
             }
@@ -514,28 +630,36 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
      * Prompts the user to select the current place from a list of likely places, and shows the
      * current place on the map - provided the user has granted location permission.
      */
-    private void showCurrentPlace() {
-        if (mMap == null) {
+    private void showCurrentPlace()
+    {
+        if (mMap == null)
+        {
             return;
         }
 
-        if (mLocationPermissionGranted) {
+        if (mLocationPermissionGranted)
+        {
             // Get the likely places - that is, the businesses and other points of interest that
             // are the best match for the device's current location.
             @SuppressWarnings("MissingPermission") final Task<PlaceLikelihoodBufferResponse> placeResult =
                     mPlaceDetectionClient.getCurrentPlace(null);
             placeResult.addOnCompleteListener
-                    (new OnCompleteListener<PlaceLikelihoodBufferResponse>() {
+                    (new OnCompleteListener<PlaceLikelihoodBufferResponse>()
+                    {
                         @Override
-                        public void onComplete(@NonNull Task<PlaceLikelihoodBufferResponse> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
+                        public void onComplete(@NonNull Task<PlaceLikelihoodBufferResponse> task)
+                        {
+                            if (task.isSuccessful() && task.getResult() != null)
+                            {
                                 PlaceLikelihoodBufferResponse likelyPlaces = task.getResult();
 
                                 // Set the count, handling cases where less than 5 entries are returned.
                                 int count;
-                                if (likelyPlaces.getCount() < M_MAX_ENTRIES) {
+                                if (likelyPlaces.getCount() < M_MAX_ENTRIES)
+                                {
                                     count = likelyPlaces.getCount();
-                                } else {
+                                } else
+                                {
                                     count = M_MAX_ENTRIES;
                                 }
 
@@ -545,7 +669,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                                 mLikelyPlaceAttributions = new String[count];
                                 mLikelyPlaceLatLngs = new LatLng[count];
 
-                                for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                                for (PlaceLikelihood placeLikelihood : likelyPlaces)
+                                {
                                     // Build a list of likely places to show the user.
                                     mLikelyPlaceNames[i] = (String) placeLikelihood.getPlace().getName();
                                     mLikelyPlaceAddresses[i] = (String) placeLikelihood.getPlace()
@@ -555,7 +680,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                                     mLikelyPlaceLatLngs[i] = placeLikelihood.getPlace().getLatLng();
 
                                     i++;
-                                    if (i > (count - 1)) {
+                                    if (i > (count - 1))
+                                    {
                                         break;
                                     }
                                 }
@@ -567,12 +693,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                                 // marker at the selected place.
                                 openPlacesDialog();
 
-                            } else {
+                            } else
+                            {
                                 Log.e(TAG, "Exception: %s", task.getException());
                             }
                         }
                     });
-        } else {
+        } else
+        {
             // The user has not granted permission.
             Log.i(TAG, "The user did not grant location permission.");
 
@@ -590,15 +718,19 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     /**
      * Displays a form allowing the user to select a place from a list of likely places.
      */
-    private void openPlacesDialog() {
+    private void openPlacesDialog()
+    {
         // Ask the user to choose the place where they are now.
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+        {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 // The "which" argument contains the position of the selected item.
                 LatLng markerLatLng = mLikelyPlaceLatLngs[which];
                 String markerSnippet = mLikelyPlaceAddresses[which];
-                if (mLikelyPlaceAttributions[which] != null) {
+                if (mLikelyPlaceAttributions[which] != null)
+                {
                     markerSnippet = markerSnippet + "\n" + mLikelyPlaceAttributions[which];
                 }
 
@@ -625,22 +757,28 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
-    private void updateLocationUI() {
-        if (mMap == null) {
+    private void updateLocationUI()
+    {
+        if (mMap == null)
+        {
             return;
         }
-        try {
-            if (mLocationPermissionGranted) {
+        try
+        {
+            if (mLocationPermissionGranted)
+            {
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            } else {
+            } else
+            {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
                 mNewLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e) {
+        } catch (SecurityException e)
+        {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -649,46 +787,52 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     //http://blog.bawa.com/2013/11/create-your-own-simple-pedometer.html
     //http://www.lewisgavin.co.uk/Step-Tracker-Android/
     @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
+    public void onAccuracyChanged(Sensor sensor, int i)
+    {
 
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event)
+    {
         Sensor sensor = event.sensor;
         float[] values = event.values;
         int value = -1;
 
-        if (values.length > 0) {
+        if (values.length > 0)
+        {
             value = (int) values[0];
         }
 
 
-        if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
+        if (sensor.getType() == Sensor.TYPE_STEP_DETECTOR)
+        {
 
             steps++;
             distance.setText(Double.toString(getDistanceRun(steps)));
         }
     }
 
-/*
+    /*
+        @Override
+        public void onResume() {
+
+            super.onResume();
+
+            sManager.registerListener((SensorEventListener) getActivity(), stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
+
+        }
+    */
     @Override
-    public void onResume() {
-
-        super.onResume();
-
-        sManager.registerListener((SensorEventListener) getActivity(), stepSensor, SensorManager.SENSOR_DELAY_FASTEST);
-
-    }
-*/
-    @Override
-    public void onStop() {
+    public void onStop()
+    {
         super.onStop();
         sManager.unregisterListener(this, stepSensor);
     }
 
     //get distance in meters
-    public double getDistanceRun(long steps) {
+    public double getDistanceRun(long steps)
+    {
         //float distance = ((float) (steps * 78) / (float) 100000) * 1000;
         //int round =(int) distance;
         return steps * 0.762;
@@ -704,7 +848,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     /**
      * Function to show settings alert dialog
      */
-    public void buildAlertMessageNoGps() {
+    public void buildAlertMessageNoGps()
+    {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
 
         // Setting Dialog Title
@@ -717,16 +862,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         //alertDialog.setIcon(R.drawable.delete);
 
         // On pressing Settings button
-        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
+        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
             }
         });
 
         // on pressing cancel button
-        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int which)
+            {
                 dialog.cancel();
             }
         });
@@ -736,23 +885,28 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     }
 
     //Private Class ==> https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
-    public class DownloadTask extends AsyncTask<String, Void, String> {
+    public class DownloadTask extends AsyncTask<String, Void, String>
+    {
 
 
         @Override
-        public String doInBackground(String... url) {
+        public String doInBackground(String... url)
+        {
             String data = "";
 
-            try {
+            try
+            {
                 data = downloadUrl(url[0]);
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 Log.d("Background Task", e.toString());
             }
             return data;
         }
 
 
-        public void onPostExecute(String result) {
+        public void onPostExecute(String result)
+        {
             super.onPostExecute(result);
 
             ParserTask parserTask = new ParserTask();
@@ -764,39 +918,46 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     }
 
 
-    public class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    public class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>>
+    {
 
         // Parsing the data in non-ui thread
         @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData)
+        {
 
             JSONObject jObject;
             List<List<HashMap<String, String>>> routes = null;
 
-            try {
+            try
+            {
                 jObject = new JSONObject(jsonData[0]);
                 DirectionsJSONParser parser = new DirectionsJSONParser();
 
                 routes = parser.parse(jObject);
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 e.printStackTrace();
             }
             return routes;
         }
 
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+        protected void onPostExecute(List<List<HashMap<String, String>>> result)
+        {
             ArrayList points = null;
             PolylineOptions lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
 
-            for (int i = 0; i < result.size(); i++) {
+            for (int i = 0; i < result.size(); i++)
+            {
                 points = new ArrayList();
                 lineOptions = new PolylineOptions();
 
                 List<HashMap<String, String>> path = result.get(i);
 
-                for (int j = 0; j < path.size(); j++) {
+                for (int j = 0; j < path.size(); j++)
+                {
                     HashMap point = path.get(j);
 
                     double lat = Double.parseDouble((String) point.get("lat"));
@@ -819,7 +980,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     }
 
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+    private String getDirectionsUrl(LatLng origin, LatLng dest)
+    {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -845,7 +1007,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         return url;
     }
 
-    private String downloadUrl(final String strUrl) throws IOException {
+    private String downloadUrl(final String strUrl) throws IOException
+    {
 
 
         String data = "";
@@ -853,7 +1016,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
 
-        try {
+        try
+        {
             URL url = new URL(strUrl);
 
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -869,7 +1033,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
             StringBuffer sb = new StringBuffer();
 
             String line = "";
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null)
+            {
                 sb.append(line);
             }
 
@@ -877,12 +1042,16 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
             br.close();
 
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             Log.d(TAG, "Exception" + e.toString());
-        } finally {
-            try {
+        } finally
+        {
+            try
+            {
                 iStream.close();
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 e.printStackTrace();
             }
             urlConnection.disconnect();

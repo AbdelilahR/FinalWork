@@ -20,12 +20,14 @@ import com.example.currentplacedetailsonmap.Model.Address;
 import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.R;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wearable.DataMap;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,6 +37,8 @@ import com.google.firebase.database.ServerValue;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static com.google.android.gms.location.places.AutocompleteFilter.TYPE_FILTER_CITIES;
 
 /**
  * Bron:
@@ -63,7 +67,11 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        //https://stackoverflow.com/questions/34416817/how-to-implement-placeautocompletefragment-and-placeautocompleteactivity-to-get
+        AutocompleteFilter autocompleteFilter = new AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_REGIONS).build();
         PlaceAutocompleteFragment paf = (PlaceAutocompleteFragment) this.getFragmentManager().findFragmentById(R.id.adress);
+        paf.setFilter(autocompleteFilter);
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -90,6 +98,7 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
             @Override
             public void onPlaceSelected(Place place)
             {
+
                 inputAdress = place.getLatLng();
             }
 
@@ -157,8 +166,14 @@ public class SignupActivity extends AppCompatActivity implements AdapterView.OnI
                                     userId = current_user.getUid();
                                     mDatabaseReference = database.getReference("User").child(userId);
 
+                                    /** Register user and push data in firebase**/
                                     User user = new User(userId, lastName, firstName, myGender, email, password, address, "online", "default");
                                     mDatabaseReference.setValue(user);
+
+                                    /** Set user Adress in a separate child to load heatmap*/
+                                    DatabaseReference mDataForHeatMap = database.getReference("DataMap");
+                                    mDataForHeatMap.push().setValue(user.getAdress());
+
                                     startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                                     finish();
                                 }
