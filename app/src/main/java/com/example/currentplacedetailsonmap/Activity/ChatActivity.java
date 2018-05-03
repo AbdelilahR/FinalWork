@@ -65,6 +65,8 @@ public class ChatActivity extends AppCompatActivity
     private static final int TOTAL_ITEMS_TO_LOAD = 10;
     private static final int GALLERY_PICK = 1;
     private static final int SEND_LOCATION = 2;
+    public static Location myLocation = new Location("");
+    private static LocationManager mLocationManager;
     private final List<Messages> messagesList = new ArrayList<>();
     private String mChatUser;
     private Toolbar mChatToolbar;
@@ -84,15 +86,33 @@ public class ChatActivity extends AppCompatActivity
     private int mCurrentPage = 1;
     // Storage Firebase
     private StorageReference mImageStorage;
-
-
     //New Solution
     private int itemPos = 0;
-
     private String mLastKey = "";
     private String mPrevKey = "";
-    private static LocationManager mLocationManager;
-    public static Location myLocation = new Location("");
+
+    private static Location getLastKnownLocation(Context c)
+    {
+
+
+        mLocationManager = (LocationManager) c.getSystemService(LOCATION_SERVICE);
+        List<String> providers = mLocationManager.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers)
+        {
+            Location l = mLocationManager.getLastKnownLocation(provider);
+            if (l == null)
+            {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
+            {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -322,7 +342,6 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
-
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
     {
@@ -404,7 +423,6 @@ public class ChatActivity extends AppCompatActivity
 
                         }
                     });
-                    refreshActivity();
 
                 }
                 if (requestCode == SEND_LOCATION && resultCode == RESULT_OK)
@@ -457,7 +475,6 @@ public class ChatActivity extends AppCompatActivity
             }
         }
         new shareAsync().execute("");
-        refreshActivity();
     }
 
     private void loadMoreMessages()
@@ -621,29 +638,6 @@ public class ChatActivity extends AppCompatActivity
 
     }
 
-    private static Location getLastKnownLocation(Context c)
-    {
-
-
-        mLocationManager = (LocationManager) c.getSystemService(LOCATION_SERVICE);
-        List<String> providers = mLocationManager.getProviders(true);
-        Location bestLocation = null;
-        for (String provider : providers)
-        {
-            Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null)
-            {
-                continue;
-            }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
-            {
-                // Found best last known location: %s", l);
-                bestLocation = l;
-            }
-        }
-        return bestLocation;
-    }
-
     private void sendMessage()
     {
 
@@ -712,11 +706,4 @@ public class ChatActivity extends AppCompatActivity
         new sendMessageAsync().execute("");
     }
 
-    public void refreshActivity()
-    {
-        finish();
-        overridePendingTransition(0, 0);
-        startActivity(getIntent());
-        overridePendingTransition(0, 0);
-    }
 }
