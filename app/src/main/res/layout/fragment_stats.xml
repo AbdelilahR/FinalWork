@@ -1,68 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Fragment.StatsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <Button
-        android:id="@+id/btn_start"
-        android:layout_width="194dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/map"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:text="Start" />
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textColor="#ff000000"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/avg_time"
+            android:layout_width="105dp"
+            android:layout_height="53dp"
 
-    <TextView
-        android:id="@+id/snippet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ff7f7f7f" />
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="Average Time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listView" />
 
-    <Chronometer
-        android:id="@+id/chronometer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
-        android:layout_marginLeft="54dp"
-        android:layout_marginStart="54dp"
-        android:layout_marginTop="27dp"
-        android:layout_toEndOf="@+id/title"
-        android:layout_toRightOf="@+id/title" />
+        <TextView
+            android:id="@+id/avg_cal"
+            android:layout_width="105dp"
+            android:layout_height="53dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="Average calorie"
+            app:layout_constraintEnd_toStartOf="@+id/avg_distance"
+            app:layout_constraintHorizontal_bias="0.6"
+            app:layout_constraintStart_toEndOf="@+id/avg_time"
+            app:layout_constraintTop_toBottomOf="@+id/listView" />
 
-    <TextView
-        android:id="@+id/distance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/calories"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginEnd="128dp"
-        android:layout_marginRight="128dp"
-        android:text="0 m" />
 
-    <TextView
-        android:id="@+id/calories"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/chronometer"
-        android:layout_marginLeft="35dp"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="43dp"
-        android:layout_toEndOf="@+id/title"
-        android:layout_toRightOf="@+id/title"
-        android:text="" />
+        <TextView
+            android:id="@+id/avg_distance"
+            android:layout_width="105dp"
+            android:layout_height="53dp"
+            android:layout_marginEnd="4dp"
 
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="Average calorie"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listView" />
+
+
+        <TextView
+            android:id="@+id/value_avg_distance"
+            android:layout_width="105dp"
+            android:layout_height="53dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="Value distance"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/avg_distance" />
+
+
+        <TextView
+            android:id="@+id/value_avg_time"
+            android:layout_width="105dp"
+            android:layout_height="53dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="Value time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/avg_time" />
+
+        <TextView
+            android:id="@+id/value_avg_cal"
+            android:layout_width="105dp"
+            android:layout_height="53dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="Value calorie"
+            app:layout_constraintEnd_toStartOf="@+id/value_avg_distance"
+            app:layout_constraintHorizontal_bias="0.696"
+            app:layout_constraintStart_toEndOf="@+id/value_avg_time"
+            app:layout_constraintTop_toBottomOf="@+id/avg_cal" />
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="0dp"
+            android:layout_height="359dp"
+            android:layout_marginBottom="120dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"></ListView>
+
+
+    </android.support.constraint.ConstraintLayout>
 </FrameLayout>

@@ -54,8 +54,7 @@ import static android.content.Context.LOCATION_SERVICE;
  * https://stackoverflow.com/questions/6159702/show-spinning-wheel-dialog-while-loading-data-on-android/6159735
  * https://stackoverflow.com/questions/24294936/how-to-put-method-into-the-asynctask
  */
-public class UserFragment extends Fragment implements Serializable
-{
+public class UserFragment extends Fragment implements Serializable {
     public ListView userListView = null;
     public ArrayList<User> userList = new ArrayList<>();
     public User myUser = new User();
@@ -77,8 +76,7 @@ public class UserFragment extends Fragment implements Serializable
     private String userId;
 
 
-    public UserFragment()
-    {
+    public UserFragment() {
         // this.radius = Float.MAX_VALUE;
         // Required empty public constructor
     }
@@ -86,8 +84,7 @@ public class UserFragment extends Fragment implements Serializable
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
+                             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_user, container, false);
 
 
@@ -95,8 +92,7 @@ public class UserFragment extends Fragment implements Serializable
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState)
-    {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         userListView = (ListView) view.findViewById(R.id.userList);
 
@@ -105,16 +101,19 @@ public class UserFragment extends Fragment implements Serializable
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
-        mCurrentUserId = mAuth.getCurrentUser().getUid();
+        if (mAuth != null) {
+            mCurrentUserId = mAuth.getCurrentUser().getUid();
+            userId = mAuth.getUid();
+        }
+        //todo Message text no internet connection when mAuth is null
         currentLocation = getLastKnownLocation();
         //public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         /*https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
-        userId = FirebaseAuth.getInstance().getUid();
+
         getActivity().setTitle("Users");
         loadUserList();
 
@@ -123,8 +122,7 @@ public class UserFragment extends Fragment implements Serializable
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //https://stackoverflow.com/questions/30847096/android-getmenuinflater-in-a-fragment-subclass-cannot-resolve-method
         //https://stackoverflow.com/questions/15653737/oncreateoptionsmenu-inside-fragments
         inflater.inflate(R.menu.settings, menu);
@@ -137,34 +135,28 @@ public class UserFragment extends Fragment implements Serializable
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
 
 
-        if (item.getItemId() == R.id.status_switch)
-        {
-            if (item.isChecked())
-            {
+        if (item.getItemId() == R.id.status_switch) {
+            if (item.isChecked()) {
                 setOnline_only(false);
                 userList = new ArrayList<>();
                 loadUserList();
                 item.setChecked(false);
-            } else if (!item.isChecked())
-            {
+            } else if (!item.isChecked()) {
                 setOnline_only(true);
                 userList = new ArrayList<>();
                 loadUserList();
                 item.setChecked(true);
             }
         }
-        if (item.getItemId() == R.id.profile_picture)
-        {
+        if (item.getItemId() == R.id.profile_picture) {
             Toast.makeText(getContext(), "what?", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getActivity(), AuthenticationActivity.class);
             startActivity(intent);
             return true;
-        } else if (item.getItemId() == R.id.distance_any)
-        {
+        } else if (item.getItemId() == R.id.distance_any) {
 
 
             setRadius(Float.MAX_VALUE);
@@ -182,8 +174,7 @@ public class UserFragment extends Fragment implements Serializable
             item.setChecked(true);
 
             return super.onOptionsItemSelected(item);
-        } else if (item.getItemId() == R.id.distance_10km)
-        {
+        } else if (item.getItemId() == R.id.distance_10km) {
             setRadius(10000);
             userList = new ArrayList<>();
             loadUserList();
@@ -192,10 +183,8 @@ public class UserFragment extends Fragment implements Serializable
             return super.onOptionsItemSelected(item);
         }
 
-        if (item.getItemId() == R.id.Logout)
-        {
+        if (item.getItemId() == R.id.Logout) {
 
-            
 
             Intent intent = new Intent(getActivity(), LoginActivity.class);
 
@@ -209,20 +198,16 @@ public class UserFragment extends Fragment implements Serializable
         return super.onOptionsItemSelected(item);
     }
 
-    private Location getLastKnownLocation()
-    {
+    private Location getLastKnownLocation() {
         mLocationManager = (LocationManager) getContext().getApplicationContext().getSystemService(LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
         Location bestLocation = null;
-        for (String provider : providers)
-        {
+        for (String provider : providers) {
             Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null)
-            {
+            if (l == null) {
                 continue;
             }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
-            {
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
                 // Found best last known location: %s", l);
                 bestLocation = l;
             }
@@ -230,27 +215,22 @@ public class UserFragment extends Fragment implements Serializable
         return bestLocation;
     }
 
-    public float getRadius()
-    {
+    public float getRadius() {
         return radius;
     }
 
-    public void setRadius(float radius)
-    {
+    public void setRadius(float radius) {
         this.radius = radius;
     }
 
-    public void loadUserList()
-    {
+    public void loadUserList() {
 
 
-        class LoadDataUserList extends AsyncTask<String, Void, String>
-        {
+        class LoadDataUserList extends AsyncTask<String, Void, String> {
             private ProgressDialog dialog = new ProgressDialog(getActivity());
 
             @Override
-            protected void onPreExecute()
-            {
+            protected void onPreExecute() {
                 dialog.setMessage("Loading. Please wait...");
                 dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 dialog.setIndeterminate(true);
@@ -261,14 +241,11 @@ public class UserFragment extends Fragment implements Serializable
             }
 
             @Override
-            protected String doInBackground(String... strings)
-            {
-                ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
-                {
+            protected String doInBackground(String... strings) {
+                ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener() {
 
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
                 /*
                 String achternaam = dataSnapshot.child(mCurrentUserId).child("achternaam").getValue().toString();
                 String voornaam = dataSnapshot.child(mCurrentUserId).child("voornaam").getValue().toString();
@@ -276,24 +253,20 @@ public class UserFragment extends Fragment implements Serializable
                 if (loggedUser != null)
                     getActivity().setTitle(loggedUser);
                 */
-                        for (DataSnapshot dsp : dataSnapshot.getChildren())
-                        {
+                        for (DataSnapshot dsp : dataSnapshot.getChildren()) {
 
 
                             myUser = dsp.getValue(User.class);
                             lastId = dsp.getKey();
-                            if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
-                            {
+                            if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId)) {
                                 userLocation.setLatitude(myUser.getAdress().getLatitude());
                                 userLocation.setLongitude(myUser.getAdress().getLongitude());
                                 distance = currentLocation.distanceTo(userLocation);
 
-                                if (getOnline_only())
-                                {
+                                if (getOnline_only()) {
                                     if (distance <= getRadius() && myUser.getStatus().equals("online"))
                                         userList.add(myUser);
-                                } else
-                                {
+                                } else {
                                     if (distance <= getRadius())
                                         userList.add(myUser);
                                 }
@@ -301,8 +274,7 @@ public class UserFragment extends Fragment implements Serializable
                         }
                         /*https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa*/
                         if (userListView != null)
-                            userListView.setOnScrollListener(new AbsListView.OnScrollListener()
-                            {
+                            userListView.setOnScrollListener(new AbsListView.OnScrollListener() {
                                 private int currentVisibleItemCount;
                                 private int currentScrollState;
                                 private int currentFirstVisibleItem;
@@ -310,8 +282,7 @@ public class UserFragment extends Fragment implements Serializable
 
 
                                 @Override
-                                public void onScrollStateChanged(AbsListView view, int scrollState)
-                                {
+                                public void onScrollStateChanged(AbsListView view, int scrollState) {
                                     this.currentScrollState = scrollState;
                                     //https://stackoverflow.com/questions/23708271/count-total-number-of-list-items-in-a-listview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                                     this.currentFirstVisibleItem = view.getFirstVisiblePosition();
@@ -319,8 +290,7 @@ public class UserFragment extends Fragment implements Serializable
                                 }
 
                                 @Override
-                                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
-                                {
+                                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                                     this.currentFirstVisibleItem = firstVisibleItem;
                                     this.currentVisibleItemCount = visibleItemCount;
                                     this.totalItem = totalItemCount;
@@ -328,24 +298,18 @@ public class UserFragment extends Fragment implements Serializable
                                 }
 
                                 //stackoverflow.com/questions/39023945/how-to-get-data-from-real-time-database-in-firebase
-                                private void isScrollCompleted()
-                                {
+                                private void isScrollCompleted() {
                                     if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
-                                            && this.currentScrollState == SCROLL_STATE_IDLE)
-                                    {
+                                            && this.currentScrollState == SCROLL_STATE_IDLE) {
 
-                                        ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
-                                        {
+                                        ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot)
-                                            {
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                                for (DataSnapshot dsp : dataSnapshot.getChildren())
-                                                {
+                                                for (DataSnapshot dsp : dataSnapshot.getChildren()) {
                                                     myUser = dsp.getValue(User.class);
                                                     lastId = dsp.getKey();
-                                                    if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId))
-                                                    {
+                                                    if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId)) {
                                                         distance = currentLocation.distanceTo(userLocation);
                                                         if (distance <= getRadius())
                                                             userList.add(myUser);
@@ -358,8 +322,7 @@ public class UserFragment extends Fragment implements Serializable
                                             }
 
                                             @Override
-                                            public void onCancelled(DatabaseError databaseError)
-                                            {
+                                            public void onCancelled(DatabaseError databaseError) {
 
                                             }
 
@@ -371,16 +334,13 @@ public class UserFragment extends Fragment implements Serializable
                         if (getActivity() != null)
                             userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
 
-                        if (userListView != null)
-                        {
+                        if (userListView != null) {
                             userListView.invalidateViews();
                             userListView.setAdapter(userAdapter);
 
-                            userListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-                            {
+                            userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
-                                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                                {
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                     //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                                     mAuth = FirebaseAuth.getInstance();
                                     Intent intent = new Intent(getActivity(), ChatActivity.class);
@@ -395,8 +355,7 @@ public class UserFragment extends Fragment implements Serializable
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
@@ -405,8 +364,7 @@ public class UserFragment extends Fragment implements Serializable
             }
 
             @Override
-            protected void onPostExecute(String s)
-            {
+            protected void onPostExecute(String s) {
                 if (dialog.isShowing())
                     dialog.dismiss();
                 // super.onPostExecute(s);
@@ -418,13 +376,11 @@ public class UserFragment extends Fragment implements Serializable
 
     }
 
-    public Boolean getOnline_only()
-    {
+    public Boolean getOnline_only() {
         return online_only;
     }
 
-    public void setOnline_only(Boolean online_only)
-    {
+    public void setOnline_only(Boolean online_only) {
         this.online_only = online_only;
     }
 }
