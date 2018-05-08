@@ -16,8 +16,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.currentplacedetailsonmap.MainActivity;
 import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.Model.UserViewHolder;
+import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -76,7 +78,7 @@ public class UserAdapter extends ArrayAdapter<User>
         /** Source: https://stackoverflow.com/questions/2741403/get-the-distance-between-two-geo-points?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
          */
 
-        myLocation = getLastKnownLocation();
+        myLocation = Utility.getLastKnownLocation(this.getContext());
         userLocation.setLatitude(user.getAdress().getLatitude());
         userLocation.setLongitude(user.getAdress().getLongitude());
 
@@ -90,7 +92,8 @@ public class UserAdapter extends ArrayAdapter<User>
         {
             metric_symbol = "m";
         }
-        userVH.text.setText(Float.valueOf(round(distanceInMeters, 2)).toString() + " " + metric_symbol);
+
+        userVH.text.setText(Float.valueOf(Utility.round(distanceInMeters, 2)).toString() + " " + metric_symbol);
 
         userVH.pseudo.setText(user.getVoornaam() + " " + user.getAchternaam());
         //Todo create variable to retrieve Avatar
@@ -109,43 +112,5 @@ public class UserAdapter extends ArrayAdapter<User>
         return convertView;
     }
 
-    /**
-     * source: https://stackoverflow.com/questions/8911356/whats-the-best-practice-to-round-a-float-to-2-decimals?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-     *
-     * @param d
-     * @param decimalPlace
-     * @return
-     */
-    private static float round(float d, int decimalPlace)
-    {
-        BigDecimal bd = new BigDecimal(Float.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
-        return bd.floatValue();
-    }
-
-    /**
-     * Source
-     * https://stackoverflow.com/questions/20438627/getlastknownlocation-returns-null?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-     */
-    private Location getLastKnownLocation()
-    {
-        mLocationManager = (LocationManager) getContext().getApplicationContext().getSystemService(LOCATION_SERVICE);
-        List<String> providers = mLocationManager.getProviders(true);
-        Location bestLocation = null;
-        for (String provider : providers)
-        {
-            Location l = mLocationManager.getLastKnownLocation(provider);
-            if (l == null)
-            {
-                continue;
-            }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy())
-            {
-                // Found best last known location: %s", l);
-                bestLocation = l;
-            }
-        }
-        return bestLocation;
-    }
 
 }

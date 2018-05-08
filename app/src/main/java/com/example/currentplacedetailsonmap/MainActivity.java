@@ -61,12 +61,12 @@ public class MainActivity extends AppCompatActivity {
                             transaction.commit();
 
                             break;
-                        case R.id.navigation_dashboard:
+                        case R.id.navigation_stats:
                             transaction.replace(R.id.main_content, statsFragment);
                             transaction.commit();
 
                             break;
-                        case R.id.navigation_notifications:
+                        case R.id.navigation_users:
 
                             transaction.replace(R.id.main_content, userFragment, userFragment.getTag());
                             transaction.commit();

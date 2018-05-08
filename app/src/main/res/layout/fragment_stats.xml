@@ -20,7 +20,7 @@
             android:gravity="center"
             android:text="Average Time"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/listView" />
+            app:layout_constraintTop_toBottomOf="@+id/stat_listView" />
 
         <TextView
             android:id="@+id/avg_cal"
@@ -34,7 +34,7 @@
             app:layout_constraintEnd_toStartOf="@+id/avg_distance"
             app:layout_constraintHorizontal_bias="0.6"
             app:layout_constraintStart_toEndOf="@+id/avg_time"
-            app:layout_constraintTop_toBottomOf="@+id/listView" />
+            app:layout_constraintTop_toBottomOf="@+id/stat_listView" />
 
 
         <TextView
@@ -47,7 +47,7 @@
             android:gravity="center"
             android:text="Average calorie"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/listView" />
+            app:layout_constraintTop_toBottomOf="@+id/stat_listView" />
 
 
         <TextView
@@ -86,7 +86,7 @@
             app:layout_constraintTop_toBottomOf="@+id/avg_cal" />
 
         <ListView
-            android:id="@+id/listView"
+            android:id="@+id/stat_listView"
             android:layout_width="match_parent"
             android:layout_height="325dp"
             android:layout_marginBottom="120dp"

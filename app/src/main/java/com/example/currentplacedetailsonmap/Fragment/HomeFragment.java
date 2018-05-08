@@ -41,7 +41,9 @@ import android.widget.Toast;
 import com.example.currentplacedetailsonmap.MainActivity;
 import com.example.currentplacedetailsonmap.Model.Address;
 import com.example.currentplacedetailsonmap.Model.DirectionsJSONParser;
+import com.example.currentplacedetailsonmap.Model.Statistiek;
 import com.example.currentplacedetailsonmap.Model.User;
+import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.common.api.Status;
@@ -70,11 +72,13 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
@@ -88,7 +92,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -97,6 +103,7 @@ import java.util.Scanner;
 /**
  * A simple {@link Fragment} subclass.
  * https://stackoverflow.com/questions/42619863/how-to-calculate-distance-every-15-sec-with-using-gps-heavy-accuracy
+ * https://stackoverflow.com/questions/41601147/get-last-node-in-firebase-database-android
  */
 public class HomeFragment extends Fragment implements OnMapReadyCallback, SensorEventListener
 {
@@ -152,6 +159,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     private TileOverlay mOverlay;
     private float timeWhenStopped;
     private float distanceInMeters;
+    private FirebaseAuth auth;
+    private String current_user;
+    private int last_id;
 
     public HomeFragment()
     {
@@ -167,7 +177,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         View view = inflater.inflate(R.layout.fragment_google_maps, container, false);
         // Build the map.
         //Todo set this into nested child fragment
-
+        final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -183,7 +193,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
         }
 
-        //Start button
+        //Start Pause button
         final Button btnStart = (Button) view.findViewById(R.id.btn_start);
         final Button btnPause = (Button) view.findViewById(R.id.btn2);
 
@@ -193,16 +203,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         //speedometer
         sManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         stepSensor = sManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-
         distance = (TextView) view.findViewById(R.id.distance);
         calories = (TextView) view.findViewById(R.id.calories);
 
-        final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-//        onMapReady(mMap);
-        // Set current location
-        // getDeviceLocation();
-
-//        myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+        final DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Stats").child(current_user);
 
         btnPause.setEnabled(false);
         btnStart.setOnClickListener(new View.OnClickListener()
@@ -226,17 +230,16 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                     btnPause.setEnabled(true);
                     start = false;
                     onResume();
-                } else
-                {
-                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1, new LocationListener()
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1100, 1, new LocationListener()
                     {
                         @Override
                         public void onLocationChanged(Location location)
                         {
 
                             distanceInMeters += mLastKnownLocation.distanceTo(location);
+
                             mLastKnownLocation = location;
-                            distance.setText(String.valueOf(distanceInMeters));
+                            distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)));
 
                         }
 
@@ -260,21 +263,28 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                         }
 
                     });
+                } else
+                {
+                    String chrono_text = chrono.getText().toString();
                     chrono.stop();
-
                     time = (int) (SystemClock.elapsedRealtime() - chrono.getBase());
-                    float distanceInMeters = results[0];
+                    mCalories = (0.0005 * 62 * distanceInMeters + 0.0035) * time;
                     int burnedCalories = (int) mCalories;
-                    mCalories = (0.0005 * 65 * distanceInMeters + 0.0035) * time;
                     calories.setText(Double.toString(burnedCalories) + " Kcal");
                     btnStart.setText("Start");
                     btnPause.setEnabled(false);
                     start = true;
-
-                    results[0] = 0;
-                    //distance.setText(Float.toString(correctedDistance) + " m");
+                    distanceInMeters = 0;
                     chrono.setBase(SystemClock.elapsedRealtime() - offset);
                     timeWhenStopped = 0;
+
+                    //set variable last_id
+                    setLAstSessionId();
+                    int new_id = getLast_id();
+                    new_id++;
+
+                    Statistiek statistiek = new Statistiek("Session", new_id, chrono_text, burnedCalories, distanceInMeters, Utility.getTime());
+                    database.push().setValue(statistiek);
                     onStop();
                 }
 
@@ -312,6 +322,78 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         addHeatMap();
 
         return view;
+    }
+
+    private void setLAstSessionId()
+    {
+
+        class loadLastId extends AsyncTask<String, Void, String>
+        {
+
+            @Override
+            protected String doInBackground(String... strings)
+            {
+                final int[] get_id = {0};
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Stats").child(current_user);
+                Query lastQuery = reference.orderByKey().limitToLast(1);
+                lastQuery.addListenerForSingleValueEvent(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
+                        for (DataSnapshot dss : dataSnapshot.getChildren())
+                        {
+                            get_id[0] = dss.child("id").getValue(int.class);
+                            setLast_id(get_id[0]);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+
+                    }
+                });
+/*
+                lastQuery.addChildEventListener(new ChildEventListener()
+                {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                    {
+                        get_id[0] = dataSnapshot.child("id").getValue(int.class);
+                        setLast_id(get_id[0]);
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s)
+                    {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot)
+                    {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s)
+                    {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+
+                    }
+                });
+                */
+                return "Executed";
+            }
+        }
+        new loadLastId().execute("");
+
     }
 
 
@@ -385,6 +467,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         setHasOptionsMenu(true);
         getActivity().setTitle("Home");
         // Retrieve location and camera position from saved instance state.
+
+        //Firebase
+        auth = FirebaseAuth.getInstance();
+        current_user = auth.getUid();
+
+
         if (savedInstanceState != null)
         {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -404,7 +492,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
 
         updateLocationUI();
         getLocationPermission();
@@ -493,7 +580,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                     myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                     String url = getDirectionsUrl(myCurrentPosition, place.getLatLng());
                     new DownloadTask().execute(url);
-                    mMap.addMarker(new MarkerOptions().position(myCurrentPosition));
+                    mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
 
                     //downloadTask.doInBackground(url);
                     /*
@@ -1144,6 +1231,19 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
             else
                 Toast.makeText(getContext(), "This goal is impossible", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * getters & setters
+     */
+    public int getLast_id()
+    {
+        return last_id;
+    }
+
+    public void setLast_id(int last_id)
+    {
+        this.last_id = last_id;
     }
 }
 

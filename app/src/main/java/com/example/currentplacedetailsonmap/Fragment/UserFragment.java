@@ -112,7 +112,6 @@ public class UserFragment extends Fragment implements Serializable {
             mCurrentUserId = mAuth.getCurrentUser().getUid();
             userId = mAuth.getUid();
         }
-        //todo Message text no internet connection when mAuth is null
         currentLocation = getLastKnownLocation();
         //public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
