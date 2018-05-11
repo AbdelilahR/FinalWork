@@ -3,6 +3,7 @@ package com.example.currentplacedetailsonmap;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -20,39 +21,53 @@ import com.google.firebase.auth.FirebaseAuth;
  * An activity that displays a map showing the place at the device's current location.
  * test
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
 
+
+    private UserFragment userFragment;
+    private StatsFragment statsFragment;
+    private HomeFragment homeFragment;
 
     @SuppressLint("ResourceType")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        HomeFragment homeFragment = new HomeFragment();
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.main_content, homeFragment);
+        transaction.replace(R.id.main_content, homeFragment = new HomeFragment());
         transaction.commit();
 
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null)
+        {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
-        } else {
+        } else
+        {
+
+
             // code used from this site:
             // https://segunfamisa.com/posts/bottom-navigation-view-android
             final BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
             bottomNavigationView.setSelectedItemId(R.id.navigation_home);
 
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener()
+            {
                 @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                public boolean onNavigationItemSelected(@NonNull MenuItem item)
+                {
 
-                    UserFragment userFragment = new UserFragment();
-                    HomeFragment homeFragment = new HomeFragment();
-                    StatsFragment statsFragment = new StatsFragment();
+                    userFragment = new UserFragment();
+                    homeFragment = new HomeFragment();
+                    statsFragment = new StatsFragment();
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-                    switch (item.getItemId()) {
+                    if (savedInstanceState != null)
+                        homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, HomeFragment.class.getSimpleName());
+                    switch (item.getItemId())
+                    {
                         //Todo implement fragments
 
                         case R.id.navigation_home:
@@ -80,5 +95,12 @@ public class MainActivity extends AppCompatActivity {
             //TODO Remove this line when the tests are done
             //FirebaseAuth.getInstance().signOut();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState)
+    {
+        super.onSaveInstanceState(outState, outPersistentState);
+        getSupportFragmentManager().putFragment(outState, HomeFragment.class.getSimpleName(), homeFragment);
     }
 }

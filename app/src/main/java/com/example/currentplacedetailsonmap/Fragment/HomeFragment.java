@@ -104,6 +104,7 @@ import java.util.Scanner;
  * A simple {@link Fragment} subclass.
  * https://stackoverflow.com/questions/42619863/how-to-calculate-distance-every-15-sec-with-using-gps-heavy-accuracy
  * https://stackoverflow.com/questions/41601147/get-last-node-in-firebase-database-android
+ * https://stackoverflow.com/questions/20550016/savedinstancestate-is-always-null-in-fragment/41388475
  */
 public class HomeFragment extends Fragment implements OnMapReadyCallback, SensorEventListener
 {
@@ -115,6 +116,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
+    private static final String BUNDLE_LAST_ID = "last_id";
     // Used for selecting the current place.
     private static final int M_MAX_ENTRIES = 5;
     public static View popup;
@@ -279,7 +281,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                     timeWhenStopped = 0;
 
                     //set variable last_id
-                    setLAstSessionId();
                     int new_id = getLast_id();
                     new_id++;
 
@@ -466,18 +467,21 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         getActivity().setTitle("Home");
+        setRetainInstance(true);
+
         // Retrieve location and camera position from saved instance state.
 
         //Firebase
         auth = FirebaseAuth.getInstance();
         current_user = auth.getUid();
 
-
+    setLAstSessionId();
         if (savedInstanceState != null)
         {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mNewLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+            last_id = savedInstanceState.getInt(BUNDLE_LAST_ID);
         }
 
         // Retrieve the content view that renders the map.
@@ -510,6 +514,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
             outState.putParcelable(KEY_LOCATION, mNewLocation);
+            outState.putInt(BUNDLE_LAST_ID, last_id);
             super.onSaveInstanceState(outState);
         }
     }
