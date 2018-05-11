@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -261,7 +262,7 @@ public class UserFragment extends Fragment implements Serializable {
 
                                 myUser = dsp.getValue(User.class);
                                 lastId = dsp.getKey();
-                                if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId)) {
+                                if (!myUser.getUserId().equals(mCurrentUserId) && myUser != null) {
                                     userLocation.setLatitude(myUser.getAdress().getLatitude());
                                     userLocation.setLongitude(myUser.getAdress().getLongitude());
                                     distance = currentLocation.distanceTo(userLocation);
@@ -273,6 +274,10 @@ public class UserFragment extends Fragment implements Serializable {
                                         if (distance <= getRadius())
                                             userList.add(myUser);
                                     }
+                                }
+                                else
+                                {
+                                    Log.d("ERROR","wrong userID");
                                 }
                             }
                         /*https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa*/

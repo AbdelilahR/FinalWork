@@ -283,8 +283,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                     //set variable last_id
                     int new_id = getLast_id();
                     new_id++;
-
-                    Statistiek statistiek = new Statistiek("Session", new_id, chrono_text, burnedCalories, distanceInMeters, Utility.getTime());
+                    Statistiek statistiek = new Statistiek("Session", new_id, time, burnedCalories, distanceInMeters, Utility.getTime());
                     database.push().setValue(statistiek);
                     onStop();
                 }
@@ -475,7 +474,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         auth = FirebaseAuth.getInstance();
         current_user = auth.getUid();
 
-    setLAstSessionId();
+        setLAstSessionId();
         if (savedInstanceState != null)
         {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);

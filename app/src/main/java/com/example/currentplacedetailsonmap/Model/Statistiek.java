@@ -4,7 +4,7 @@ import android.widget.TextView;
 
 public class Statistiek
 {
-    private String time;
+    private int time;
     private int burnedCalories;
     private float distanceInMeters;
     private String date;
@@ -15,7 +15,7 @@ public class Statistiek
     {
     }
 
-    public Statistiek(String name, int id, String time, int burnedCalories, float distanceInMeters, String date)
+    public Statistiek(String name, int id, int time, int burnedCalories, float distanceInMeters, String date)
     {
         this.time = time;
         this.burnedCalories = burnedCalories;
@@ -24,6 +24,8 @@ public class Statistiek
         this.id = id;
         this.name = name;
     }
+
+
 
     public String getName()
     {
@@ -45,12 +47,12 @@ public class Statistiek
         this.id = id;
     }
 
-    public String getTime()
+    public int getTime()
     {
         return time;
     }
 
-    public void setTime(String time)
+    public void setTime(int time)
     {
         this.time = time;
     }
