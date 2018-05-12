@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/all_session"
+            android:title="All session"></item>
+        <item
+            android:id="@+id/today_session"
+            android:title="Today"></item>
+        <item
+            android:id="@+id/yesterday_session"
+            android:title="Yesterday"></item>
+        <item
+            android:id="@+id/lastWeek_session"
+            android:title="Last week"></item>
+
+    </group>
+
+</menu>

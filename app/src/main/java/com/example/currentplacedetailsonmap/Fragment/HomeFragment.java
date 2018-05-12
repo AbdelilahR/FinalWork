@@ -416,6 +416,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                 {
                     // Create a heat map tile provider, passing it the latlngs of the police stations.
                     mProvider = new HeatmapTileProvider.Builder().data(userlocations_list).build();
+
                     // Add a tile overlay to the map, using the heat map tile provider.
                     mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
                 }
@@ -697,9 +698,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                 if (mProvider != null)
                 {
                     if (zoom >= 10)
-                        mProvider.setRadius(100);
+                        mProvider.setRadius(150);
                     else
-                        mProvider.setRadius(20);
+                        mProvider.setRadius(HeatmapTileProvider.DEFAULT_RADIUS);
 
                 }
 
