@@ -2,9 +2,11 @@ package com.example.currentplacedetailsonmap.Model;
 
 import android.widget.TextView;
 
-public class Statistiek
+import java.io.Serializable;
+
+public class Statistiek implements Serializable
 {
-    private int time;
+    private long time;
     private int burnedCalories;
     private float distanceInMeters;
     private String date;
@@ -15,7 +17,7 @@ public class Statistiek
     {
     }
 
-    public Statistiek(String name, int id, int time, int burnedCalories, float distanceInMeters, String date)
+    public Statistiek(String name, int id, long time, int burnedCalories, float distanceInMeters, String date)
     {
         this.time = time;
         this.burnedCalories = burnedCalories;
@@ -47,12 +49,12 @@ public class Statistiek
         this.id = id;
     }
 
-    public int getTime()
+    public long getTime()
     {
         return time;
     }
 
-    public void setTime(int time)
+    public void setTime(long time)
     {
         this.time = time;
     }

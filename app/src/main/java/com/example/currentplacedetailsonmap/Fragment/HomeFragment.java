@@ -138,7 +138,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     public LatLng myCurrentPosition;
     public ArrayList<LatLng> userlocations_list = new ArrayList<>();
     //Custom
-    int time = 0;
+    long time = 0;
     double mCalories = 0;
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
@@ -269,7 +269,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                 {
                     String chrono_text = chrono.getText().toString();
                     chrono.stop();
-                    time = (int) (SystemClock.elapsedRealtime() - chrono.getBase());
+                    time =  (SystemClock.elapsedRealtime() - chrono.getBase());
                     mCalories = (0.0005 * 62 * distanceInMeters + 0.0035) * time;
                     int burnedCalories = (int) mCalories;
                     calories.setText(Double.toString(burnedCalories) + " Kcal");
@@ -704,7 +704,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
                 }
 
-                Log.d("ZOOM LEVEL", "zoom leve is " + zoom);
+                //Log.d("ZOOM LEVEL", "zoom leve is " + zoom);
             }
         });
 

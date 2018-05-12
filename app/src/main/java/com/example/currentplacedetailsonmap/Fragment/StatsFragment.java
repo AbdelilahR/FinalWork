@@ -1,6 +1,7 @@
 package com.example.currentplacedetailsonmap.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,10 +14,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.example.currentplacedetailsonmap.Activity.StatInfo;
 import com.example.currentplacedetailsonmap.Model.Statistiek;
 import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
@@ -45,7 +48,7 @@ public class StatsFragment extends Fragment
     private String current_user;
     private DatabaseReference database;
     private List<Map<String, String>> stat_map;
-    private ArrayList<Integer> statlist_time;
+    private ArrayList<Long> statlist_time;
     private ArrayList<Integer> statlist_calorie;
     private ArrayList<Float> statlist_distance;
     //Adapter
@@ -55,7 +58,7 @@ public class StatsFragment extends Fragment
     //Context to solve nullpointerException
     private Context mContext;
     // stats average
-    private double avg_time;
+    private long avg_time;
     private double avg_calorie;
     private float avg_ditance;
     //Textviews
@@ -67,6 +70,7 @@ public class StatsFragment extends Fragment
     private boolean today_session = false;
     private boolean yesterday_session = false;
     private boolean lastWeek_session = false;
+    private ArrayList<Object> listOf_allStats;
 
     public StatsFragment()
     {
@@ -86,7 +90,7 @@ public class StatsFragment extends Fragment
         if (item.getItemId() == R.id.all_session)
         {
 
-            list_settings(true,false,false,false);
+            list_settings(true, false, false, false);
             initializeLists();
             loadSessionList();
             item.setChecked(true);
@@ -94,7 +98,7 @@ public class StatsFragment extends Fragment
         }
         if (item.getItemId() == R.id.today_session)
         {
-            list_settings(false,true,false,false);
+            list_settings(false, true, false, false);
             initializeLists();
             loadSessionList();
             item.setChecked(true);
@@ -102,7 +106,7 @@ public class StatsFragment extends Fragment
         }
         if (item.getItemId() == R.id.yesterday_session)
         {
-            list_settings(false,false,true,false);
+            list_settings(false, false, true, false);
             initializeLists();
             loadSessionList();
             item.setChecked(true);
@@ -110,7 +114,7 @@ public class StatsFragment extends Fragment
         }
         if (item.getItemId() == R.id.lastWeek_session)
         {
-            list_settings(false,false,false,true);
+            list_settings(false, false, false, true);
             initializeLists();
             loadSessionList();
             item.setChecked(true);
@@ -131,6 +135,7 @@ public class StatsFragment extends Fragment
         txt_avg_time = (TextView) view.findViewById(R.id.value_avg_time);
         txt_avg_cal = (TextView) view.findViewById(R.id.value_avg_cal);
         txt_avg_distance = (TextView) view.findViewById(R.id.value_avg_distance);
+
 
         return view;
     }
@@ -156,6 +161,8 @@ public class StatsFragment extends Fragment
         //put data in the lists
         loadSessionList();
         setHasOptionsMenu(true);
+
+
     }
 
     /**
@@ -167,7 +174,7 @@ public class StatsFragment extends Fragment
         statlist_time = new ArrayList<>();
         statlist_calorie = new ArrayList<>();
         statlist_distance = new ArrayList<>();
-
+        listOf_allStats = new ArrayList<>();
     }
 
     /**
@@ -190,6 +197,20 @@ public class StatsFragment extends Fragment
         return sum;
     }
 
+    private long calculateAverage_long(List<Long> marks)
+    {
+        Long sum = 0L;
+        if (!marks.isEmpty())
+        {
+            for (Long mark : marks)
+            {
+                sum += mark;
+            }
+            return sum.longValue() / marks.size();
+        }
+        return sum;
+    }
+
     private float calculateAverag_float(List<Float> marks)
     {
         Float sum = 0.0f;
@@ -206,6 +227,7 @@ public class StatsFragment extends Fragment
 
     /**
      * Check all the list of statistics
+     *
      * @return false if the lists are null or empty
      */
     private boolean check_Statslists()
@@ -278,20 +300,38 @@ public class StatsFragment extends Fragment
                         if (simpleAdapter != null && statListView != null)
                         {
                             statListView.setAdapter(simpleAdapter);
-                            simpleAdapter.notifyDataSetChanged();
+
                         }
 
                         if (check_Statslists())
                         {
-                            avg_time = calculateAverage_integer(statlist_time);
+                            avg_time = calculateAverage_long(statlist_time);
                             avg_calorie = calculateAverage_integer(statlist_calorie);
                             avg_ditance = calculateAverag_float(statlist_distance);
 
-                            txt_avg_time.setText(Utility.getDate((long) avg_time, "HH:mm:ss"));
+                            txt_avg_time.setText(Utility.getDate(avg_time, "HH:mm:ss"));
                             txt_avg_cal.setText(String.valueOf(Utility.round((float) avg_calorie, 2)));
                             txt_avg_distance.setText(Float.toString(avg_ditance));
                         }
+                        listOf_allStats.add(all_Stats);
+                        if (statListView != null)
+                        {
+                            statListView.invalidateViews();
+                            statListView.setAdapter(simpleAdapter);
+                            statListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                            {
+                                @Override
+                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+                                {
+                                    Intent intent = new Intent(getActivity(), StatInfo.class);
+                                    Statistiek selectedStat = (Statistiek) listOf_allStats.get(i);
+                                    intent.putExtra("selectedStat", selectedStat);
+                                    startActivity(intent);
 
+
+                                }
+                            });
+                        }
                     }
 
                     @Override
@@ -320,8 +360,6 @@ public class StatsFragment extends Fragment
 
 
                 });
-
-
                 return "Executed";
 
             }
@@ -333,6 +371,7 @@ public class StatsFragment extends Fragment
 
     /**
      * Configure the settings for the requested lists
+     *
      * @param all
      * @param today
      * @param yesterday
@@ -349,6 +388,7 @@ public class StatsFragment extends Fragment
 
     /**
      * Add the data for all the statlist_
+     *
      * @param statistiek
      */
     private void fill_statLists(Statistiek statistiek)
