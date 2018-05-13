@@ -96,7 +96,7 @@ public class UserAdapter extends ArrayAdapter<User>
         userVH.text.setText(Float.valueOf(Utility.round(distanceInMeters, 2)).toString() + " " + metric_symbol);
 
         userVH.pseudo.setText(user.getVoornaam() + " " + user.getAchternaam());
-        //Todo create variable to retrieve Avatar
+
         if (user.getAvatar().equals("default"))
             userVH.avatar.setImageResource(R.drawable.default_avatar);
         else

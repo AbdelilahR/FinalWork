@@ -178,7 +178,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_google_maps, container, false);
         // Build the map.
-        //Todo set this into nested child fragment
         final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -248,20 +247,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                         @Override
                         public void onProviderDisabled(String provider)
                         {
-                            // TODO Auto-generated method stub
+                            //
                         }
 
                         @Override
                         public void onProviderEnabled(String provider)
                         {
-                            // TODO Auto-generated method stub
+                            //
                         }
 
                         @Override
                         public void onStatusChanged(String provider, int status,
                                                     Bundle extras)
                         {
-                            // TODO Auto-generated method stub
+                            //
                         }
 
                     });
@@ -484,7 +483,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         }
 
         // Retrieve the content view that renders the map.
-        //TODO fix this
+        ////
         //getActivity().setContentView(R.layout.activity_main);
 
         // Construct a GeoDataClient.

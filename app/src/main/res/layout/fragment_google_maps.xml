@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".Fragment.HomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+
     <Button
         android:id="@+id/btn_start"
         android:layout_width="194dp"

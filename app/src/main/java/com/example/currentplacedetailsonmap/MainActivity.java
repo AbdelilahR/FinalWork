@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
                         homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, HomeFragment.class.getSimpleName());
                     switch (item.getItemId())
                     {
-                        //Todo implement fragments
+
 
                         case R.id.navigation_home:
 
@@ -92,8 +92,7 @@ public class MainActivity extends AppCompatActivity
                 }
             });
 
-            //TODO Remove this line when the tests are done
-            //FirebaseAuth.getInstance().signOut();
+
         }
     }
 

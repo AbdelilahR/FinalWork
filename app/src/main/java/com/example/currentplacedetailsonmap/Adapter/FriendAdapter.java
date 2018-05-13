@@ -86,7 +86,7 @@ public class FriendAdapter extends ArrayAdapter<Friends>
         friendsVH.text.setText(Float.valueOf(Utility.round(distanceInMeters, 2)).toString() + " " + metric_symbol);
 
         friendsVH.pseudo.setText(friends.getUser().getVoornaam() + " " + friends.getUser().getAchternaam());
-        //Todo create variable to retrieve Avatar
+
         if (friends.getUser().getAvatar().equals("default"))
             friendsVH.avatar.setImageResource(R.drawable.default_avatar);
         else
