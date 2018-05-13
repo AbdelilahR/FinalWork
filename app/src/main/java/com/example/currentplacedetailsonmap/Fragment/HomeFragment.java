@@ -281,9 +281,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                     timeWhenStopped = 0;
 
                     //set variable last_id
-                    int new_id = getLast_id();
-                    new_id++;
-                    Statistiek statistiek = new Statistiek("Session", new_id, time, burnedCalories, distanceInMeters, Utility.getTime());
+                    ++last_id;
+                    Statistiek statistiek = new Statistiek("Session", last_id, time, burnedCalories, distanceInMeters, Utility.getTime());
                     database.push().setValue(statistiek);
                     onStop();
                 }

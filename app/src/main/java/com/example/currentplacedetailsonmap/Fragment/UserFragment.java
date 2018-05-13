@@ -319,8 +319,8 @@ public class UserFragment extends Fragment implements Serializable
                                     @Override
                                     public void onScrollStateChanged(AbsListView view, int scrollState)
                                     {
+
                                         this.currentScrollState = scrollState;
-                                        //https://stackoverflow.com/questions/23708271/count-total-number-of-list-items-in-a-listview?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                                         this.currentFirstVisibleItem = view.getFirstVisiblePosition();
                                         this.isScrollCompleted();
                                     }

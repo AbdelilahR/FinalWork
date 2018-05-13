@@ -1,6 +1,8 @@
 package com.example.currentplacedetailsonmap.Fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -71,6 +74,7 @@ public class StatsFragment extends Fragment
     private boolean yesterday_session = false;
     private boolean lastWeek_session = false;
     private ArrayList<Object> listOf_allStats;
+    private String lastId;
 
     public StatsFragment()
     {
@@ -120,7 +124,34 @@ public class StatsFragment extends Fragment
             item.setChecked(true);
             return true;
         }
+        if (item.getItemId() == R.id.delete_all)
+        {
 
+            AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                    .setTitle("Delete all statistics")
+                    .setMessage("Are you sure? This operation is irreversible.")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+                            FirebaseDatabase.getInstance().getReference("Stats").child(current_user).removeValue();
+                            loadSessionList();
+
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i)
+                        {
+
+                        }
+                    }).show();
+
+
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -251,17 +282,19 @@ public class StatsFragment extends Fragment
             @Override
             protected String doInBackground(String... strings)
             {
-                database.addChildEventListener(new ChildEventListener()
+                database.limitToFirst(20).addChildEventListener(new ChildEventListener()
                 {
                     @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                    public void onChildAdded(final DataSnapshot dataSnapshot, String s)
                     {
                         Statistiek all_Stats = dataSnapshot.getValue(Statistiek.class);
+                        lastId = dataSnapshot.getKey();
                         String title = all_Stats.getName() + " " + all_Stats.getId();
 
                         Map<String, String> data = new HashMap<>();
                         data.put("title", title);
                         data.put("date", all_Stats.getDate());
+                        data.put("push_id", lastId);
                         Date date = Utility.convertStringTo_Date(all_Stats.getDate());
 
                         //Check the settings of the user and put the correct data in the lists
@@ -331,6 +364,164 @@ public class StatsFragment extends Fragment
 
                                 }
                             });
+
+                            statListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+                            {
+                                @Override
+                                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l)
+                                {
+
+                                    final String push_id = stat_map.get(i).get("push_id");
+                                    AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                                            .setTitle("You are about to delete this item")
+                                            .setMessage("Are you sure? This operation is irreversible.")
+                                            .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                                            {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i)
+                                                {
+                                                    FirebaseDatabase.getInstance().getReference("Stats").child(current_user).child(push_id).setValue(null);
+                                                    initializeLists();
+                                                    loadSessionList();
+
+                                                }
+                                            })
+                                            .setNegativeButton("No", new DialogInterface.OnClickListener()
+                                            {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i)
+                                                {
+
+                                                }
+                                            }).show();
+
+                                    return true;
+                                }
+                            });
+                            statListView.setOnScrollListener(new AbsListView.OnScrollListener()
+                            {
+                                private int currentVisibleItemCount;
+                                private int currentScrollState;
+                                private int currentFirstVisibleItem;
+                                private int totalItem;
+
+                                @Override
+                                public void onScrollStateChanged(AbsListView view, int scrollState)
+                                {
+
+                                    this.currentScrollState = scrollState;
+                                    this.currentFirstVisibleItem = view.getFirstVisiblePosition();
+                                    this.isScrollCompleted();
+                                }
+
+                                private void isScrollCompleted()
+                                {
+                                    if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
+                                            && this.currentScrollState == SCROLL_STATE_IDLE)
+                                    {
+                                        database.orderByKey().startAt(lastId + 1).limitToFirst(20).addChildEventListener(new ChildEventListener()
+                                        {
+                                            @Override
+                                            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+                                            {
+                                                Statistiek all_Stats = dataSnapshot.getValue(Statistiek.class);
+                                                lastId = dataSnapshot.getKey();
+                                                String title = all_Stats.getName() + " " + all_Stats.getId();
+
+                                                Map<String, String> data = new HashMap<>();
+                                                data.put("title", title);
+                                                data.put("date", all_Stats.getDate());
+                                                Date date = Utility.convertStringTo_Date(all_Stats.getDate());
+
+                                                //Check the settings of the user and put the correct data in the lists
+                                                if (all_session)
+                                                {
+                                                    stat_map.add(data);
+                                                    fill_statLists(all_Stats);
+                                                } else if (today_session)
+                                                {
+                                                    if (DateUtils.isToday(date.getTime()))
+                                                    {
+                                                        stat_map.add(data);
+                                                        fill_statLists(all_Stats);
+                                                    }
+                                                } else if (yesterday_session)
+                                                {
+                                                    if (Utility.isYesterday(date.getTime()))
+                                                        stat_map.add(data);
+                                                    fill_statLists(all_Stats);
+                                                } else if (lastWeek_session)
+                                                {
+                                                    if (Utility.isLastWeek(date.getTime()))
+                                                        stat_map.add(data);
+                                                    fill_statLists(all_Stats);
+                                                }
+
+                                                if (stat_map != null)
+                                                {
+                                                    simpleAdapter = new SimpleAdapter(mContext,
+                                                            stat_map,
+                                                            android.R.layout.simple_list_item_2,
+                                                            new String[]{"title", "date"},
+                                                            new int[]{android.R.id.text1, android.R.id.text2});
+                                                }
+
+                                                if (simpleAdapter != null && statListView != null)
+                                                {
+                                                    statListView.setAdapter(simpleAdapter);
+
+                                                }
+
+                                                if (check_Statslists())
+                                                {
+                                                    avg_time = calculateAverage_long(statlist_time);
+                                                    avg_calorie = calculateAverage_integer(statlist_calorie);
+                                                    avg_ditance = calculateAverag_float(statlist_distance);
+
+                                                    txt_avg_time.setText(Utility.getDate(avg_time, "HH:mm:ss"));
+                                                    txt_avg_cal.setText(String.valueOf(Utility.round((float) avg_calorie, 2)));
+                                                    txt_avg_distance.setText(Float.toString(avg_ditance));
+                                                }
+                                                listOf_allStats.add(all_Stats);
+                                            }
+
+                                            @Override
+                                            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+                                            {
+
+                                            }
+
+                                            @Override
+                                            public void onChildRemoved(DataSnapshot dataSnapshot)
+                                            {
+
+                                            }
+
+                                            @Override
+                                            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+                                            {
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError)
+                                            {
+
+                                            }
+                                        });
+                                    }
+
+                                }
+
+                                @Override
+                                public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+                                {
+                                    this.currentFirstVisibleItem = firstVisibleItem;
+                                    this.currentVisibleItemCount = visibleItemCount;
+                                    this.totalItem = totalItemCount;
+
+                                }
+                            });
                         }
                     }
 
@@ -343,7 +534,14 @@ public class StatsFragment extends Fragment
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot)
                     {
-
+                        stat_map = new ArrayList<>();
+                        simpleAdapter = new SimpleAdapter(mContext,
+                                stat_map,
+                                android.R.layout.simple_list_item_2,
+                                new String[]{"title", "date"},
+                                new int[]{android.R.id.text1, android.R.id.text2});
+                        simpleAdapter.notifyDataSetChanged();
+                        statListView.setAdapter(simpleAdapter);
                     }
 
                     @Override

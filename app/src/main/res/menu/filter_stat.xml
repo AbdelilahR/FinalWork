@@ -17,5 +17,9 @@
             android:title="Last week"></item>
 
     </group>
+    <item
+        android:id="@+id/delete_all"
+        android:title="Delete all">
 
+    </item>
 </menu>
