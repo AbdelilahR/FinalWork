@@ -31,6 +31,7 @@ import com.example.currentplacedetailsonmap.Activity.ChatActivity;
 import com.example.currentplacedetailsonmap.Activity.LoginActivity;
 import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.Adapter.UserAdapter;
+import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -81,7 +82,7 @@ public class UserFragment extends Fragment implements Serializable
     private float distance;
     private Location userLocation = new Location("");
     private Location currentLocation = new Location("");
-    private String userId;
+
 
 
     public UserFragment()
@@ -119,7 +120,7 @@ public class UserFragment extends Fragment implements Serializable
         if (mAuth != null)
         {
             mCurrentUserId = mAuth.getCurrentUser().getUid();
-            userId = mAuth.getUid();
+
         }
         currentLocation = getLastKnownLocation();
         //public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
@@ -211,7 +212,7 @@ public class UserFragment extends Fragment implements Serializable
 
             long milis = new Date().getTime();
             String last_seen = String.valueOf(milis);
-            FirebaseDatabase.getInstance().getReference().child("User").child(userId).child("status").setValue(last_seen);
+            FirebaseDatabase.getInstance().getReference().child("User").child(mCurrentUserId).child("status").setValue(last_seen);
             FirebaseAuth.getInstance().signOut();
             startActivity(intent);
             return true;
@@ -253,7 +254,7 @@ public class UserFragment extends Fragment implements Serializable
     public void loadUserList()
     {
 
-        if (isNetworkAvailable())
+        if (Utility.isNetworkAvailable(getActivity()))
         {
             class LoadDataUserList extends AsyncTask<String, Void, String>
             {
@@ -437,10 +438,5 @@ public class UserFragment extends Fragment implements Serializable
         this.online_only = online_only;
     }
 
-    private boolean isNetworkAvailable()
-    {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
+
 }

@@ -2,6 +2,7 @@ package com.example.currentplacedetailsonmap.Activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -14,7 +15,10 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,7 +28,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.currentplacedetailsonmap.Fragment.FriendsFragment;
 import com.firebase.client.ServerValue;
 import com.example.currentplacedetailsonmap.Adapter.MessageAdapter;
 import com.example.currentplacedetailsonmap.Model.GetTimeAgo;
@@ -86,10 +92,15 @@ public class ChatActivity extends AppCompatActivity
     private int mCurrentPage = 1;
     // Storage Firebase
     private StorageReference mImageStorage;
-    //New Solution
     private int itemPos = 0;
     private String mLastKey = "";
     private String mPrevKey = "";
+    private User selectedUser;
+    private String mCurrent_state;
+    private DatabaseReference mFriendReqDatabase;
+    private DatabaseReference mFriendDatabase;
+    private DatabaseReference mNotificationDatabase;
+    private Menu menu;
 
     private static Location getLastKnownLocation(Context c)
     {
@@ -119,13 +130,13 @@ public class ChatActivity extends AppCompatActivity
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.send_options, menu);
-
-        return super.onCreateOptionsMenu(menu);
+        this.menu = menu;
+        return true;
 
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public boolean onOptionsItemSelected(final MenuItem item)
     {
         if (item.getItemId() == R.id.send_image)
         {
@@ -134,7 +145,7 @@ public class ChatActivity extends AppCompatActivity
             galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
 
             startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
-
+            return true;
 
         } else if (item.getItemId() == R.id.send_location)
         {
@@ -148,7 +159,82 @@ public class ChatActivity extends AppCompatActivity
             sendIntent.setType("image/*");
 
             onActivityResult(SEND_LOCATION, RESULT_OK, sendIntent);
+            return true;
 
+        } else if (item.getItemId() == R.id.send_friendRequest)
+        {
+
+            if (mCurrent_state.equals("not_friends"))
+            {
+
+                if (mCurrent_state.equals("not_friends"))
+                {
+
+
+                    //DatabaseReference newNotificationref = mRootRef.child("notifications").child(mChatUser).push();
+                    //String newNotificationId = newNotificationref.getKey();
+
+                    // HashMap<String, String> notificationData = new HashMap<>();
+                    //notificationData.put("from", mCurrentUserId);
+                    //notificationData.put("type", "request");
+
+                    Map requestMap = new HashMap();
+                    String path_mCurrentUser = "Friends/" + mCurrentUserId + "/" + mChatUser + "/";
+                    //requestMap.put("Friends/" + mCurrentUserId + "/", selectedUser.getUserId());
+                    requestMap.put(path_mCurrentUser + "achternaam", selectedUser.getAchternaam());
+                    requestMap.put(path_mCurrentUser + "adress", selectedUser.getAdress());
+                    requestMap.put(path_mCurrentUser + "avatar", selectedUser.getAvatar());
+                    requestMap.put(path_mCurrentUser + "email", selectedUser.getEmail());
+                    requestMap.put(path_mCurrentUser + "geslacht", selectedUser.getGeslacht());
+                    requestMap.put(path_mCurrentUser + "status", selectedUser.getStatus());
+                    requestMap.put(path_mCurrentUser + "userId", selectedUser.getUserId());
+                    requestMap.put(path_mCurrentUser + "voornaam", selectedUser.getVoornaam());
+                    requestMap.put(path_mCurrentUser + "wachtwoord", selectedUser.getWachtwoord());
+                    requestMap.put(path_mCurrentUser + "request_type", "sent");
+
+                    String path_mSelectedUser = "Friends/" + mChatUser + "/" + mCurrentUserId + "/";
+                    //TODO get User data of currentUser
+                    /**
+                     requestMap.put("Friend_req/" + mCurrentUserId + "/" + mChatUser + "/request_type", "sent");
+                     requestMap.put("Friend_req/" + mChatUser + "/" + mCurrentUserId + "/request_type", "received");
+                     */
+                    //requestMap.put("notifications/" + mChatUser + "/" + newNotificationId, notificationData);
+
+                    mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener()
+                    {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+                        {
+
+                            if (databaseError != null)
+                            {
+
+                                Toast.makeText(ChatActivity.this, "There was some error in sending request", Toast.LENGTH_SHORT).show();
+
+                            } else
+                            {
+
+                                mCurrent_state = "req_sent";
+                                //mProfileSendReqBtn.setText("Cancel Friend Request");
+                                item.setEnabled(true);
+                                item.setVisible(true);
+
+                            }
+
+                            //mProfileSendReqBtn.setEnabled(true);
+
+
+                        }
+                    });
+
+                }
+
+            } else
+            {
+                item.setEnabled(false);
+                item.setVisible(false);
+            }
+            return true;
         }
 
         return true;
@@ -161,6 +247,7 @@ public class ChatActivity extends AppCompatActivity
         setContentView(R.layout.activity_chat);
 
         mChatToolbar = (Toolbar) findViewById(R.id.chat_app_bar);
+        mCurrent_state = "not_friends";
         setSupportActionBar(mChatToolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -168,16 +255,20 @@ public class ChatActivity extends AppCompatActivity
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 
+        //initialize firebase
+        mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
+        mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
+        mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("notifications");
         mRootRef = FirebaseDatabase.getInstance().getReference();
+        //initialize current user and selected user
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserId = mAuth.getCurrentUser().getUid();
-        User selectedUser = (User) getIntent().getExtras().getSerializable("selectedUser");
+        selectedUser = (User) getIntent().getExtras().getSerializable("selectedUser");
         mChatUser = selectedUser.getUserId();
         String selectedUser_userame = selectedUser.getVoornaam() + " " + selectedUser.getAchternaam();
-
+        //layout
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
-
         actionBar.setCustomView(action_bar_view);
 
         // ---- Custom Action bar Items ----
@@ -399,7 +490,6 @@ public class ChatActivity extends AppCompatActivity
                                 Map messageUserMap = new HashMap();
                                 messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
                                 messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-
 
 
                                 mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
@@ -706,4 +796,21 @@ public class ChatActivity extends AppCompatActivity
         new sendMessageAsync().execute("");
     }
 
+    /**
+     * source --> https://stackoverflow.com/questions/32969172/how-to-display-menu-item-with-icon-and-text-in-appcompatactivity
+     *
+     * @param r
+     * @param title
+     * @return
+     */
+    private CharSequence menuIconWithText(Drawable r, String title)
+    {
+
+        r.setBounds(0, 0, r.getIntrinsicWidth(), r.getIntrinsicHeight());
+        SpannableString sb = new SpannableString("    " + title);
+        ImageSpan imageSpan = new ImageSpan(r, ImageSpan.ALIGN_BOTTOM);
+        sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        return sb;
+    }
 }

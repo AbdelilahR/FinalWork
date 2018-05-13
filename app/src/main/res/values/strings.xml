@@ -44,5 +44,11 @@
     <string name="send_to">send</string>
     <string name="change_image">Change Image</string>
     <string name="Town">Town</string>
+    <string name="send_location">Send location</string>
+    <string name="send_image">Send image</string>
+    <string name="send_friendRequest">Send friend request</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
 

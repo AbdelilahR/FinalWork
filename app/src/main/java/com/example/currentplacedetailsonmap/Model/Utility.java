@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -21,6 +23,16 @@ public class Utility
     }
 
     /**
+     * https://stackoverflow.com/questions/16294607/check-network-available-in-android
+     * @return
+     */
+    public static boolean isNetworkAvailable(Context context)
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+    /**
      * source: https://stackoverflow.com/questions/8911356/whats-the-best-practice-to-round-a-float-to-2-decimals?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
      *
      * @param d
@@ -32,6 +44,21 @@ public class Utility
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
+    }
+
+    /**
+     * https://www.viralandroid.com/2015/11/get-current-time-in-android-programmatically.html
+     *
+     * @return
+     */
+
+    // -- Dates Functions -- //
+    public static String getTime()
+    {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String date = sdformat.format(calendar.getTime());
+        return date;
     }
 
     /**
@@ -57,19 +84,6 @@ public class Utility
             }
         }
         return bestLocation;
-    }
-
-    /**
-     * https://www.viralandroid.com/2015/11/get-current-time-in-android-programmatically.html
-     *
-     * @return
-     */
-    public static String getTime()
-    {
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String date = sdformat.format(calendar.getTime());
-        return date;
     }
 
     /**
