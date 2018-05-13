@@ -101,6 +101,7 @@ public class ChatActivity extends AppCompatActivity
     private DatabaseReference mFriendDatabase;
     private DatabaseReference mNotificationDatabase;
     private Menu menu;
+    private User mCurrentUser;
 
     private static Location getLastKnownLocation(Context c)
     {
@@ -164,8 +165,6 @@ public class ChatActivity extends AppCompatActivity
         } else if (item.getItemId() == R.id.send_friendRequest)
         {
 
-            if (mCurrent_state.equals("not_friends"))
-            {
 
                 if (mCurrent_state.equals("not_friends"))
                 {
@@ -179,6 +178,7 @@ public class ChatActivity extends AppCompatActivity
                     //notificationData.put("type", "request");
 
                     Map requestMap = new HashMap();
+
                     String path_mCurrentUser = "Friends/" + mCurrentUserId + "/" + mChatUser + "/";
                     //requestMap.put("Friends/" + mCurrentUserId + "/", selectedUser.getUserId());
                     requestMap.put(path_mCurrentUser + "achternaam", selectedUser.getAchternaam());
@@ -193,13 +193,17 @@ public class ChatActivity extends AppCompatActivity
                     requestMap.put(path_mCurrentUser + "request_type", "sent");
 
                     String path_mSelectedUser = "Friends/" + mChatUser + "/" + mCurrentUserId + "/";
-                    //TODO get User data of currentUser
-                    /**
-                     requestMap.put("Friend_req/" + mCurrentUserId + "/" + mChatUser + "/request_type", "sent");
-                     requestMap.put("Friend_req/" + mChatUser + "/" + mCurrentUserId + "/request_type", "received");
-                     */
-                    //requestMap.put("notifications/" + mChatUser + "/" + newNotificationId, notificationData);
-
+                    Log.d("VARIABLE","Current user object: " + mCurrentUser);
+                    requestMap.put(path_mSelectedUser + "achternaam", mCurrentUser.getAchternaam());
+                    requestMap.put(path_mSelectedUser + "adress", mCurrentUser.getAdress());
+                    requestMap.put(path_mSelectedUser + "avatar", mCurrentUser.getAvatar());
+                    requestMap.put(path_mSelectedUser + "email", mCurrentUser.getEmail());
+                    requestMap.put(path_mSelectedUser + "geslacht", mCurrentUser.getGeslacht());
+                    requestMap.put(path_mSelectedUser + "status", mCurrentUser.getStatus());
+                    requestMap.put(path_mSelectedUser + "userId", mCurrentUser.getUserId());
+                    requestMap.put(path_mSelectedUser + "voornaam", mCurrentUser.getVoornaam());
+                    requestMap.put(path_mSelectedUser + "wachtwoord", mCurrentUser.getWachtwoord());
+                    requestMap.put(path_mSelectedUser + "request_type", "received");
                     mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener()
                     {
                         @Override
@@ -226,14 +230,16 @@ public class ChatActivity extends AppCompatActivity
 
                         }
                     });
-
+                    item.setEnabled(false);
+                    item.setVisible(false);
+                }
+                else
+                {
+                    item.setEnabled(true);
+                    item.setVisible(true);
                 }
 
-            } else
-            {
-                item.setEnabled(false);
-                item.setVisible(false);
-            }
+
             return true;
         }
 
@@ -264,6 +270,8 @@ public class ChatActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserId = mAuth.getCurrentUser().getUid();
         selectedUser = (User) getIntent().getExtras().getSerializable("selectedUser");
+        loadCurrentUser();
+
         mChatUser = selectedUser.getUserId();
         String selectedUser_userame = selectedUser.getVoornaam() + " " + selectedUser.getAchternaam();
         //layout
@@ -430,6 +438,39 @@ public class ChatActivity extends AppCompatActivity
             }
         });
 
+
+    }
+
+    private void loadCurrentUser()
+    {
+
+        
+        class getCurrentUserAsync extends AsyncTask<String,Void,String>
+        {
+
+
+            @Override
+            protected String doInBackground(String... strings)
+            {
+                FirebaseDatabase.getInstance().getReference("User").child(mCurrentUserId).addValueEventListener(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
+                        mCurrentUser = dataSnapshot.getValue(User.class);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
+
+                    }
+                });
+                return "Executed";
+            }
+
+        }
+       new getCurrentUserAsync().execute("");
 
     }
 

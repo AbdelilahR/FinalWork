@@ -96,7 +96,7 @@ public class FriendsFragment extends Fragment
         //setHasOptionsMenu(true);
     }
 
-
+    //TODO finish this function (loadFriendlist)
     public void loadFriendList()
     {
 
@@ -134,9 +134,7 @@ public class FriendsFragment extends Fragment
                                 myFriend = dsp.getValue(Friends.class);
                                 lastId = dsp.getKey();
 
-                                    friendsLocation.setLatitude(myFriend.getAdress().getLatitude());
-                                    friendsLocation.setLongitude(myFriend.getAdress().getLongitude());
-                                    distance = currentLocation.distanceTo(friendsLocation);
+
 
 
                                     friendList.add(myFriend);
