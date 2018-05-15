@@ -19,6 +19,12 @@ import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.Model.UserViewHolder;
 import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -36,6 +42,7 @@ public class FriendAdapter extends ArrayAdapter<Friends>
     public String metric_symbol = "m";
     public Location myLocation = new Location("");
     public Location userLocation = new Location("");
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private LocationManager mLocationManager;
     private ArrayList<Friends> friends;
 
@@ -65,7 +72,7 @@ public class FriendAdapter extends ArrayAdapter<Friends>
             friendsVH.decline = (Button) convertView.findViewById(R.id.decline_friendReq);
             convertView.setTag(friendsVH);
         }
-        Friends friends = getItem(position);
+        final Friends friends = getItem(position);
         /** Source: https://stackoverflow.com/questions/2741403/get-the-distance-between-two-geo-points?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
          */
 
@@ -104,14 +111,50 @@ public class FriendAdapter extends ArrayAdapter<Friends>
 
         if (friends.getRequest().equals("sent"))
         {
+            //Cancel Friend Request
             friendsVH.cancel_accept.setText("Cancel Request");
+            friendsVH.cancel_accept.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    DatabaseReference request_currentUser = FirebaseDatabase.getInstance().getReference("Friends").child(auth.getUid()).child(friends.getUser().getUserId());
+                    DatabaseReference request_selectedUser = FirebaseDatabase.getInstance().getReference("Friends").child(friends.getUser().getUserId()).child(auth.getUid());
+                    request_currentUser.removeValue();
+                    request_selectedUser.removeValue();
+
+                }
+            });
             friendsVH.decline.setVisibility(View.GONE);
             //friendsVH.decline.setText("Decline Request");
         } else if (friends.getRequest().equals("received"))
         {
-            friendsVH.cancel_accept.setText("Accept Request");
             friendsVH.decline.setVisibility(View.VISIBLE);
-            friendsVH.decline.setText("Decline");
+            //Accept Friend Request
+            friendsVH.cancel_accept.setText("Accept Request");
+            friendsVH.cancel_accept.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    DatabaseReference acceptedRequest_currrentUser = FirebaseDatabase.getInstance().getReference("Friends").child(auth.getUid());
+                }
+            });
+
+            //Decline Friend Request
+            friendsVH.decline.setText("Decline Request");
+            friendsVH.decline.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    DatabaseReference request_currentUser = FirebaseDatabase.getInstance().getReference("Friends").child(auth.getUid()).child(friends.getUser().getUserId());
+                    DatabaseReference request_selectedUser = FirebaseDatabase.getInstance().getReference("Friends").child(friends.getUser().getUserId()).child(auth.getUid());
+                    request_currentUser.removeValue();
+                    request_selectedUser.removeValue();
+
+                }
+            });
         }
 
         return convertView;
