@@ -13,10 +13,10 @@ public class Friends implements Serializable
     public Address adress;
     public User user;
 
-    public Friends(String request, Address adress, User user)
+    public Friends(String request,User user)
     {
         this.request = request;
-        this.adress = adress;
+
         this.user = user;
     }
 

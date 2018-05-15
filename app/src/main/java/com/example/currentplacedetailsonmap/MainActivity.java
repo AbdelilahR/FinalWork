@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.example.currentplacedetailsonmap.Activity.LoginActivity;
+import com.example.currentplacedetailsonmap.Fragment.FriendsFragment;
 import com.example.currentplacedetailsonmap.Fragment.HomeFragment;
 import com.example.currentplacedetailsonmap.Fragment.StatsFragment;
 import com.example.currentplacedetailsonmap.Fragment.UserFragment;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity
     private UserFragment userFragment;
     private StatsFragment statsFragment;
     private HomeFragment homeFragment;
+    private FriendsFragment friendsFragment;
 
     @SuppressLint("ResourceType")
     @Override
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity
                     userFragment = new UserFragment();
                     homeFragment = new HomeFragment();
                     statsFragment = new StatsFragment();
+                    friendsFragment = new FriendsFragment();
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     if (savedInstanceState != null)
                         homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, HomeFragment.class.getSimpleName());
@@ -87,6 +90,10 @@ public class MainActivity extends AppCompatActivity
                             transaction.commit();
 
                             break;
+                        case R.id.navigation_friends:
+                            transaction.replace(R.id.main_content, friendsFragment);
+                            transaction.commit();
+
                     }
                     return true;
                 }

@@ -44,13 +44,14 @@ public class FriendsFragment extends Fragment
     private FirebaseAuth mAuth;
     private String mCurrentUserId;
     private Location currentLocation;
-    private ArrayList<Friends> friendList;
+    private ArrayList<Friends> friendList = new ArrayList<>();
     private FriendAdapter friendAdapter;
     private Friends myFriend;
     private String lastId;
     private Location friendsLocation = new Location("");
     private float distance;
     public DatabaseReference ref;
+    private User user_request;
 
     public FriendsFragment()
     {
@@ -130,14 +131,14 @@ public class FriendsFragment extends Fragment
                             for (DataSnapshot dsp : dataSnapshot.getChildren())
                             {
 
+                                String request_type = dsp.child("request_type").getValue().toString();
+                                user_request = dsp.getValue(User.class);
 
-                                myFriend = dsp.getValue(Friends.class);
+                                myFriend = new Friends(request_type,user_request);
                                 lastId = dsp.getKey();
 
 
-
-
-                                    friendList.add(myFriend);
+                                friendList.add(myFriend);
 
 
                             }
@@ -188,7 +189,7 @@ public class FriendsFragment extends Fragment
                                                         lastId = dsp.getKey();
 
 
-                                                                friendList.add(myFriend);
+                                                        friendList.add(myFriend);
 
 
                                                     }
@@ -211,9 +212,9 @@ public class FriendsFragment extends Fragment
                             if (getActivity() != null)
                                 friendAdapter = new FriendAdapter(getActivity().getApplicationContext(), friendList);
 
-                            if (friendsListView != null)
+                            if (friendsListView != null && friendList != null)
                             {
-                                friendsListView.invalidateViews();
+
                                 friendsListView.setAdapter(friendAdapter);
 
                                 friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -224,8 +225,8 @@ public class FriendsFragment extends Fragment
                                         //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                                         mAuth = FirebaseAuth.getInstance();
                                         Intent intent = new Intent(getActivity(), ChatActivity.class);
-                                        User selectedUser = (User) parent.getAdapter().getItem(position);
-                                        intent.putExtra("selectedUser", selectedUser);
+                                        Friends selectedFriend = (Friends) parent.getAdapter().getItem(position);
+                                        intent.putExtra("selectedUser", selectedFriend.getUser());
                                         startActivity(intent);
 
                                     }

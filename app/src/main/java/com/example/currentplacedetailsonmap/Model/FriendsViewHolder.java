@@ -16,5 +16,6 @@ public class FriendsViewHolder
     public TextView text;
     public CircleImageView avatar;
     public ImageView status;
-    public Button request;
+    public Button cancel_accept;
+    public Button decline;
 }

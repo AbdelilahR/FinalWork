@@ -51,7 +51,7 @@ public class FriendAdapter extends ArrayAdapter<Friends>
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
     {
         if (convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_user_listview, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_friend_listview, parent, false);
 
         FriendsViewHolder friendsVH = (FriendsViewHolder) convertView.getTag();
         if (friendsVH == null)
@@ -61,7 +61,8 @@ public class FriendAdapter extends ArrayAdapter<Friends>
             friendsVH.text = (TextView) convertView.findViewById(R.id.text);
             friendsVH.avatar = (CircleImageView) convertView.findViewById(R.id.avatar);
             friendsVH.status = (ImageView) convertView.findViewById(R.id.status);
-            friendsVH.request = (Button) convertView.findViewById(R.id.request);
+            friendsVH.cancel_accept = (Button) convertView.findViewById(R.id.cancel_accept_friendReq);
+            friendsVH.decline = (Button) convertView.findViewById(R.id.decline_friendReq);
             convertView.setTag(friendsVH);
         }
         Friends friends = getItem(position);
@@ -69,8 +70,8 @@ public class FriendAdapter extends ArrayAdapter<Friends>
          */
 
         myLocation = Utility.getLastKnownLocation(this.getContext());
-        userLocation.setLatitude(friends.getAdress().getLatitude());
-        userLocation.setLongitude(friends.getAdress().getLongitude());
+        userLocation.setLatitude(friends.getUser().getAdress().getLatitude());
+        userLocation.setLongitude(friends.getUser().getAdress().getLongitude());
 
         float distanceInMeters = myLocation.distanceTo(userLocation);
 
@@ -99,6 +100,20 @@ public class FriendAdapter extends ArrayAdapter<Friends>
 
         else
             friendsVH.status.setImageResource(R.drawable.offline_icon);
+
+
+        if (friends.getRequest().equals("sent"))
+        {
+            friendsVH.cancel_accept.setText("Cancel Request");
+            friendsVH.decline.setVisibility(View.GONE);
+            //friendsVH.decline.setText("Decline Request");
+        } else if (friends.getRequest().equals("received"))
+        {
+            friendsVH.cancel_accept.setText("Accept Request");
+            friendsVH.decline.setVisibility(View.VISIBLE);
+            friendsVH.decline.setText("Decline");
+        }
+
         return convertView;
     }
 

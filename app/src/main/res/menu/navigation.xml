@@ -18,5 +18,11 @@
         android:title="Users"
 
         />
+    <item
+        android:id="@+id/navigation_friends"
+        android:icon="@drawable/cast_abc_scrubber_control_off_mtrl_alpha"
+        android:title="Friends"
+
+        />
 
 </menu>
