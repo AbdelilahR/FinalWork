@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".Activity.ChatActivity">
     <item
         android:id="@+id/send_location"
         android:title="@string/send_location"
         app:showAsAction="always"
-        android:icon="@drawable/send_location"/>
+        />
+     <!--   android:icon="@drawable/send_location"
+             android:icon="@drawable/send_image"
+              android:icon="@drawable/add_friend"
+
+     -->
+
     <item
         android:id="@+id/send_image"
-        app:showAsAction="always"
-        android:icon="@drawable/send_image"
-        android:title="@string/send_image" />
+        android:title="@string/send_image"
+        app:showAsAction="always" />
     <item
         android:id="@+id/send_friendRequest"
-        app:showAsAction="always"
-        android:icon="@drawable/add_friend"
-        android:title="@string/send_friendRequest" />
+        android:title="@string/send_friendRequest"
+        app:showAsAction="always" />
 </menu>

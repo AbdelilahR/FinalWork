@@ -38,8 +38,7 @@ import static com.example.currentplacedetailsonmap.R.drawable.online_icon;
  * Created by Abdel-Portable on 18-04-18.
  * source: http://tutos-android-france.com/listview-afficher-une-liste-delements/
  */
-public class UserAdapter extends ArrayAdapter<User>
-{
+public class UserAdapter extends ArrayAdapter<User> {
 
 
     public String metric_symbol = "m";
@@ -47,9 +46,9 @@ public class UserAdapter extends ArrayAdapter<User>
     public Location userLocation = new Location("");
     private LocationManager mLocationManager;
     private ArrayList<User> users;
+    private float distanceInMeters;
 
-    public UserAdapter(@NonNull Context context, ArrayList<User> users)
-    {
+    public UserAdapter(@NonNull Context context, ArrayList<User> users) {
         super(context, 0, users);
         this.users = users;
 
@@ -57,14 +56,12 @@ public class UserAdapter extends ArrayAdapter<User>
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
-    {
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_user_listview, parent, false);
 
         UserViewHolder userVH = (UserViewHolder) convertView.getTag();
-        if (userVH == null)
-        {
+        if (userVH == null) {
             userVH = new UserViewHolder();
             userVH.pseudo = (TextView) convertView.findViewById(R.id.pseudo);
             userVH.text = (TextView) convertView.findViewById(R.id.text);
@@ -81,15 +78,13 @@ public class UserAdapter extends ArrayAdapter<User>
         myLocation = Utility.getLastKnownLocation(this.getContext());
         userLocation.setLatitude(user.getAdress().getLatitude());
         userLocation.setLongitude(user.getAdress().getLongitude());
+        if (myLocation != null && userLocation != null)
+             distanceInMeters = myLocation.distanceTo(userLocation);
 
-        float distanceInMeters = myLocation.distanceTo(userLocation);
-
-        if (distanceInMeters > 1000)
-        {
+        if (distanceInMeters > 1000) {
             distanceInMeters = (distanceInMeters / 1000);
             metric_symbol = "km";
-        } else
-        {
+        } else {
             metric_symbol = "m";
         }
 
