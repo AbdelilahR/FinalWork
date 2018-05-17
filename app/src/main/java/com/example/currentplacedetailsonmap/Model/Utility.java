@@ -8,6 +8,9 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
+
+import com.example.currentplacedetailsonmap.Interfaces.AsyncResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -30,6 +34,7 @@ public class Utility
 
     /**
      * https://stackoverflow.com/questions/16294607/check-network-available-in-android
+     *
      * @return
      */
     public static boolean isNetworkAvailable(Context context)
@@ -38,6 +43,7 @@ public class Utility
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
     /**
      * source: https://stackoverflow.com/questions/8911356/whats-the-best-practice-to-round-a-float-to-2-decimals?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
      *
@@ -162,27 +168,30 @@ public class Utility
 
     /**
      * https://stackoverflow.com/questions/12818711/how-to-find-time-is-today-or-yesterday-in-android
+     *
      * @param date
      * @return
      */
-    public static boolean isYesterday(long date) {
+    public static boolean isYesterday(long date)
+    {
         Calendar now = Calendar.getInstance();
         Calendar cdate = Calendar.getInstance();
         cdate.setTimeInMillis(date);
 
-        now.add(Calendar.DATE,-1);
+        now.add(Calendar.DATE, -1);
 
         return now.get(Calendar.YEAR) == cdate.get(Calendar.YEAR)
                 && now.get(Calendar.MONTH) == cdate.get(Calendar.MONTH)
                 && now.get(Calendar.DATE) == cdate.get(Calendar.DATE);
     }
 
-    public static boolean isLastWeek(long date) {
+    public static boolean isLastWeek(long date)
+    {
         Calendar now = Calendar.getInstance();
         Calendar cdate = Calendar.getInstance();
         cdate.setTimeInMillis(date);
 
-        now.add(Calendar.DATE,-7);
+        now.add(Calendar.DATE, -7);
 
         return now.get(Calendar.YEAR) == cdate.get(Calendar.YEAR)
                 && now.get(Calendar.MONTH) == cdate.get(Calendar.MONTH)
@@ -191,21 +200,45 @@ public class Utility
 
     /**
      * https://stackoverflow.com/questions/8992964/android-load-from-url-to-bitmap?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+     *
      * @param src
      * @return
+     *
+    public static Bitmap getBitmapFromURL(final String src)
+    {
+    Bitmap myBitmap = null;
+    class getBitmapFromUrl_async extends AsyncTask<String, Bitmap, Bitmap>
+    {
+    public AsyncResponse delegate = null;
+     @Override protected Bitmap doInBackground(String... strings)
+     {
+     Bitmap myAsync_Bitmap = null;
+     try
+     {
+     URL url = new URL(src);
+     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+     connection.setDoInput(true);
+     connection.connect();
+     InputStream input = connection.getInputStream();
+     myAsync_Bitmap = BitmapFactory.decodeStream(input);
+     } catch (Exception e)
+     {
+     e.getMessage();
+     }
+     return myAsync_Bitmap;
+     }
+
+
+     @Override protected void onPostExecute(Bitmap bitmap)
+     {
+     delegate.processFinish(bitmap);
+     }
+     }
+     new getBitmapFromUrl_async().execute("");
+
+     return myBitmap;
+     }
      */
-    public static Bitmap getBitmapFromURL(String src) {
-        try {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        } catch (IOException e) {
-            // Log exception
-            return null;
-        }
-    }
+
 }
+
