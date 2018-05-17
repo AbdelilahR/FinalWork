@@ -324,8 +324,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         addHeatMap();
 
 
-        // Put a marker on the map for every friend of the user
-        loadFriendList_onMap();
 
 
 
@@ -472,6 +470,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        // Put a marker on the map for every friend of the user
+        loadFriendList_onMap();
 
         getLocationPermission();
         updateLocationUI();
@@ -1041,12 +1042,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                 });
                 Log.d("THREAD CHECK 3", Thread.currentThread().getName());
 
-                if (friendsList != null)
+                return "Executed";
+
+            }
+
+            @Override
+            protected void onPostExecute(String s)
+            {
+
+
+                if (friendsList != null && !friendsList.isEmpty())
                 {
 
                     for (Friends myFriend : friendsList)
                     {
-                        Log.d("THREAD CHECK 3", Thread.currentThread().getName());
                         markerOptions.position(new LatLng(myFriend.getUser().getAdress().getLatitude(), myFriend.getUser().getAdress().getLongitude()));
                         markerOptions.title(myFriend.getUser().getVoornaam() + " " + myFriend.getUser().getAchternaam());
                         String url = myFriend.getUser().getAvatar();
@@ -1059,7 +1068,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                             Log.d("THREAD CHECK 4", Thread.currentThread().getName());
                             String avatar_url = myFriend.getUser().getAvatar();
-                            markers.add(markerOptions);
+
                             try
                             {
                                 Log.d("THREAD CHECK 5", Thread.currentThread().getName());
@@ -1079,42 +1088,25 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 //return null;
                             }
 
-
+                            markers.add(markerOptions);
                         }
 
-                        //mMap.addMarker(markerOptions);
-                        markers.add(markerOptions);
+
                     }
 
                 }
 
 
-                return "Executed";
-
-            }
-
-            @Override
-            protected void onPostExecute(String s)
-            {
-
-
-                mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback()
+                for (MarkerOptions mo : markers)
                 {
-                    @Override
-                    public void onMapLoaded()
-                    {
-                        for (MarkerOptions mo : markers)
-                        {
-                            mMap.addMarker(mo);
-                        }
-                    }
-                });
-
-
+                    mMap.addMarker(mo);
+                }
             }
+
+
         }
         new loadFriendList_onMap_async().execute("");
-
+/*
         LocationManager mManager = (LocationManager) getActivity().getSystemService(getContext().LOCATION_SERVICE);
         mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, new LocationListener()
         {
@@ -1142,7 +1134,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             {
 
             }
-        });
+        });*/
     }
 
     // this function will send the current location of the user to all his friends
