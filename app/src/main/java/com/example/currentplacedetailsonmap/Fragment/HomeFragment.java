@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -38,9 +40,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.currentplacedetailsonmap.Adapter.FriendAdapter;
 import com.example.currentplacedetailsonmap.MainActivity;
 import com.example.currentplacedetailsonmap.Model.Address;
 import com.example.currentplacedetailsonmap.Model.DirectionsJSONParser;
+import com.example.currentplacedetailsonmap.Model.Friends;
 import com.example.currentplacedetailsonmap.Model.Statistiek;
 import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.Model.Utility;
@@ -62,6 +66,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -81,6 +86,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -164,6 +170,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     private String current_user;
     private int last_id;
     private boolean position_enable;
+    private ArrayList<Friends> friendsList = new ArrayList<>();
+    private Friends friend = new Friends();
+    private MarkerOptions markerOptions = new MarkerOptions();
+    private User added_user;
+    private Bitmap _default;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -189,9 +200,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
                 Toast.makeText(getActivity(), "Please enable your localisation for the app to work properly", Toast.LENGTH_SHORT);
 
         }
-        //updateLocationUI();
-        //getDeviceLocation();
-
 
         //Start Pause button
         final Button btnStart = (Button) view.findViewById(R.id.btn_start);
@@ -303,8 +311,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
             }
         });
 
+        // Set a heatmap layer on the map
         addHeatMap();
 
+        // Put a marker on the map for every friend of the user
+        loadFriendList_onMap();
         return view;
     }
 
@@ -436,13 +447,18 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         getActivity().setTitle("Home");
         setRetainInstance(true);
 
-        // Retrieve location and camera position from saved instance state.
 
-        //Firebase
+        // Firebase variables
         auth = FirebaseAuth.getInstance();
         current_user = auth.getUid();
 
+        //initialize default avatar
+        _default = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.default_avatar);
+
+        // Retrieve last id from firebase and initialize it
         setLAstSessionId();
+
+        // Retrieve location and camera position from saved instance state + last id.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mNewLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -459,6 +475,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        //
+
 
         updateLocationUI();
         getLocationPermission();
@@ -867,7 +886,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         }
     }
 
-
     //http://blog.bawa.com/2013/11/create-your-own-simple-pedometer.html
     //http://www.lewisgavin.co.uk/Step-Tracker-Android/
     @Override
@@ -960,6 +978,70 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
         alertDialog.show();
     }
 
+
+    /**
+     * getters & setters
+     */
+    public int getLast_id() {
+        return last_id;
+    }
+
+    public void setLast_id(int last_id) {
+        this.last_id = last_id;
+    }
+
+    public void loadFriendList_onMap() {
+
+        class loadFriendList_onMap_async extends AsyncTask<String, Void, String> {
+
+
+            @Override
+            protected String doInBackground(String... strings) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot dsp : dataSnapshot.getChildren()) {
+                            added_user = dsp.getValue(User.class);
+                            String request_type = dsp.child("request_type").getValue().toString();
+                            friend = new Friends(request_type, added_user);
+                            friendsList.add(friend);
+                        }
+
+                        if (friendsList != null) {
+
+                            for (Friends myFriend : friendsList) {
+                                markerOptions.position(new LatLng(myFriend.getUser().getAdress().getLatitude(), myFriend.getUser().getAdress().getLongitude()));
+                                markerOptions.title(myFriend.getUser().getVoornaam() + " " + myFriend.getUser().getAchternaam());
+                                String url = myFriend.getUser().getAvatar();
+                                if (url.equals("default"))
+
+                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(_default, 100, 100, false)));
+                                else
+                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(Utility.getBitmapFromURL(myFriend.getUser().getAvatar())));
+
+                                mMap.addMarker(markerOptions);
+
+                            }
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                return "Executed";
+
+            }
+
+        }
+        new loadFriendList_onMap_async().execute("");
+    }
+
     private String getDirectionsUrl(LatLng origin, LatLng dest) {
 
         // Origin of route
@@ -1032,17 +1114,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
     }
 
     /**
-     * getters & setters
+     * source => https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
+     * --- Start ---
      */
-    public int getLast_id() {
-        return last_id;
-    }
-
-    public void setLast_id(int last_id) {
-        this.last_id = last_id;
-    }
-
-    //Private Class ==> https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
     public class DownloadTask extends AsyncTask<String, Void, String> {
 
 
@@ -1125,7 +1199,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback, Sensor
             else
                 Toast.makeText(getContext(), "This goal is impossible", Toast.LENGTH_SHORT).show();
         }
+
     }
+    /**
+     *  --- End ---
+     */
 }
 
 

@@ -87,7 +87,6 @@ public class FriendAdapter extends ArrayAdapter<Friends> {
         }
 
         friendsVH.text.setText(Float.valueOf(Utility.round(distanceInMeters, 2)).toString() + " " + metric_symbol);
-
         friendsVH.pseudo.setText(friends.getUser().getVoornaam() + " " + friends.getUser().getAchternaam());
 
         if (friends.getUser().getAvatar().equals("default"))
