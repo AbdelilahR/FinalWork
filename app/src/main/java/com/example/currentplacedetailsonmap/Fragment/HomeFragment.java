@@ -167,6 +167,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private Bitmap _default;
     private Bitmap bitmap;
     private ArrayList<MarkerOptions> markers = new ArrayList<MarkerOptions>();
+    private SupportMapFragment mapFragment;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -179,7 +180,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_google_maps, container, false);
         // Build the map.
         final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         //Check if GPS is enabled
@@ -305,7 +306,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         // Set a heatmap layer on the map
         addHeatMap();
         // Put a marker on the map for every friend of the user
-        loadFriendList_onMap();
+        loadFriendList_onMap(this);
 
         return view;
     }
@@ -385,7 +386,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         });
 
 
-
     }
 
     @Override
@@ -433,7 +433,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
 
 
     }
@@ -898,9 +897,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         this.last_id = last_id;
     }
 
-    private void loadFriendList_onMap() {
+    private void loadFriendList_onMap(final HomeFragment homeFragment) {
         loadFriendLists();
         class loadFriendList_onMapAsync extends AsyncTask<String, Void, String> {
+
 
             @Override
             protected String doInBackground(String... strings) {
@@ -944,14 +944,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             protected void onPostExecute(String s) {
                 for (MarkerOptions mo : markers) {
                     mMap.addMarker(new MarkerOptions().position(mo.getPosition()).title(mo.getTitle()).icon(mo.getIcon()));
-                    onMapReady(mMap);
                 }
+                mapFragment.getMapAsync(homeFragment);
 
             }
         }
         new loadFriendList_onMapAsync().execute();
-        //onMapReady(mMap);
-
     }
 
     public void loadFriendLists() {
@@ -1146,8 +1144,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     public Bitmap getBitmap() {
         return bitmap;
     }
+
     /**
-     *  --- End ---
+     * --- End ---
      */
 
     public void setBitmap(Bitmap bitmap) {
