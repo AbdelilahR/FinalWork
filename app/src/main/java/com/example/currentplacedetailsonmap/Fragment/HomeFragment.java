@@ -171,6 +171,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private SupportMapFragment mapFragment;
     private HttpURLConnection connection;
     private Thread helper_thread;
+    private String avatar_url;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -935,7 +936,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                     markerOptions.icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(_default, 50, 50, false)));
                                     markers.add(markerOptions);
                                 } else {
-                                    final String avatar_url = myFriend.getUser().getAvatar();
+                                    avatar_url = myFriend.getUser().getAvatar();
                                     helper_thread = new Thread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -964,9 +965,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                         }
                         try {
                             helper_thread.join();
-                            for (MarkerOptions mo : markers) {
-                                mMap.addMarker(new MarkerOptions().position(mo.getPosition()).title(mo.getTitle()));
-                            }
+                            if (mMap != null)
+                                for (MarkerOptions mo : markers) {
+                                    mMap.addMarker(mo);
+                                }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
