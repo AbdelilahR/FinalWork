@@ -5,8 +5,8 @@ android {
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.example.currentplacedetailsonmap"
-        minSdkVersion 21
-        targetSdkVersion 21
+        minSdkVersion 20
+        targetSdkVersion 20
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
