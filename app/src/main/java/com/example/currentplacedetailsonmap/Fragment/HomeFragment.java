@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -168,6 +169,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private Bitmap bitmap;
     private ArrayList<MarkerOptions> markers = new ArrayList<MarkerOptions>();
     private SupportMapFragment mapFragment;
+    private HttpURLConnection connection;
+    private Thread helper_thread;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -303,12 +306,16 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        // Set a heatmap layer on the map
-        addHeatMap();
-        // Put a marker on the map for every friend of the user
-        loadFriendList_onMap(this);
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        // Put a marker on the map for every friend of the user
+        loadFriendList_onMap();
+        // Set a heatmap layer on the map
+        addHeatMap();
     }
 
     private void setLAstSessionId() {
@@ -621,6 +628,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                 //Log.d("ZOOM LEVEL", "zoom leve is " + zoom);
             }
         });
+
+
     }
 
     /**
@@ -897,120 +906,97 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         this.last_id = last_id;
     }
 
-    private void loadFriendList_onMap(final HomeFragment homeFragment) {
+    private void loadFriendList_onMap() {
         loadFriendLists();
         class loadFriendList_onMapAsync extends AsyncTask<String, Void, String> {
 
 
             @Override
             protected String doInBackground(String... strings) {
-                if (friendsList != null) {
-                    for (Friends myFriend : new ArrayList<Friends>(friendsList)) {
-                        markerOptions.position(new LatLng(myFriend.getUser().getAdress().getLatitude(), myFriend.getUser().getAdress().getLongitude()));
-                        markerOptions.title(myFriend.getUser().getVoornaam() + " " + myFriend.getUser().getAchternaam());
-                        String url = myFriend.getUser().getAvatar();
-                        if (url.equals("default")) {
-                            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(_default, 50, 50, false)));
-                            markers.add(markerOptions);
-                        } else {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
 
-                            String avatar_url = myFriend.getUser().getAvatar();
+                reference.addListenerForSingleValueEvent(new ValueEventListener()
 
-                            try {
-
-                                URL _url = new URL(avatar_url);
-                                HttpURLConnection connection = (HttpURLConnection) _url.openConnection();
-                                connection.setDoInput(true);
-                                connection.connect();
-                                InputStream input = connection.getInputStream();
-                                Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                                if (myBitmap != null)
-                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(myBitmap));
-                                //return myBitmap;
-                            } catch (IOException e) {
-                                // Log exception
-                                //return null;
-                            }
-                            markers.add(markerOptions);
+                {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot dsp : dataSnapshot.getChildren()) {
+                            added_user = dsp.getValue(User.class);
+                            String request_type = dsp.child("request_type").getValue().toString();
+                            friend = new Friends(request_type, added_user);
+                            friendsList.add(friend);
                         }
+                        if (friendsList != null) {
+                            for (Friends myFriend : new ArrayList<Friends>(friendsList)) {
+                                markerOptions.position(new LatLng(myFriend.getUser().getAdress().getLatitude(), myFriend.getUser().getAdress().getLongitude()));
+                                markerOptions.title(myFriend.getUser().getVoornaam() + " " + myFriend.getUser().getAchternaam());
+                                String url = myFriend.getUser().getAvatar();
+                                if (url.equals("default")) {
+                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(_default, 50, 50, false)));
+                                    markers.add(markerOptions);
+                                } else {
+                                    final String avatar_url = myFriend.getUser().getAvatar();
+                                    helper_thread = new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                URL _url = new URL(avatar_url);
+                                                connection = (HttpURLConnection) _url.openConnection();
+                                                connection.setDoInput(true);
+                                                connection.connect();
+                                                InputStream input = connection.getInputStream();
+                                                Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                                                if (myBitmap != null)
+                                                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(myBitmap));
+                                                markers.add(markerOptions);
+                                                //return myBitmap;
+                                            } catch (IOException e) {
+                                                // Log exception
+                                                //return null;
+                                            }
+                                        }
+                                    });
+                                    helper_thread.start();
+
+                                }
+                            }
+
+                        }
+                        try {
+                            helper_thread.join();
+                            for (MarkerOptions mo : markers) {
+                                mMap.addMarker(new MarkerOptions().position(mo.getPosition()).title(mo.getTitle()));
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+
                     }
 
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+
+                });
+
 
                 return "Executed";
             }
 
             @Override
             protected void onPostExecute(String s) {
-                for (MarkerOptions mo : markers) {
-                    mMap.addMarker(new MarkerOptions().position(mo.getPosition()).title(mo.getTitle()).icon(mo.getIcon()));
-                }
-                mapFragment.getMapAsync(homeFragment);
 
             }
         }
         new loadFriendList_onMapAsync().execute();
+
     }
 
     public void loadFriendLists() {
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
 
-        reference.addListenerForSingleValueEvent(new ValueEventListener()
-
-        {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot dsp : dataSnapshot.getChildren()) {
-                    added_user = dsp.getValue(User.class);
-                    String request_type = dsp.child("request_type").getValue().toString();
-                    friend = new Friends(request_type, added_user);
-                    friendsList.add(friend);
-                }
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-
-        });
-
-
-
-
-
-/*
-        LocationManager mManager = (LocationManager) getActivity().getSystemService(getContext().LOCATION_SERVICE);
-        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, new LocationListener()
-        {
-            @Override
-            public void onLocationChanged(Location location)
-            {
-
-
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle)
-            {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s)
-            {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s)
-            {
-
-            }
-        });*/
     }
 
     // this function will send the current location of the user to all his friends
