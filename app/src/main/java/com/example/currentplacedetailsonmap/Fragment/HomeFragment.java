@@ -314,6 +314,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     //set variable last_id
                     ++last_id;
                     Statistiek statistiek = new Statistiek("Session", last_id, time, (int) mCalories, distanceInMeters, Utility.getTime());
+                    distance.setText("0 m");
+                    calories.setText(0 );
+                    mCalories = 0f;
                     database.push().setValue(statistiek);
                     onStop();
                 }
