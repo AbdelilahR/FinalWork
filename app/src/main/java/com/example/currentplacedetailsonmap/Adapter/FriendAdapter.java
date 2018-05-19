@@ -93,7 +93,6 @@ public class FriendAdapter extends ArrayAdapter<Friends> {
             friendsVH.avatar.setImageResource(R.drawable.default_avatar);
         else
             Picasso.with(friendsVH.avatar.getContext()).load(friends.getUser().getAvatar()).resize(50, 50).into(friendsVH.avatar);
-//  Picasso.with(viewHolder.messageImage.getContext()).load(c.getMessage()).resize(400, 0).into(viewHolder.messageImage);
 
         String online = friends.getUser().getStatus();
         if (online.equals("online"))
@@ -103,6 +102,7 @@ public class FriendAdapter extends ArrayAdapter<Friends> {
             friendsVH.status.setImageResource(R.drawable.offline_icon);
 
         if (friends.getRequest().equals("sent")) {
+
             //Cancel Friend Request
             friendsVH.cancel_accept.setVisibility(View.VISIBLE);
             friendsVH.decline.setVisibility(View.GONE);
@@ -121,8 +121,9 @@ public class FriendAdapter extends ArrayAdapter<Friends> {
             });
 
         } else if (friends.getRequest().equals("received")) {
-            friendsVH.decline.setVisibility(View.VISIBLE);
+
             //Accept Friend Request
+            friendsVH.decline.setVisibility(View.VISIBLE);
             friendsVH.cancel_accept.setText("Accept Request");
             final FriendsViewHolder finalFriendsVH = friendsVH;
             friendsVH.cancel_accept.setOnClickListener(new View.OnClickListener() {

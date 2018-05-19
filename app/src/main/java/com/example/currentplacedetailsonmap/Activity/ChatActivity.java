@@ -180,7 +180,7 @@ public class ChatActivity extends AppCompatActivity
                     Map requestMap = new HashMap();
 
                     String path_mCurrentUser = "Friends/" + mCurrentUserId + "/" + mChatUser + "/";
-                    //requestMap.put("Friends/" + mCurrentUserId + "/", selectedUser.getUserId());
+
                     requestMap.put(path_mCurrentUser + "achternaam", selectedUser.getAchternaam());
                     requestMap.put(path_mCurrentUser + "adress", selectedUser.getAdress());
                     requestMap.put(path_mCurrentUser + "avatar", selectedUser.getAvatar());
@@ -193,7 +193,7 @@ public class ChatActivity extends AppCompatActivity
                     requestMap.put(path_mCurrentUser + "request_type", "sent");
 
                     String path_mSelectedUser = "Friends/" + mChatUser + "/" + mCurrentUserId + "/";
-                    Log.d("VARIABLE","Current user object: " + mCurrentUser);
+
                     requestMap.put(path_mSelectedUser + "achternaam", mCurrentUser.getAchternaam());
                     requestMap.put(path_mSelectedUser + "adress", mCurrentUser.getAdress());
                     requestMap.put(path_mSelectedUser + "avatar", mCurrentUser.getAvatar());

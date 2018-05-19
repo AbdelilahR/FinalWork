@@ -1,7 +1,9 @@
 package com.example.currentplacedetailsonmap.Fragment;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -52,6 +54,7 @@ public class FriendsFragment extends Fragment
     private float distance;
     public DatabaseReference ref;
     private User user_request;
+
 
     public FriendsFragment()
     {
@@ -134,7 +137,7 @@ public class FriendsFragment extends Fragment
                                 String request_type = dsp.child("request_type").getValue().toString();
                                 user_request = dsp.getValue(User.class);
 
-                                myFriend = new Friends(request_type,user_request);
+                                myFriend = new Friends(request_type, user_request);
                                 lastId = dsp.getKey();
 
 
@@ -228,6 +231,41 @@ public class FriendsFragment extends Fragment
                                         Friends selectedFriend = (Friends) parent.getAdapter().getItem(position);
                                         intent.putExtra("selectedUser", selectedFriend.getUser());
                                         startActivity(intent);
+
+                                    }
+                                });
+
+                                friendsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+                                {
+                                    @Override
+                                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l)
+                                    {
+                                        //final String push_id = stat_map.get(i).get("push_id");
+                                        final Friends selectedFriend = (Friends) adapterView.getAdapter().getItem(i);
+                                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                                                .setTitle("You are about to delete this item")
+                                                .setMessage("Are you sure? This operation is irreversible.")
+                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                                                {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i)
+                                                    {
+                                                        FirebaseDatabase.getInstance().getReference("Friends").child(mCurrentUserId).child(selectedFriend.getUser().getUserId()).setValue(null);
+                                                        friendList = new ArrayList<>();
+                                                        loadFriendList();
+
+                                                    }
+                                                })
+                                                .setNegativeButton("No", new DialogInterface.OnClickListener()
+                                                {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i)
+                                                    {
+
+                                                    }
+                                                }).show();
+
+                                        return true;
 
                                     }
                                 });
