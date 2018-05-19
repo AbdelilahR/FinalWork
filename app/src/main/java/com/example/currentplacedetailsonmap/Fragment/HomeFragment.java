@@ -107,6 +107,7 @@ import java.util.List;
  * <p>
  * Formula user for calories burned
  * https://www.runnersworld.com/weight-loss/how-many-calories-are-you-really-burning
+ * World avg = 62 => https://en.wikipedia.org/wiki/Human_body_weight
  */
 public class HomeFragment extends Fragment implements OnMapReadyCallback
 {
@@ -268,7 +269,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 if (distanceInMeters >= 1.60934f)
                                 {
                                     float mile = distanceInMeters * 0.621371f;
-                                    mCalories = (0.63f * 136.687f) * mile;
+                                    mCalories = ((0.63f * 136.687f) * mile) / 1000;
                                     calories.setText(String.valueOf(Utility.round(mCalories, 0)) + " Kcal");
                                 } else
                                     calories.setText("Run at least 2km");
@@ -1240,7 +1241,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             if (lineOptions != null)
                 mMap.addPolyline(lineOptions);
             else
-               Log.e("ERROR","goal impossible");
+                Log.e("ERROR", "goal impossible");
         }
 
     }
