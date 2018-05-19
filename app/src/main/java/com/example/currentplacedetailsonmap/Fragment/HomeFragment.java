@@ -39,6 +39,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.currentplacedetailsonmap.Activity.ChatActivity;
 import com.example.currentplacedetailsonmap.MainActivity;
 import com.example.currentplacedetailsonmap.Model.Address;
 import com.example.currentplacedetailsonmap.Model.DirectionsJSONParser;
@@ -689,7 +690,29 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             }
         });
 
-
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener()
+        {
+            @Override
+            public void onInfoWindowClick(Marker marker)
+            {
+                User user = null;
+                String user_name;
+                String friend_name = marker.getTitle();
+                if (friendsList != null)
+                    for (Friends friends : friendsList)
+                    {
+                        user_name = friends.getUser().getVoornaam() + " " + friends.getUser().getAchternaam();
+                        if (user_name.equals(friend_name))
+                            user = friends.getUser();
+                    }
+                if (user != null)
+                {
+                    Intent intent = new Intent(getActivity(), ChatActivity.class);
+                    intent.putExtra("selectedUser", user);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     /**
