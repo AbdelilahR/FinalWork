@@ -51,6 +51,7 @@ import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -140,7 +141,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     public ArrayList<LatLng> userlocations_list = new ArrayList<>();
     //Custom
     long time = 0;
-    double mCalories = 0;
+    float mCalories = 0f;
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
     // The entry points to the Places API.
@@ -153,11 +154,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
     private Location mNewLocation;
-    private String[] mLikelyPlaceNames;
-    private String[] mLikelyPlaceAddresses;
-    private String[] mLikelyPlaceAttributions;
-    private LatLng[] mLikelyPlaceLatLngs;
-    private long steps = 0;
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
     private float timeWhenStopped;
@@ -178,6 +174,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private Thread helper_thread;
     private String avatar_url;
     private MarkerOptions goal;
+    private Chronometer chrono;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+
 
     public HomeFragment()
     {
@@ -212,7 +212,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         final Button btnPause = (Button) view.findViewById(R.id.btn2);
 
         //Chronometer
-        final Chronometer chrono = (Chronometer) view.findViewById(R.id.chronometer);
+        chrono = (Chronometer) view.findViewById(R.id.chronometer);
 
         //speedometer
         sManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
@@ -221,6 +221,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         calories = (TextView) view.findViewById(R.id.calories);
 
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Stats").child(current_user);
+
 
         btnPause.setEnabled(false);
         btnStart.setOnClickListener(new View.OnClickListener()
@@ -237,59 +238,63 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                 if (start == true)
                 {
-                    onResume();
-                    btnStart.setText("Stop");
-                    //  distance.setText("0 m");
-
-                    chrono.start();
-                    btnPause.setEnabled(true);
-                    start = false;
-
-                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000, 5, new LocationListener()
+                    locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                    locationListener = new LocationListener()
                     {
                         @Override
                         public void onLocationChanged(Location location)
                         {
-                            if (mLastKnownLocation != null)
+                            if (mLastKnownLocation != null && location != null)
                             {
-                                getDeviceLocation();
                                 distanceInMeters += mLastKnownLocation.distanceTo(location);
                                 mLastKnownLocation = location;
                                 if (goal != null)
                                 {
+                                    //refresh map
+                                    mMap.clear();
+                                    addHeatMap();
+                                    loadFriendList_onMap();
+                                    mMap.addMarker(goal);
+
                                     String url = getDirectionsUrl(myCurrentPosition, goal.getPosition());
                                     new DownloadTask().execute(url);
                                 }
                                 sendLocation(location);
-                                distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)));
-
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
                                 //update burnedcalories
                                 time = (SystemClock.elapsedRealtime() - chrono.getBase());
-                                mCalories = (0.0005 * 62 * distanceInMeters + 0.0035) * time;
-                                calories.setText(Double.toString(Utility.round((int) mCalories, 2)) + " Kcal");
+                                mCalories = ((0.0005f * 62f * distanceInMeters + 0.0035f) * time) / 1000;
+                                calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " Kcal");
+                                distance.setText(String.valueOf(Utility.round(distanceInMeters, 0)) + " m");
+                                Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
                             }
                         }
 
                         @Override
-                        public void onProviderDisabled(String provider)
+                        public void onStatusChanged(String s, int i, Bundle bundle)
                         {
-                            //
+
                         }
 
                         @Override
-                        public void onProviderEnabled(String provider)
+                        public void onProviderEnabled(String s)
                         {
-                            //
+
                         }
 
                         @Override
-                        public void onStatusChanged(String provider, int status,
-                                                    Bundle extras)
+                        public void onProviderDisabled(String s)
                         {
-                            //
-                        }
 
-                    });
+                        }
+                    };
+
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0, locationListener);
+                    btnStart.setText("Stop");
+                    chrono.start();
+                    btnPause.setEnabled(true);
+                    start = false;
+                    onResume();
                 } else
                 {
                     chrono.stop();
@@ -493,6 +498,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
 
     }
+
 
     /**
      * Saves the state of the map when the activity is paused.
@@ -1128,7 +1134,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         return data;
     }
 
-
     public class DownloadTask extends AsyncTask<String, Void, String>
     {
 
@@ -1226,6 +1231,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
     }
     /**  --- End --- */
+
+
 }
 
 
