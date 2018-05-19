@@ -174,6 +174,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private HttpURLConnection connection;
     private Thread helper_thread;
     private String avatar_url;
+    private MarkerOptions goal;
 
     public HomeFragment()
     {
@@ -240,17 +241,25 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     btnPause.setEnabled(true);
                     start = false;
                     onResume();
-                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1100, 1, new LocationListener()
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 5, new LocationListener()
                     {
                         @Override
                         public void onLocationChanged(Location location)
                         {
                             if (mLastKnownLocation != null)
                             {
+                                getDeviceLocation();
                                 distanceInMeters += mLastKnownLocation.distanceTo(location);
                                 mLastKnownLocation = location;
+                                String url = getDirectionsUrl(myCurrentPosition, goal.getPosition());
+                                new DownloadTask().execute(url);
                                 sendLocation(location);
                                 distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)));
+
+                                //update burnedcalories
+                                time = (SystemClock.elapsedRealtime() - chrono.getBase());
+                                mCalories = (0.0005 * 62 * distanceInMeters + 0.0035) * time;
+                                calories.setText(Double.toString(Utility.round((float) mCalories,2)) + " Kcal");
                             }
                         }
 
@@ -276,7 +285,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     });
                 } else
                 {
-                    String chrono_text = chrono.getText().toString();
                     chrono.stop();
                     time = (SystemClock.elapsedRealtime() - chrono.getBase());
                     mCalories = (0.0005 * 62 * distanceInMeters + 0.0035) * time;
@@ -566,16 +574,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
                     String url = getDirectionsUrl(myCurrentPosition, place.getLatLng());
                     new DownloadTask().execute(url);
-                    mMap.addMarker(new MarkerOptions().title("Goal").position(place.getLatLng()));
+                    goal = new MarkerOptions().title("Goal").position(place.getLatLng());
+                    mMap.addMarker(goal);
 
-                    //downloadTask.doInBackground(url);
-                    /*
-
-                    mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
-
-                    PolygonOptions options = new PolygonOptions().add(myCurrentPosition).add(place.getLatLng());
-                    Polygon polygon = mMap.addPolygon(options);
-                    */
                 }
 
                 @Override
@@ -807,8 +808,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         }
         updateLocationUI();
     }
-
-
 
 
     /**
