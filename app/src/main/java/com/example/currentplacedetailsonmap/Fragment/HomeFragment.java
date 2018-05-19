@@ -258,7 +258,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                     loadFriendList_onMap();
                                     mMap.addMarker(goal);
 
-                                    String url = getDirectionsUrl(myCurrentPosition, goal.getPosition());
+                                    String url = getDirectionsUrl(new LatLng(location.getLatitude(),location.getLongitude()), goal.getPosition());
                                     new DownloadTask().execute(url);
                                 }
                                 sendLocation(location);
