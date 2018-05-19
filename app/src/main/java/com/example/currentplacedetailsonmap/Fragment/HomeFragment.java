@@ -221,7 +221,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         calories = (TextView) view.findViewById(R.id.calories);
 
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Stats").child(current_user);
-
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         btnPause.setEnabled(false);
         btnStart.setOnClickListener(new View.OnClickListener()
@@ -238,7 +238,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                 if (start == true)
                 {
-                    locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
                     locationListener = new LocationListener()
                     {
                         @Override
@@ -247,6 +247,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                             if (mLastKnownLocation != null && location != null)
                             {
                                 distanceInMeters += mLastKnownLocation.distanceTo(location);
+                                float one_mile = 0.000621371f;
                                 mLastKnownLocation = location;
                                 if (goal != null)
                                 {
@@ -264,13 +265,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 //update burnedcalories
                                 time = (SystemClock.elapsedRealtime() - chrono.getBase());
 
-                                if (distanceInMeters >= 1609.34)
+                                if (distanceInMeters >= 1.60934f)
                                 {
-                                    mCalories = 0.63f * 62f;
+                                    float mile = distanceInMeters * 0.621371f;
+                                    mCalories = (0.63f * 136.687f) * mile;
                                     calories.setText(String.valueOf(Utility.round(mCalories, 0)) + " Kcal");
-                                }
-                                else
-                                    calories.setText("Run at least 1km");
+                                } else
+                                    calories.setText("Run at least 2km");
 
                                 distance.setText(String.valueOf(Utility.round(distanceInMeters, 0)) + " m");
                                 Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
@@ -304,6 +305,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     onResume();
                 } else
                 {
+                    onPause();
+                    locationManager.removeUpdates(locationListener);
                     chrono.stop();
                     time = (SystemClock.elapsedRealtime() - chrono.getBase());
                     btnStart.setText("Start");
@@ -315,8 +318,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     ++last_id;
                     Statistiek statistiek = new Statistiek("Session", last_id, time, (int) mCalories, distanceInMeters, Utility.getTime());
                     distance.setText("0 m");
-                    calories.setText(0 );
+                    calories.setText("0");
                     mCalories = 0f;
+                    distanceInMeters = 0f;
                     database.push().setValue(statistiek);
                     onStop();
                 }
@@ -1236,7 +1240,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             if (lineOptions != null)
                 mMap.addPolyline(lineOptions);
             else
-                Toast.makeText(getContext(), "This goal is impossible", Toast.LENGTH_SHORT).show();
+               Log.e("ERROR","goal impossible");
         }
 
     }
