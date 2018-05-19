@@ -6,20 +6,22 @@
     <item
         android:id="@+id/send_location"
         android:title="@string/send_location"
-        app:showAsAction="always"
+
+
         />
-     <!--   android:icon="@drawable/send_location"
-             android:icon="@drawable/send_image"
-              android:icon="@drawable/add_friend"
+     <!--
+
+
 
      -->
 
     <item
         android:id="@+id/send_image"
         android:title="@string/send_image"
-        app:showAsAction="always" />
+
+         />
     <item
         android:id="@+id/send_friendRequest"
         android:title="@string/send_friendRequest"
-        app:showAsAction="always" />
+       />
 </menu>

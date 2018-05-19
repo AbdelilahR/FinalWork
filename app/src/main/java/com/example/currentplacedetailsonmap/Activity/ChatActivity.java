@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.currentplacedetailsonmap.Fragment.FriendsFragment;
+import com.example.currentplacedetailsonmap.Model.Address;
 import com.firebase.client.ServerValue;
 import com.example.currentplacedetailsonmap.Adapter.MessageAdapter;
 import com.example.currentplacedetailsonmap.Model.GetTimeAgo;
@@ -166,78 +167,69 @@ public class ChatActivity extends AppCompatActivity
         {
 
 
-                if (mCurrent_state.equals("not_friends"))
+            if (mCurrent_state.equals("not_friends"))
+            {
+
+                Map requestMap = new HashMap();
+
+                String path_mCurrentUser = "Friends/" + mCurrentUserId + "/" + mChatUser + "/";
+
+                requestMap.put(path_mCurrentUser + "achternaam", selectedUser.getAchternaam());
+                requestMap.put(path_mCurrentUser + "adress", selectedUser.getAdress());
+                requestMap.put(path_mCurrentUser + "avatar", selectedUser.getAvatar());
+                requestMap.put(path_mCurrentUser + "email", selectedUser.getEmail());
+                requestMap.put(path_mCurrentUser + "geslacht", selectedUser.getGeslacht());
+                requestMap.put(path_mCurrentUser + "status", selectedUser.getStatus());
+                requestMap.put(path_mCurrentUser + "userId", selectedUser.getUserId());
+                requestMap.put(path_mCurrentUser + "voornaam", selectedUser.getVoornaam());
+                requestMap.put(path_mCurrentUser + "wachtwoord", selectedUser.getWachtwoord());
+                requestMap.put(path_mCurrentUser + "request_type", "sent");
+
+                String path_mSelectedUser = "Friends/" + mChatUser + "/" + mCurrentUserId + "/";
+                Address position = new Address(myLocation.getLatitude(), myLocation.getLongitude());
+                requestMap.put(path_mSelectedUser + "achternaam", mCurrentUser.getAchternaam());
+                requestMap.put(path_mSelectedUser + "adress", position);
+                requestMap.put(path_mSelectedUser + "avatar", mCurrentUser.getAvatar());
+                requestMap.put(path_mSelectedUser + "email", mCurrentUser.getEmail());
+                requestMap.put(path_mSelectedUser + "geslacht", mCurrentUser.getGeslacht());
+                requestMap.put(path_mSelectedUser + "status", mCurrentUser.getStatus());
+                requestMap.put(path_mSelectedUser + "userId", mCurrentUser.getUserId());
+                requestMap.put(path_mSelectedUser + "voornaam", mCurrentUser.getVoornaam());
+                requestMap.put(path_mSelectedUser + "wachtwoord", mCurrentUser.getWachtwoord());
+                requestMap.put(path_mSelectedUser + "request_type", "received");
+                mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener()
                 {
-
-
-                    //DatabaseReference newNotificationref = mRootRef.child("notifications").child(mChatUser).push();
-                    //String newNotificationId = newNotificationref.getKey();
-
-                    // HashMap<String, String> notificationData = new HashMap<>();
-                    //notificationData.put("from", mCurrentUserId);
-                    //notificationData.put("type", "request");
-
-                    Map requestMap = new HashMap();
-
-                    String path_mCurrentUser = "Friends/" + mCurrentUserId + "/" + mChatUser + "/";
-
-                    requestMap.put(path_mCurrentUser + "achternaam", selectedUser.getAchternaam());
-                    requestMap.put(path_mCurrentUser + "adress", selectedUser.getAdress());
-                    requestMap.put(path_mCurrentUser + "avatar", selectedUser.getAvatar());
-                    requestMap.put(path_mCurrentUser + "email", selectedUser.getEmail());
-                    requestMap.put(path_mCurrentUser + "geslacht", selectedUser.getGeslacht());
-                    requestMap.put(path_mCurrentUser + "status", selectedUser.getStatus());
-                    requestMap.put(path_mCurrentUser + "userId", selectedUser.getUserId());
-                    requestMap.put(path_mCurrentUser + "voornaam", selectedUser.getVoornaam());
-                    requestMap.put(path_mCurrentUser + "wachtwoord", selectedUser.getWachtwoord());
-                    requestMap.put(path_mCurrentUser + "request_type", "sent");
-
-                    String path_mSelectedUser = "Friends/" + mChatUser + "/" + mCurrentUserId + "/";
-
-                    requestMap.put(path_mSelectedUser + "achternaam", mCurrentUser.getAchternaam());
-                    requestMap.put(path_mSelectedUser + "adress", mCurrentUser.getAdress());
-                    requestMap.put(path_mSelectedUser + "avatar", mCurrentUser.getAvatar());
-                    requestMap.put(path_mSelectedUser + "email", mCurrentUser.getEmail());
-                    requestMap.put(path_mSelectedUser + "geslacht", mCurrentUser.getGeslacht());
-                    requestMap.put(path_mSelectedUser + "status", mCurrentUser.getStatus());
-                    requestMap.put(path_mSelectedUser + "userId", mCurrentUser.getUserId());
-                    requestMap.put(path_mSelectedUser + "voornaam", mCurrentUser.getVoornaam());
-                    requestMap.put(path_mSelectedUser + "wachtwoord", mCurrentUser.getWachtwoord());
-                    requestMap.put(path_mSelectedUser + "request_type", "received");
-                    mRootRef.updateChildren(requestMap, new DatabaseReference.CompletionListener()
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
                     {
-                        @Override
-                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+
+                        if (databaseError != null)
                         {
 
-                            if (databaseError != null)
-                            {
+                            Toast.makeText(ChatActivity.this, "There was some error in sending request", Toast.LENGTH_SHORT).show();
 
-                                Toast.makeText(ChatActivity.this, "There was some error in sending request", Toast.LENGTH_SHORT).show();
+                        } else
+                        {
 
-                            } else
-                            {
-
-                                mCurrent_state = "req_sent";
-                                //mProfileSendReqBtn.setText("Cancel Friend Request");
-                                item.setEnabled(true);
-                                item.setVisible(true);
-
-                            }
-
-                            //mProfileSendReqBtn.setEnabled(true);
-
+                            mCurrent_state = "req_sent";
+                            //mProfileSendReqBtn.setText("Cancel Friend Request");
+                            item.setEnabled(true);
+                            item.setVisible(true);
 
                         }
-                    });
-                    item.setEnabled(false);
-                    item.setVisible(false);
-                }
-                else
-                {
-                    item.setEnabled(true);
-                    item.setVisible(true);
-                }
+
+                        //mProfileSendReqBtn.setEnabled(true);
+
+
+                    }
+                });
+                item.setEnabled(false);
+                item.setVisible(false);
+            } else
+            {
+                item.setEnabled(true);
+                item.setVisible(true);
+            }
 
 
             return true;
@@ -444,8 +436,8 @@ public class ChatActivity extends AppCompatActivity
     private void loadCurrentUser()
     {
 
-        
-        class getCurrentUserAsync extends AsyncTask<String,Void,String>
+
+        class getCurrentUserAsync extends AsyncTask<String, Void, String>
         {
 
 
@@ -470,7 +462,7 @@ public class ChatActivity extends AppCompatActivity
             }
 
         }
-       new getCurrentUserAsync().execute("");
+        new getCurrentUserAsync().execute("");
 
     }
 

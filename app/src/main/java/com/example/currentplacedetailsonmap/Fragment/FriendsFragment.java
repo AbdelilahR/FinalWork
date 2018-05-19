@@ -141,7 +141,7 @@ public class FriendsFragment extends Fragment
                                 lastId = dsp.getKey();
 
 
-                                friendList.add(myFriend);
+                                    friendList.add(myFriend);
 
 
                             }
@@ -251,6 +251,7 @@ public class FriendsFragment extends Fragment
                                                     public void onClick(DialogInterface dialogInterface, int i)
                                                     {
                                                         FirebaseDatabase.getInstance().getReference("Friends").child(mCurrentUserId).child(selectedFriend.getUser().getUserId()).setValue(null);
+                                                        FirebaseDatabase.getInstance().getReference("Friends").child(selectedFriend.getUser().getUserId()).child(mCurrentUserId).setValue(null);
                                                         friendList = new ArrayList<>();
                                                         loadFriendList();
 
