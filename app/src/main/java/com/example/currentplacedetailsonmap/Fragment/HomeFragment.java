@@ -106,7 +106,7 @@ import java.util.List;
  * https://stackoverflow.com/questions/20550016/savedinstancestate-is-always-null-in-fragment/41388475
  * <p>
  * Formula user for calories burned
- * https://fitness.stackexchange.com/questions/25472/how-to-calculate-calorie-from-pedometer
+ * https://www.runnersworld.com/weight-loss/how-many-calories-are-you-really-burning
  */
 public class HomeFragment extends Fragment implements OnMapReadyCallback
 {
@@ -263,8 +263,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
                                 //update burnedcalories
                                 time = (SystemClock.elapsedRealtime() - chrono.getBase());
-                                mCalories = ((0.0005f * 62f * distanceInMeters + 0.0035f) * time) / 1000;
-                                calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " Kcal");
+
+                                if (distanceInMeters >= 1609.34)
+                                {
+                                    mCalories = 0.63f * 62f;
+                                    calories.setText(String.valueOf(Utility.round(mCalories, 0)) + " Kcal");
+                                }
+                                else
+                                    calories.setText("Run at least 1km");
+
                                 distance.setText(String.valueOf(Utility.round(distanceInMeters, 0)) + " m");
                                 Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
                             }
