@@ -103,6 +103,9 @@ import java.util.List;
  * https://stackoverflow.com/questions/42619863/how-to-calculate-distance-every-15-sec-with-using-gps-heavy-accuracy
  * https://stackoverflow.com/questions/41601147/get-last-node-in-firebase-database-android
  * https://stackoverflow.com/questions/20550016/savedinstancestate-is-always-null-in-fragment/41388475
+ * <p>
+ * Formula user for calories burned
+ * https://fitness.stackexchange.com/questions/25472/how-to-calculate-calorie-from-pedometer
  */
 public class HomeFragment extends Fragment implements OnMapReadyCallback
 {
@@ -234,14 +237,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                 if (start == true)
                 {
+                    onResume();
                     btnStart.setText("Stop");
                     //  distance.setText("0 m");
 
                     chrono.start();
                     btnPause.setEnabled(true);
                     start = false;
-                    onResume();
-                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000, 5, new LocationListener()
+
+                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000, 5, new LocationListener()
                     {
                         @Override
                         public void onLocationChanged(Location location)
@@ -251,15 +255,18 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 getDeviceLocation();
                                 distanceInMeters += mLastKnownLocation.distanceTo(location);
                                 mLastKnownLocation = location;
-                                String url = getDirectionsUrl(myCurrentPosition, goal.getPosition());
-                                new DownloadTask().execute(url);
+                                if (goal != null)
+                                {
+                                    String url = getDirectionsUrl(myCurrentPosition, goal.getPosition());
+                                    new DownloadTask().execute(url);
+                                }
                                 sendLocation(location);
                                 distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)));
 
                                 //update burnedcalories
                                 time = (SystemClock.elapsedRealtime() - chrono.getBase());
                                 mCalories = (0.0005 * 62 * distanceInMeters + 0.0035) * time;
-                                calories.setText(Double.toString(Utility.round((float) mCalories,2)) + " Kcal");
+                                calories.setText(Double.toString(Utility.round((int) mCalories, 2)) + " Kcal");
                             }
                         }
 
@@ -287,19 +294,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                 {
                     chrono.stop();
                     time = (SystemClock.elapsedRealtime() - chrono.getBase());
-                    mCalories = (0.0005 * 62 * distanceInMeters + 0.0035) * time;
-                    int burnedCalories = (int) mCalories;
-                    calories.setText(Double.toString(burnedCalories) + " Kcal");
                     btnStart.setText("Start");
                     btnPause.setEnabled(false);
                     start = true;
-                    distanceInMeters = 0;
                     chrono.setBase(SystemClock.elapsedRealtime() - offset);
                     timeWhenStopped = 0;
-
                     //set variable last_id
                     ++last_id;
-                    Statistiek statistiek = new Statistiek("Session", last_id, time, burnedCalories, distanceInMeters, Utility.getTime());
+                    Statistiek statistiek = new Statistiek("Session", last_id, time, (int) mCalories, distanceInMeters, Utility.getTime());
                     database.push().setValue(statistiek);
                     onStop();
                 }

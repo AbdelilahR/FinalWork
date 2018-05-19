@@ -16,20 +16,24 @@ public class StatInfo extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stat_info);
+
         //initialize textviews
         TextView sessionId = (TextView) this.findViewById(R.id.sessionid_value);
         TextView duration = (TextView) this.findViewById(R.id.duration_value);
         TextView burnedCalories = (TextView) this.findViewById(R.id.calories_value);
         TextView distance = (TextView) this.findViewById(R.id.distance_value);
         TextView date = (TextView) this.findViewById(R.id.date_value);
+
         //Retrieve selected stat from intent
         Statistiek selectedStat = (Statistiek) getIntent().getExtras().getSerializable("selectedStat");
+
         //initialize variables
         String id = String.valueOf(selectedStat.getId());
         String time = Utility.getDate(selectedStat.getTime(), "HH:mm:ss");
         String burnedCal = String.valueOf(selectedStat.getBurnedCalories());
         String dist = String.valueOf(selectedStat.getDistanceInMeters());
         String dates = selectedStat.getDate();
+
         //Set text for all textviews
         sessionId.setText(id);
         duration.setText(time);
