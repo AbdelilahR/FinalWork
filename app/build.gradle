@@ -70,7 +70,7 @@ dependencies {
 
 
 
-
+    implementation 'com.github.jd-alexander:android-flat-button:v1.1'
 
 
     implementation 'com.android.support:recyclerview-v7:25.4.0'

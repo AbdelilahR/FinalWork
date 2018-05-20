@@ -71,19 +71,24 @@ public class MainActivity extends AppCompatActivity
                         homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, HomeFragment.class.getSimpleName());
                     switch (item.getItemId())
                     {
+
                         case R.id.navigation_home:
+                            onPause();
                             transaction.replace(R.id.main_content, homeFragment);
                             transaction.commit();
                             break;
                         case R.id.navigation_stats:
+                            onPause();
                             transaction.replace(R.id.main_content, statsFragment);
                             transaction.commit();
                             break;
                         case R.id.navigation_users:
+                            onPause();
                             transaction.replace(R.id.main_content, userFragment, userFragment.getTag());
                             transaction.commit();
                             break;
                         case R.id.navigation_friends:
+                            onPause();
                             transaction.replace(R.id.main_content, friendsFragment);
                             transaction.commit();
                     }

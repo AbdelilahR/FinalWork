@@ -52,14 +52,11 @@ import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionClient;
-import com.google.android.gms.location.places.PlaceLikelihood;
-import com.google.android.gms.location.places.PlaceLikelihoodBufferResponse;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -99,6 +96,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import info.hoang8f.widget.FButton;
 
 
 /**
@@ -211,8 +210,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         }
 
         //Start Pause button
-        final Button btnStart = (Button) view.findViewById(R.id.btn_start);
-        final Button btnPause = (Button) view.findViewById(R.id.btn2);
+        final FButton btnStart = (FButton) view.findViewById(R.id.btn_start);
+        final FButton btnPause = (FButton) view.findViewById(R.id.btn2);
 
         //Chronometer
         chrono = (Chronometer) view.findViewById(R.id.chronometer);
@@ -234,6 +233,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             @Override
             public void onClick(View view)
             {
+
                 new Thread(new Runnable()
                 {
                     @Override
@@ -313,16 +313,16 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 {
                                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0, locationListener);
                                     btnStart.setText("Stop");
+                                    btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
+                                    btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_alizarin));
                                     chrono.start();
                                     btnPause.setEnabled(true);
                                     start = false;
                                 }
                             });
 
-                            onResume();
                         } else
                         {
-                            onPause();
                             locationManager.removeUpdates(locationListener);
                             chrono.stop();
                             time = (SystemClock.elapsedRealtime() - chrono.getBase());
@@ -340,6 +340,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 {
                                     chrono.setBase(SystemClock.elapsedRealtime() - offset);
                                     btnStart.setText("Start");
+                                    btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_turquoise));
+                                    btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_emerald));
                                     btnPause.setEnabled(false);
                                     distance.setText("0 m");
                                     calories.setText("0");
@@ -349,7 +351,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                             mCalories = 0f;
                             distanceInMeters = 0f;
                             database.push().setValue(statistiek);
-                            onStop();
+
+
                         }
 
 
@@ -368,18 +371,22 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                 if (pause == true)
                 {
-                    onPause();
+
                     timeWhenStopped = chrono.getBase() - SystemClock.elapsedRealtime();
                     chrono.stop();
 
                     btnPause.setText("Resume");
+                    btnPause.setButtonColor(getResources().getColor(R.color.fbutton_color_carrot));
+                    btnPause.setShadowColor(getResources().getColor(R.color.fbutton_color_pumpkin));
+
                     pause = false;
                 } else
                 {
-                    onResume();
                     chrono.setBase(SystemClock.elapsedRealtime() + (int) timeWhenStopped);
                     chrono.start();
                     btnPause.setText("Pause");
+                    btnPause.setButtonColor(getResources().getColor(R.color.fbutton_color_orange));
+                    btnPause.setShadowColor(getResources().getColor(R.color.fbutton_color_sun_flower));
                     pause = true;
                 }
 
@@ -390,6 +397,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
         return view;
     }
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
@@ -543,8 +551,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
 
     }
-
-
     /**
      * Saves the state of the map when the activity is paused.
      */
@@ -728,11 +734,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             {
                 if (mOverlay != null)
                     mOverlay.clearTileCache();
-                float zoom = map.getCameraPosition().zoom;
 
                 if (mProvider != null)
                 {
-                    if (zoom >= 10)
+                    if (map.getCameraPosition().zoom >= 10)
                         mProvider.setRadius(150);
                     else
                         mProvider.setRadius(HeatmapTileProvider.DEFAULT_RADIUS);

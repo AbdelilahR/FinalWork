@@ -1,41 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    xmlns:fbutton="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/fbutton_color_belize_hole"
     tools:context=".Fragment.HomeFragment">
 
 
-    <Button
+    <info.hoang8f.widget.FButton
         android:id="@+id/btn_start"
-        android:layout_width="194dp"
+        android:layout_width="184dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/map"
-        android:layout_alignParentStart="true"
-        android:text="Start" />
+        android:text="Start"
+        android:textColor="@color/white"
+        fbutton:cornerRadius="50dp"
+        fbutton:fButtonColor="@color/fbutton_color_turquoise"
+        fbutton:shadowColor="@color/fbutton_color_emerald"
+        fbutton:shadowEnabled="true" />
 
-    <Button
+    <info.hoang8f.widget.FButton
         android:id="@+id/btn2"
         android:layout_width="194dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/map"
         android:layout_toEndOf="@+id/btn_start"
-        android:text="Pause" />
+        android:text="Pause"
+        android:textColor="@color/white"
+        fbutton:cornerRadius="50dp"
+        fbutton:fButtonColor="@color/fbutton_color_orange"
+        fbutton:shadowColor="@color/fbutton_color_sun_flower"
+        fbutton:shadowEnabled="true" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:textColor="#ff000000"
+        android:textColor="@color/fbutton_color_turquoise"
         android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/snippet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ff7f7f7f" />
 
     <Chronometer
         android:id="@+id/chronometer"
@@ -46,42 +51,40 @@
         android:layout_marginStart="54dp"
         android:layout_marginTop="27dp"
         android:layout_toEndOf="@+id/title"
-        android:layout_toRightOf="@+id/title" />
+        android:layout_toRightOf="@+id/title"
+
+        android:textColor="@color/fbutton_color_turquoise" />
 
     <TextView
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-
+        android:layout_above="@+id/calories"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="78dp"
-        android:layout_marginTop="53dp"
-        android:text="0 m" />
+        android:layout_marginBottom="-115dp"
+        android:layout_marginEnd="35dp"
+        android:text="999 m"
+        android:textColor="@color/fbutton_color_turquoise"
+        android:textSize="25pt" />
 
     <TextView
         android:id="@+id/calories"
-        android:layout_width="36dp"
+        android:layout_width="wrap_content"
         android:layout_height="34dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="46dp"
         android:layout_marginTop="115dp"
-        android:text="" />
+        android:text="0 Kcal"
+        android:textColor="@color/fbutton_color_turquoise" />
 
-    <android.support.design.widget.TabItem
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="294dp"
-
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"></fragment>
 
