@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     tools:context=".Fragment.UserFragment">
 
 
@@ -12,7 +13,7 @@
     <!--android:id="@+id/userList"-->
 
     <ListView
-
+        android:background="@color/fbutton_color_belize_hole"
         android:id="@+id/userList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -234,15 +234,19 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             public void onClick(View view)
             {
 
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                    buildAlertMessageNoGps();
+                else
+                {
+                    if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                        getDeviceLocation();
+                }
                 new Thread(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                            buildAlertMessageNoGps();
-                        else
-                            getDeviceLocation();
+
 
                         if (start == true)
                         {

@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/fbutton_color_peter_river"
+
     android:padding="10dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -28,7 +30,8 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@+id/avatar"
-        android:textColor="@android:color/black"
+
+        android:textColor="@color/white"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/avatar"
         app:layout_constraintTop_toTopOf="parent"
@@ -41,7 +44,7 @@
         android:layout_alignLeft="@+id/pseudo"
         android:layout_below="@+id/pseudo"
         android:layout_marginEnd="176dp"
-        android:textColor="@android:color/black"
+        android:textColor="@color/fbutton_color_silver"
         app:layout_constraintEnd_toStartOf="@+id/status"
         app:layout_constraintTop_toBottomOf="@+id/pseudo"
         tools:text="Texte" />
