@@ -276,11 +276,11 @@ public class StatsFragment extends Fragment
      */
     private void loadSessionList()
     {
-        class loadSessionListAsync extends AsyncTask<String, Void, String>
-        {
 
+        new Thread(new Runnable()
+        {
             @Override
-            protected String doInBackground(String... strings)
+            public void run()
             {
                 database.limitToFirst(20).addChildEventListener(new ChildEventListener()
                 {
@@ -558,13 +558,23 @@ public class StatsFragment extends Fragment
 
 
                 });
+            }
+        }).start();
+        /*
+        class loadSessionListAsync extends AsyncTask<String, Void, String>
+        {
+
+            @Override
+            protected String doInBackground(String... strings)
+            {
+
                 return "Executed";
 
             }
         }
 
         new loadSessionListAsync().execute("");
-
+*/
     }
 
     /**

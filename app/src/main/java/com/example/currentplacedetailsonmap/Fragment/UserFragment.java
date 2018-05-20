@@ -248,119 +248,127 @@ public class UserFragment extends Fragment implements Serializable {
 
                 @Override
                 protected String doInBackground(String... strings) {
-                    ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener() {
-
+                    new Thread(new Runnable()
+                    {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot dsp : dataSnapshot.getChildren()) {
+                        public void run()
+                        {
+                            ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot dsp : dataSnapshot.getChildren()) {
 
 
-                                myUser = dsp.getValue(User.class);
-                                lastId = dsp.getKey();
-                                if (!myUser.getUserId().equals(mCurrentUserId) && myUser != null) {
-                                    userLocation.setLatitude(myUser.getAdress().getLatitude());
-                                    userLocation.setLongitude(myUser.getAdress().getLongitude());
-                                    if (currentLocation != null && userLocation != null)
-                                        distance = currentLocation.distanceTo(userLocation);
+                                        myUser = dsp.getValue(User.class);
+                                        lastId = dsp.getKey();
+                                        if (!myUser.getUserId().equals(mCurrentUserId) && myUser != null) {
+                                            userLocation.setLatitude(myUser.getAdress().getLatitude());
+                                            userLocation.setLongitude(myUser.getAdress().getLongitude());
+                                            if (currentLocation != null && userLocation != null)
+                                                distance = currentLocation.distanceTo(userLocation);
 
-                                    if (getOnline_only()) {
-                                        if (distance <= getRadius() && myUser.getStatus().equals("online"))
-                                            userList.add(myUser);
-                                    } else {
-                                        if (distance <= getRadius())
-                                            userList.add(myUser);
-                                    }
-                                } else {
-                                    Log.d("ERROR", "wrong userID");
-                                }
-                            }
-                            /**/
-                            if (userListView != null)
-                                userListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-                                    private int currentVisibleItemCount;
-                                    private int currentScrollState;
-                                    private int currentFirstVisibleItem;
-                                    private int totalItem;
-
-
-                                    @Override
-                                    public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-                                        this.currentScrollState = scrollState;
-                                        this.currentFirstVisibleItem = view.getFirstVisiblePosition();
-                                        this.isScrollCompleted();
-                                    }
-
-                                    @Override
-                                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                                        this.currentFirstVisibleItem = firstVisibleItem;
-                                        this.currentVisibleItemCount = visibleItemCount;
-                                        this.totalItem = totalItemCount;
-
-                                    }
-
-                                    //
-                                    private void isScrollCompleted() {
-                                        if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
-                                                && this.currentScrollState == SCROLL_STATE_IDLE) {
-
-                                            ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                                    for (DataSnapshot dsp : dataSnapshot.getChildren()) {
-                                                        myUser = dsp.getValue(User.class);
-                                                        lastId = dsp.getKey();
-                                                        if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId)) {
-                                                            distance = currentLocation.distanceTo(userLocation);
-                                                            if (distance <= getRadius())
-                                                                userList.add(myUser);
-
-                                                        }
-                                                    }
-
-                                                    userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
-                                                    userListView.setAdapter(userAdapter);
-                                                }
-
-                                                @Override
-                                                public void onCancelled(DatabaseError databaseError) {
-
-                                                }
-
-                                            });
+                                            if (getOnline_only()) {
+                                                if (distance <= getRadius() && myUser.getStatus().equals("online"))
+                                                    userList.add(myUser);
+                                            } else {
+                                                if (distance <= getRadius())
+                                                    userList.add(myUser);
+                                            }
+                                        } else {
+                                            Log.d("ERROR", "wrong userID");
                                         }
                                     }
-                                });
+                                    /**/
+                                    if (userListView != null)
+                                        userListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+                                            private int currentVisibleItemCount;
+                                            private int currentScrollState;
+                                            private int currentFirstVisibleItem;
+                                            private int totalItem;
 
-                            if (getActivity() != null)
-                                userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
 
-                            if (userListView != null) {
-                                userListView.invalidateViews();
-                                userListView.setAdapter(userAdapter);
+                                            @Override
+                                            public void onScrollStateChanged(AbsListView view, int scrollState) {
 
-                                userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                        //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                                        mAuth = FirebaseAuth.getInstance();
-                                        Intent intent = new Intent(getActivity(), ChatActivity.class);
-                                        User selectedUser = (User) parent.getAdapter().getItem(position);
-                                        intent.putExtra("selectedUser", selectedUser);
-                                        startActivity(intent);
+                                                this.currentScrollState = scrollState;
+                                                this.currentFirstVisibleItem = view.getFirstVisiblePosition();
+                                                this.isScrollCompleted();
+                                            }
 
+                                            @Override
+                                            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                                                this.currentFirstVisibleItem = firstVisibleItem;
+                                                this.currentVisibleItemCount = visibleItemCount;
+                                                this.totalItem = totalItemCount;
+
+                                            }
+
+                                            //
+                                            private void isScrollCompleted() {
+                                                if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
+                                                        && this.currentScrollState == SCROLL_STATE_IDLE) {
+
+                                                    ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                                            for (DataSnapshot dsp : dataSnapshot.getChildren()) {
+                                                                myUser = dsp.getValue(User.class);
+                                                                lastId = dsp.getKey();
+                                                                if (!myUser.getUserId().equalsIgnoreCase(mCurrentUserId)) {
+                                                                    distance = currentLocation.distanceTo(userLocation);
+                                                                    if (distance <= getRadius())
+                                                                        userList.add(myUser);
+
+                                                                }
+                                                            }
+
+                                                            userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
+                                                            userListView.setAdapter(userAdapter);
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(DatabaseError databaseError) {
+
+                                                        }
+
+                                                    });
+                                                }
+                                            }
+                                        });
+
+                                    if (getActivity() != null)
+                                        userAdapter = new UserAdapter(getActivity().getApplicationContext(), userList);
+
+                                    if (userListView != null) {
+                                        userListView.invalidateViews();
+                                        userListView.setAdapter(userAdapter);
+
+                                        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                                //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                                                mAuth = FirebaseAuth.getInstance();
+                                                Intent intent = new Intent(getActivity(), ChatActivity.class);
+                                                User selectedUser = (User) parent.getAdapter().getItem(position);
+                                                intent.putExtra("selectedUser", selectedUser);
+                                                startActivity(intent);
+
+                                            }
+                                        });
                                     }
-                                });
-                            }
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
 
                         }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                    }).start();
 
                     return "Executed";
                 }

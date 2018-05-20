@@ -125,161 +125,168 @@ public class FriendsFragment extends Fragment
                 @Override
                 protected String doInBackground(String... strings)
                 {
-                    ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
-                    {
+                   new Thread(new Runnable()
+                   {
+                       @Override
+                       public void run()
+                       {
+                           ref.limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
+                           {
 
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot)
-                        {
-                            for (DataSnapshot dsp : dataSnapshot.getChildren())
-                            {
+                               @Override
+                               public void onDataChange(DataSnapshot dataSnapshot)
+                               {
+                                   for (DataSnapshot dsp : dataSnapshot.getChildren())
+                                   {
 
-                                String request_type = dsp.child("request_type").getValue().toString();
-                                user_request = dsp.getValue(User.class);
+                                       String request_type = dsp.child("request_type").getValue().toString();
+                                       user_request = dsp.getValue(User.class);
 
-                                myFriend = new Friends(request_type, user_request);
-                                lastId = dsp.getKey();
-
-
-                                    friendList.add(myFriend);
-
-
-                            }
-                            /**/
-                            if (friendsListView != null)
-                                friendsListView.setOnScrollListener(new AbsListView.OnScrollListener()
-                                {
-                                    private int currentVisibleItemCount;
-                                    private int currentScrollState;
-                                    private int currentFirstVisibleItem;
-                                    private int totalItem;
+                                       myFriend = new Friends(request_type, user_request);
+                                       lastId = dsp.getKey();
 
 
-                                    @Override
-                                    public void onScrollStateChanged(AbsListView view, int scrollState)
-                                    {
-
-                                        this.currentScrollState = scrollState;
-                                        this.currentFirstVisibleItem = view.getFirstVisiblePosition();
-                                        this.isScrollCompleted();
-                                    }
-
-                                    @Override
-                                    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
-                                    {
-                                        this.currentFirstVisibleItem = firstVisibleItem;
-                                        this.currentVisibleItemCount = visibleItemCount;
-                                        this.totalItem = totalItemCount;
-
-                                    }
-
-                                    //
-                                    private void isScrollCompleted()
-                                    {
-                                        if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
-                                                && this.currentScrollState == SCROLL_STATE_IDLE)
-                                        {
-
-                                            ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
-                                            {
-                                                @Override
-                                                public void onDataChange(DataSnapshot dataSnapshot)
-                                                {
-
-                                                    for (DataSnapshot dsp : dataSnapshot.getChildren())
-                                                    {
-                                                        myFriend = dsp.getValue(Friends.class);
-                                                        lastId = dsp.getKey();
+                                       friendList.add(myFriend);
 
 
-                                                        friendList.add(myFriend);
+                                   }
+                                   /**/
+                                   if (friendsListView != null)
+                                       friendsListView.setOnScrollListener(new AbsListView.OnScrollListener()
+                                       {
+                                           private int currentVisibleItemCount;
+                                           private int currentScrollState;
+                                           private int currentFirstVisibleItem;
+                                           private int totalItem;
 
 
-                                                    }
+                                           @Override
+                                           public void onScrollStateChanged(AbsListView view, int scrollState)
+                                           {
 
-                                                    friendAdapter = new FriendAdapter(getActivity().getApplicationContext(), friendList);
-                                                    friendsListView.setAdapter(friendAdapter);
-                                                }
+                                               this.currentScrollState = scrollState;
+                                               this.currentFirstVisibleItem = view.getFirstVisiblePosition();
+                                               this.isScrollCompleted();
+                                           }
 
-                                                @Override
-                                                public void onCancelled(DatabaseError databaseError)
-                                                {
+                                           @Override
+                                           public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+                                           {
+                                               this.currentFirstVisibleItem = firstVisibleItem;
+                                               this.currentVisibleItemCount = visibleItemCount;
+                                               this.totalItem = totalItemCount;
 
-                                                }
+                                           }
 
-                                            });
-                                        }
-                                    }
-                                });
+                                           //
+                                           private void isScrollCompleted()
+                                           {
+                                               if (totalItem - currentFirstVisibleItem == currentVisibleItemCount
+                                                       && this.currentScrollState == SCROLL_STATE_IDLE)
+                                               {
 
-                            if (getActivity() != null)
-                                friendAdapter = new FriendAdapter(getActivity().getApplicationContext(), friendList);
+                                                   ref.orderByKey().startAt(lastId + 1).limitToFirst(5).addListenerForSingleValueEvent(new ValueEventListener()
+                                                   {
+                                                       @Override
+                                                       public void onDataChange(DataSnapshot dataSnapshot)
+                                                       {
 
-                            if (friendsListView != null && friendList != null)
-                            {
+                                                           for (DataSnapshot dsp : dataSnapshot.getChildren())
+                                                           {
+                                                               myFriend = dsp.getValue(Friends.class);
+                                                               lastId = dsp.getKey();
 
-                                friendsListView.setAdapter(friendAdapter);
 
-                                friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-                                {
-                                    @Override
-                                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                                    {
-                                        //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-                                        mAuth = FirebaseAuth.getInstance();
-                                        Intent intent = new Intent(getActivity(), ChatActivity.class);
-                                        Friends selectedFriend = (Friends) parent.getAdapter().getItem(position);
-                                        intent.putExtra("selectedUser", selectedFriend.getUser());
-                                        startActivity(intent);
+                                                               friendList.add(myFriend);
 
-                                    }
-                                });
 
-                                friendsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
-                                {
-                                    @Override
-                                    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l)
-                                    {
-                                        //final String push_id = stat_map.get(i).get("push_id");
-                                        final Friends selectedFriend = (Friends) adapterView.getAdapter().getItem(i);
-                                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
-                                                .setTitle("You are about to delete this item")
-                                                .setMessage("Are you sure? This operation is irreversible.")
-                                                .setPositiveButton("Yes", new DialogInterface.OnClickListener()
-                                                {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i)
-                                                    {
-                                                        FirebaseDatabase.getInstance().getReference("Friends").child(mCurrentUserId).child(selectedFriend.getUser().getUserId()).setValue(null);
-                                                        FirebaseDatabase.getInstance().getReference("Friends").child(selectedFriend.getUser().getUserId()).child(mCurrentUserId).setValue(null);
-                                                        friendList = new ArrayList<>();
-                                                        loadFriendList();
+                                                           }
 
-                                                    }
-                                                })
-                                                .setNegativeButton("No", new DialogInterface.OnClickListener()
-                                                {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i)
-                                                    {
+                                                           friendAdapter = new FriendAdapter(getActivity().getApplicationContext(), friendList);
+                                                           friendsListView.setAdapter(friendAdapter);
+                                                       }
 
-                                                    }
-                                                }).show();
+                                                       @Override
+                                                       public void onCancelled(DatabaseError databaseError)
+                                                       {
 
-                                        return true;
+                                                       }
 
-                                    }
-                                });
-                            }
+                                                   });
+                                               }
+                                           }
+                                       });
 
-                        }
+                                   if (getActivity() != null)
+                                       friendAdapter = new FriendAdapter(getActivity().getApplicationContext(), friendList);
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError)
-                        {
+                                   if (friendsListView != null && friendList != null)
+                                   {
 
-                        }
-                    });
+                                       friendsListView.setAdapter(friendAdapter);
+
+                                       friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                                       {
+                                           @Override
+                                           public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                                           {
+                                               //https://stackoverflow.com/questions/3913592/start-an-activity-with-a-parameter?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+                                               mAuth = FirebaseAuth.getInstance();
+                                               Intent intent = new Intent(getActivity(), ChatActivity.class);
+                                               Friends selectedFriend = (Friends) parent.getAdapter().getItem(position);
+                                               intent.putExtra("selectedUser", selectedFriend.getUser());
+                                               startActivity(intent);
+
+                                           }
+                                       });
+
+                                       friendsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+                                       {
+                                           @Override
+                                           public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l)
+                                           {
+                                               //final String push_id = stat_map.get(i).get("push_id");
+                                               final Friends selectedFriend = (Friends) adapterView.getAdapter().getItem(i);
+                                               AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                                                       .setTitle("You are about to delete this item")
+                                                       .setMessage("Are you sure? This operation is irreversible.")
+                                                       .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                                                       {
+                                                           @Override
+                                                           public void onClick(DialogInterface dialogInterface, int i)
+                                                           {
+                                                               FirebaseDatabase.getInstance().getReference("Friends").child(mCurrentUserId).child(selectedFriend.getUser().getUserId()).setValue(null);
+                                                               FirebaseDatabase.getInstance().getReference("Friends").child(selectedFriend.getUser().getUserId()).child(mCurrentUserId).setValue(null);
+                                                               friendList = new ArrayList<>();
+                                                               loadFriendList();
+
+                                                           }
+                                                       })
+                                                       .setNegativeButton("No", new DialogInterface.OnClickListener()
+                                                       {
+                                                           @Override
+                                                           public void onClick(DialogInterface dialogInterface, int i)
+                                                           {
+
+                                                           }
+                                                       }).show();
+
+                                               return true;
+
+                                           }
+                                       });
+                                   }
+
+                               }
+
+                               @Override
+                               public void onCancelled(DatabaseError databaseError)
+                               {
+
+                               }
+                           });
+                       }
+                   }).start();
 
                     return "Executed";
                 }

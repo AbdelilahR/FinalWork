@@ -16,6 +16,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -93,6 +94,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -223,7 +225,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Stats").child(current_user);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
+        final Handler handler = new Handler();
         btnPause.setEnabled(false);
         btnStart.setOnClickListener(new View.OnClickListener()
         {
@@ -232,100 +234,127 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             @Override
             public void onClick(View view)
             {
-                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                    buildAlertMessageNoGps();
-                else
-                    getDeviceLocation();
-
-                if (start == true)
+                new Thread(new Runnable()
                 {
-
-                    locationListener = new LocationListener()
+                    @Override
+                    public void run()
                     {
-                        @Override
-                        public void onLocationChanged(Location location)
+                        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                            buildAlertMessageNoGps();
+                        else
+                            getDeviceLocation();
+
+                        if (start == true)
                         {
-                            if (mLastKnownLocation != null && location != null)
+
+                            locationListener = new LocationListener()
                             {
-                                distanceInMeters += mLastKnownLocation.distanceTo(location);
-                                float one_mile = 0.000621371f;
-                                mLastKnownLocation = location;
-                                if (goal != null)
+                                @Override
+                                public void onLocationChanged(Location location)
                                 {
-                                    //refresh map
-                                    mMap.clear();
-                                    addHeatMap();
-                                    loadFriendList_onMap();
-                                    mMap.addMarker(goal);
+                                    if (mLastKnownLocation != null && location != null)
+                                    {
+                                        distanceInMeters += mLastKnownLocation.distanceTo(location);
+                                        float one_mile = 0.000621371f;
+                                        mLastKnownLocation = location;
+                                        if (goal != null)
+                                        {
+                                            //refresh map
+                                            mMap.clear();
+                                            addHeatMap();
+                                            loadFriendList_onMap();
+                                            mMap.addMarker(goal);
 
-                                    String url = getDirectionsUrl(myCurrentPosition, goal.getPosition());
-                                    new DownloadTask().execute(url);
+                                            String url = getDirectionsUrl(new LatLng(location.getLatitude(), location.getLongitude()), goal.getPosition());
+                                            new DownloadTask().execute(url);
+                                        }
+                                        sendLocation(location);
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
+                                        //update burnedcalories
+                                        time = (SystemClock.elapsedRealtime() - chrono.getBase());
+
+                                        if (distanceInMeters >= 1.60934f)
+                                        {
+                                            float mile = distanceInMeters * 0.621371f;
+                                            mCalories = ((0.63f * 136.687f) * mile) / 1000;
+                                            calories.setText(String.valueOf(Utility.round(mCalories, 0)) + " Kcal");
+                                        } else
+                                            calories.setText("Run at least 2km");
+
+                                        distance.setText(String.valueOf(Utility.round(distanceInMeters, 0)) + " m");
+                                        Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
+                                    }
                                 }
-                                sendLocation(location);
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
-                                //update burnedcalories
-                                time = (SystemClock.elapsedRealtime() - chrono.getBase());
 
-                                if (distanceInMeters >= 1.60934f)
+                                @Override
+                                public void onStatusChanged(String s, int i, Bundle bundle)
                                 {
-                                    float mile = distanceInMeters * 0.621371f;
-                                    mCalories = ((0.63f * 136.687f) * mile) / 1000;
-                                    calories.setText(String.valueOf(Utility.round(mCalories, 0)) + " Kcal");
-                                } else
-                                    calories.setText("Run at least 2km");
 
-                                distance.setText(String.valueOf(Utility.round(distanceInMeters, 0)) + " m");
-                                Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
-                            }
-                        }
+                                }
 
-                        @Override
-                        public void onStatusChanged(String s, int i, Bundle bundle)
+                                @Override
+                                public void onProviderEnabled(String s)
+                                {
+
+                                }
+
+                                @Override
+                                public void onProviderDisabled(String s)
+                                {
+
+                                }
+                            };
+
+
+                            handler.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0, locationListener);
+                                    btnStart.setText("Stop");
+                                    chrono.start();
+                                    btnPause.setEnabled(true);
+                                    start = false;
+                                }
+                            });
+
+                            onResume();
+                        } else
                         {
+                            onPause();
+                            locationManager.removeUpdates(locationListener);
+                            chrono.stop();
+                            time = (SystemClock.elapsedRealtime() - chrono.getBase());
 
+                            start = true;
+
+                            timeWhenStopped = 0;
+                            //set variable last_id
+                            ++last_id;
+                            Statistiek statistiek = new Statistiek("Session", last_id, time, (int) mCalories, distanceInMeters, Utility.getTime());
+                            handler.post(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    chrono.setBase(SystemClock.elapsedRealtime() - offset);
+                                    btnStart.setText("Start");
+                                    btnPause.setEnabled(false);
+                                    distance.setText("0 m");
+                                    calories.setText("0");
+                                }
+                            });
+
+                            mCalories = 0f;
+                            distanceInMeters = 0f;
+                            database.push().setValue(statistiek);
+                            onStop();
                         }
 
-                        @Override
-                        public void onProviderEnabled(String s)
-                        {
 
-                        }
-
-                        @Override
-                        public void onProviderDisabled(String s)
-                        {
-
-                        }
-                    };
-
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0, locationListener);
-                    btnStart.setText("Stop");
-                    chrono.start();
-                    btnPause.setEnabled(true);
-                    start = false;
-                    onResume();
-                } else
-                {
-                    onPause();
-                    locationManager.removeUpdates(locationListener);
-                    chrono.stop();
-                    time = (SystemClock.elapsedRealtime() - chrono.getBase());
-                    btnStart.setText("Start");
-                    btnPause.setEnabled(false);
-                    start = true;
-                    chrono.setBase(SystemClock.elapsedRealtime() - offset);
-                    timeWhenStopped = 0;
-                    //set variable last_id
-                    ++last_id;
-                    Statistiek statistiek = new Statistiek("Session", last_id, time, (int) mCalories, distanceInMeters, Utility.getTime());
-                    distance.setText("0 m");
-                    calories.setText("0");
-                    mCalories = 0f;
-                    distanceInMeters = 0f;
-                    database.push().setValue(statistiek);
-                    onStop();
-                }
-
+                    }
+                }).start();
 
             }
 
@@ -336,6 +365,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             @Override
             public void onClick(View v)
             {
+
                 if (pause == true)
                 {
                     onPause();
@@ -936,12 +966,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private void loadFriendList_onMap()
     {
 
-        class loadFriendList_onMapAsync extends AsyncTask<String, Void, String>
+        new Thread(new Runnable()
         {
-
-
             @Override
-            protected String doInBackground(String... strings)
+            public void run()
             {
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
 
@@ -975,36 +1003,28 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                     } else
                                     {
                                         avatar_url = myFriend.getUser().getAvatar();
-                                        helper_thread = new Thread(new Runnable()
-                                        {
-                                            @Override
-                                            public void run()
-                                            {
-                                                try
-                                                {
-                                                    URL _url = new URL(avatar_url);
-                                                    connection = (HttpURLConnection) _url.openConnection();
-                                                    connection.setDoInput(true);
-                                                    connection.connect();
-                                                    InputStream input = connection.getInputStream();
-                                                    Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                                                    Bitmap resized_bitmap = Bitmap.createScaledBitmap(myBitmap, 100, 100, true);
-                                                    if (myBitmap != null)
-                                                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resized_bitmap));
-                                                } catch (IOException e)
-                                                {
 
-                                                }
-                                            }
-                                        });
-                                        helper_thread.start();
+                                        URL _url = null;
                                         try
                                         {
-                                            helper_thread.join();
-                                        } catch (InterruptedException e)
+                                            _url = new URL(avatar_url);
+                                            connection = (HttpURLConnection) _url.openConnection();
+                                            connection.setDoInput(true);
+                                            connection.connect();
+                                            InputStream input = connection.getInputStream();
+                                            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                                            Bitmap resized_bitmap = Bitmap.createScaledBitmap(myBitmap, 100, 100, true);
+                                            if (myBitmap != null)
+                                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resized_bitmap));
+                                        } catch (MalformedURLException e)
+                                        {
+                                            e.printStackTrace();
+                                        } catch (IOException e)
                                         {
                                             e.printStackTrace();
                                         }
+
+
                                     }
                                     markers.add(markerOptions);
                                 }
@@ -1025,16 +1045,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     }
 
                 });
-                return "Executed";
             }
+        }).start();
 
-            @Override
-            protected void onPostExecute(String s)
-            {
-
-            }
-        }
-        new loadFriendList_onMapAsync().execute();
     }
 
 
@@ -1044,25 +1057,33 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
      */
     private void sendLocation(final Location currentLocation)
     {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
-        reference.addValueEventListener(new ValueEventListener()
+        new Thread(new Runnable()
         {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
+            public void run()
             {
-                for (DataSnapshot dss : dataSnapshot.getChildren())
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
+                reference.addValueEventListener(new ValueEventListener()
                 {
-                    dss.getRef().child("adress").child("latitude").setValue(currentLocation.getLatitude());
-                    dss.getRef().child("adress").child("longitude").setValue(currentLocation.getLongitude());
-                }
-            }
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot)
+                    {
+                        for (DataSnapshot dss : dataSnapshot.getChildren())
+                        {
+                            dss.getRef().child("adress").child("latitude").setValue(currentLocation.getLatitude());
+                            dss.getRef().child("adress").child("longitude").setValue(currentLocation.getLongitude());
+                        }
+                    }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError)
+                    {
 
+                    }
+                });
             }
-        });
+        }).start();
+
     }
 
     /**
