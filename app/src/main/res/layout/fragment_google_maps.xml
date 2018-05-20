@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:fbutton="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/fbutton_color_belize_hole"
     tools:context=".Fragment.HomeFragment">
-
 
     <info.hoang8f.widget.FButton
         android:id="@+id/btn_start"
@@ -34,26 +32,14 @@
         fbutton:shadowColor="@color/fbutton_color_sun_flower"
         fbutton:shadowEnabled="true" />
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@color/fbutton_color_turquoise"
-        android:textStyle="bold" />
-
     <Chronometer
         android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
-        android:layout_marginLeft="54dp"
-        android:layout_marginStart="54dp"
-        android:layout_marginTop="27dp"
-        android:layout_toEndOf="@+id/title"
-        android:layout_toRightOf="@+id/title"
-
-        android:textColor="@color/fbutton_color_turquoise" />
+        android:layout_alignStart="@+id/calories"
+        android:layout_alignTop="@+id/distance"
+        android:textColor="@color/fbutton_color_turquoise"
+        android:textSize="15pt" />
 
     <TextView
         android:id="@+id/distance"
@@ -70,15 +56,14 @@
     <TextView
         android:id="@+id/calories"
         android:layout_width="wrap_content"
-        android:layout_height="34dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="46dp"
-        android:layout_marginTop="115dp"
+        android:layout_marginStart="39dp"
+        android:layout_marginTop="102dp"
         android:text="0 Kcal"
-        android:textColor="@color/fbutton_color_turquoise" />
-
-
+        android:textColor="@color/fbutton_color_turquoise"
+        android:textSize="15pt" />
 
     <fragment
         android:id="@+id/map"
@@ -87,6 +72,4 @@
         android:layout_height="294dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"></fragment>
-
-
 </RelativeLayout>

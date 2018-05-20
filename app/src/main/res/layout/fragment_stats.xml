@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/fbutton_color_midnight_blue"
+
     tools:context=".Fragment.StatsFragment">
 
 
@@ -19,11 +21,14 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="Average Time"
+            android:textStyle="bold"
+            android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/stat_listView" />
 
         <TextView
             android:id="@+id/avg_cal"
+
             android:layout_width="105dp"
             android:layout_height="53dp"
             android:layout_marginEnd="8dp"
@@ -31,21 +36,25 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="Average calorie"
+            android:textColor="@color/white"
+            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/avg_distance"
-            app:layout_constraintHorizontal_bias="0.6"
+            app:layout_constraintHorizontal_bias="0.675"
             app:layout_constraintStart_toEndOf="@+id/avg_time"
             app:layout_constraintTop_toBottomOf="@+id/stat_listView" />
 
 
         <TextView
             android:id="@+id/avg_distance"
-            android:layout_width="105dp"
+            android:layout_width="114dp"
             android:layout_height="53dp"
             android:layout_marginEnd="4dp"
 
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="Average distance"
+            android:textColor="@color/white"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/stat_listView" />
 
@@ -57,7 +66,9 @@
             android:layout_marginEnd="8dp"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="Value distance"
+            android:text="0 m"
+            android:textStyle="bold"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/avg_distance" />
 
@@ -68,7 +79,9 @@
             android:layout_height="53dp"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="Value time"
+            android:text="00:00"
+            android:textStyle="bold"
+            android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/avg_time" />
 
@@ -79,7 +92,9 @@
             android:layout_marginEnd="8dp"
             android:layout_marginTop="4dp"
             android:gravity="center"
-            android:text="Value calorie"
+            android:text="0 Kcal"
+            android:textStyle="bold"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toStartOf="@+id/value_avg_distance"
             app:layout_constraintHorizontal_bias="0.696"
             app:layout_constraintStart_toEndOf="@+id/value_avg_time"
@@ -96,6 +111,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/fbutton_color_belize_hole"
+
             app:layout_constraintVertical_bias="0.0">
 
         </ListView>
