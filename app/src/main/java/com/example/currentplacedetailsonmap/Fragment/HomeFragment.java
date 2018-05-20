@@ -262,9 +262,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                             //refresh map
                                             mMap.clear();
                                             addHeatMap();
-                                            loadFriendList_onMap();
                                             mMap.addMarker(goal);
-
                                             String url = getDirectionsUrl(new LatLng(location.getLatitude(), location.getLongitude()), goal.getPosition());
                                             new DownloadTask().execute(url);
                                         }
@@ -311,7 +309,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 @Override
                                 public void run()
                                 {
-                                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0, locationListener);
+                                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 100, locationListener);
                                     btnStart.setText("Stop");
                                     btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
                                     btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_alizarin));
@@ -551,6 +549,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
 
     }
+
     /**
      * Saves the state of the map when the activity is paused.
      */
@@ -1019,8 +1018,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                             InputStream input = connection.getInputStream();
                                             Bitmap myBitmap = BitmapFactory.decodeStream(input);
                                             Bitmap resized_bitmap = Bitmap.createScaledBitmap(myBitmap, 100, 100, true);
+
                                             if (myBitmap != null)
                                                 markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resized_bitmap));
+                                            myBitmap = null;
+                                            resized_bitmap = null;
                                         } catch (MalformedURLException e)
                                         {
                                             e.printStackTrace();

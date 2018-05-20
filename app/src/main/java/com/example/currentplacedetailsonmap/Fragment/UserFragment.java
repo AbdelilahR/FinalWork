@@ -61,6 +61,7 @@ import static android.content.Context.LOCATION_SERVICE;
  * https://stackoverflow.com/questions/4238921/detect-whether-there-is-an-internet-connection-available-on-android?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
  * https://stackoverflow.com/questions/44777989/firebase-infinite-scroll-list-view-load-10-items-on-scrolling?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
  * https://stackoverflow.com/questions/39023945/how-to-get-data-from-real-time-database-in-firebase
+ * https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database
  */
 public class UserFragment extends Fragment implements Serializable {
     public ListView userListView = null;
@@ -116,9 +117,7 @@ public class UserFragment extends Fragment implements Serializable {
 
         }
         currentLocation = getLastKnownLocation();
-        //public DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("User");
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        /*https://stackoverflow.com/questions/38965731/how-to-get-all-childs-data-in-firebase-database */
+
 
         getActivity().setTitle("Users");
         loadUserList();
