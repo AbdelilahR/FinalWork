@@ -282,7 +282,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
                                 //update burnedcalories
                                 time = (SystemClock.elapsedRealtime() - chrono.getBase());
-
                                 if (time > ONE_MINUTE)
                                 {
                                     mCalories = (0.2f * distanceInMeters) + 3.5f;
