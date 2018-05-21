@@ -287,6 +287,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                         calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " cal");
                                     else
                                         calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " kcal");
+                                } else
+                                {
+                                    calories.setText("Run at least 1m");
                                 }
                                 if (distanceInMeters < 1000f)
                                     distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)) + " m");
