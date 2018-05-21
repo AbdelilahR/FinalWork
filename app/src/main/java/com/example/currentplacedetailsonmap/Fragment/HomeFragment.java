@@ -107,7 +107,7 @@ import info.hoang8f.widget.FButton;
  * https://stackoverflow.com/questions/20550016/savedinstancestate-is-always-null-in-fragment/41388475
  * <p>
  * Formula user for calories burned
- * https://www.runnersworld.com/weight-loss/how-many-calories-are-you-really-burning
+ * https://fitness.stackexchange.com/questions/15608/energy-expenditure-calories-burned-equation-for-running
  * World avg = 62 => https://en.wikipedia.org/wiki/Human_body_weight
  */
 public class HomeFragment extends Fragment implements OnMapReadyCallback
@@ -116,6 +116,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int DEFAULT_ZOOM = 15;
+    private long plus_one_minute = 1;
+    private long ONE_MINUTE = plus_one_minute * 60 * 1000;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -259,11 +261,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                         public void onLocationChanged(Location location)
                         {
 
-                            if (mLastKnownLocation != null && location != null) {
+                            if (mLastKnownLocation != null && location != null)
+                            {
                                 distanceInMeters += mLastKnownLocation.distanceTo(location);
                                 float one_mile = 0.000621371f;
 
-                                if (goal != null) {
+                                //TODO update directions when Goal is chosen/
+                                /*
+                                if (goal != null)
+                                {
                                     //refresh map
                                     mMap.clear();
                                     addHeatMap();
@@ -271,25 +277,29 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                     String url = getDirectionsUrl(new LatLng(location.getLatitude(), location.getLongitude()), goal.getPosition());
                                     new DownloadTask().execute(url);
                                 }
+                                */
                                 sendLocation(location);
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
                                 //update burnedcalories
                                 time = (SystemClock.elapsedRealtime() - chrono.getBase());
 
-                                if (distanceInMeters >= 1.60934f) {
-                                    float mile = distanceInMeters * 0.621371f;
-                                    mCalories = ((0.63f * 136.687f) * mile) / 1000;
-                                    calories.setText(String.valueOf(Utility.round(mCalories, 0)) + " Kcal");
-                                } else
-                                    calories.setText("Run at least 2km");
+                                if (time > ONE_MINUTE)
+                                {
+                                    mCalories = (0.2f * distanceInMeters) + 3.5f;
+                                    plus_one_minute++;
+                                    if (mCalories < 1000f)
+                                        calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " cal");
+                                    else
+                                        calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " kcal");
+                                }
+                                if (distanceInMeters < 1000f)
+                                    distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)) + " m");
+                                else
+                                    distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)) + " km");
 
-                                distance.setText(String.valueOf(Utility.round(distanceInMeters, 0)) + " m");
                                 Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
                             }
-
-                            }
-
-
+                        }
 
                         @Override
                         public void onStatusChanged(String s, int i, Bundle bundle)
