@@ -1027,28 +1027,36 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                     {
                                         avatar_url = myFriend.getUser().getAvatar();
 
-                                        URL _url = null;
-                                        try
+                                        final URL[] _url = {null};
+                                        Handler handler = new Handler();
+                                        handler.post(new Runnable()
                                         {
-                                            _url = new URL(avatar_url);
-                                            connection = (HttpURLConnection) _url.openConnection();
-                                            connection.setDoInput(true);
-                                            connection.connect();
-                                            InputStream input = connection.getInputStream();
-                                            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                                            Bitmap resized_bitmap = Bitmap.createScaledBitmap(myBitmap, 100, 100, true);
+                                            @Override
+                                            public void run()
+                                            {
+                                                try
+                                                {
+                                                    _url[0] = new URL(avatar_url);
+                                                    connection = (HttpURLConnection) _url[0].openConnection();
+                                                    connection.setDoInput(true);
+                                                    connection.connect();
+                                                    InputStream input = connection.getInputStream();
+                                                    Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                                                    Bitmap resized_bitmap = Bitmap.createScaledBitmap(myBitmap, 100, 100, true);
 
-                                            if (myBitmap != null)
-                                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resized_bitmap));
-                                            myBitmap = null;
-                                            resized_bitmap = null;
-                                        } catch (MalformedURLException e)
-                                        {
-                                            e.printStackTrace();
-                                        } catch (IOException e)
-                                        {
-                                            e.printStackTrace();
-                                        }
+                                                    if (myBitmap != null)
+                                                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resized_bitmap));
+
+                                                } catch (MalformedURLException e)
+                                                {
+                                                    e.printStackTrace();
+                                                } catch (IOException e)
+                                                {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+
 
 
                                     }
