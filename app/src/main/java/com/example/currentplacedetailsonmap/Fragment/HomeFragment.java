@@ -112,8 +112,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int DEFAULT_ZOOM = 15;
-    public ArrayList<LatLng> userlocations_list = null;
     private long plus_one_minute = 1;
+    public ArrayList<LatLng> userlocations_list = null;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
