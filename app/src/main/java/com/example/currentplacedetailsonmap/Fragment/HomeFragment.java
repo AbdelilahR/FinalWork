@@ -291,7 +291,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 if (distanceInMeters < 1000f)
                                     distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)) + " m");
                                 else
-                                    distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)) + " km");
+                                {
+                                    distance.setText(String.valueOf(Utility.round((distanceInMeters / 1000), 2)) + " km");
+                                }
+
 
                                 Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
                             }
