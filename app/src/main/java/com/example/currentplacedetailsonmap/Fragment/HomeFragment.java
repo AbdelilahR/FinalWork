@@ -16,7 +16,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -33,7 +32,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -45,7 +43,6 @@ import com.example.currentplacedetailsonmap.MainActivity;
 import com.example.currentplacedetailsonmap.Model.Address;
 import com.example.currentplacedetailsonmap.Model.DirectionsJSONParser;
 import com.example.currentplacedetailsonmap.Model.Friends;
-
 import com.example.currentplacedetailsonmap.Model.Statistiek;
 import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.Model.Utility;
@@ -91,7 +88,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,7 +103,7 @@ import info.hoang8f.widget.FButton;
  * https://stackoverflow.com/questions/20550016/savedinstancestate-is-always-null-in-fragment/41388475
  * <p>
  * Formula user for calories burned
- * https://www.runnersworld.com/weight-loss/how-many-calories-are-you-really-burning
+ * https://fitness.stackexchange.com/questions/15608/energy-expenditure-calories-burned-equation-for-running
  * World avg = 62 => https://en.wikipedia.org/wiki/Human_body_weight
  */
 public class HomeFragment extends Fragment implements OnMapReadyCallback
@@ -116,6 +112,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int DEFAULT_ZOOM = 15;
+    public ArrayList<LatLng> userlocations_list = null;
+    private long plus_one_minute = 1;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -140,7 +138,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     public TextView distance;
     public TextView calories;
     public LatLng myCurrentPosition;
-    public ArrayList<LatLng> userlocations_list = new ArrayList<>();
+    private long ONE_MINUTE = plus_one_minute * 60 * 1000;
     //Custom
     long time = 0;
     float mCalories = 0f;
@@ -170,7 +168,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private User added_user;
     private Bitmap _default;
     private Bitmap bitmap;
-    private ArrayList<MarkerOptions> markers = new ArrayList<MarkerOptions>();
+    private ArrayList<MarkerOptions> listOf_markersOptions = new ArrayList<>();
+    private ArrayList<Marker> listOf_markers = new ArrayList<>();
     private SupportMapFragment mapFragment;
     private HttpURLConnection connection;
     private Thread helper_thread;
@@ -179,7 +178,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private Chronometer chrono;
     private LocationManager locationManager;
     private LocationListener locationListener;
-
+    private boolean locationHasChanger;
+    private String metric_symbol;
 
     public HomeFragment()
     {
@@ -200,14 +200,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         //Check if GPS is enabled
         final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-        {
             buildAlertMessageNoGps();
-            if (position_enable == true)
-                getDeviceLocation();
-            else
-                Toast.makeText(getActivity(), "Please enable your localisation for the app to work properly", Toast.LENGTH_SHORT);
+        else
+            Toast.makeText(getActivity(), "Please enable your localisation for the app to work properly", Toast.LENGTH_SHORT);
 
-        }
 
         //Start Pause button
         final FButton btnStart = (FButton) view.findViewById(R.id.btn_start);
@@ -217,16 +213,26 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         chrono = (Chronometer) view.findViewById(R.id.chronometer);
 
         //speedometer
-        sManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        sManager = (SensorManager)
+
+                getActivity().
+
+                        getSystemService(Context.SENSOR_SERVICE);
+
         stepSensor = sManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         distance = (TextView) view.findViewById(R.id.distance);
         calories = (TextView) view.findViewById(R.id.calories);
 
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Stats").child(current_user);
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        final Handler handler = new Handler();
+        locationManager = (LocationManager)
+
+                getActivity().
+
+                        getSystemService(Context.LOCATION_SERVICE);
+
         btnPause.setEnabled(false);
         btnStart.setOnClickListener(new View.OnClickListener()
+
         {
 
             @SuppressLint("MissingPermission")
@@ -234,134 +240,128 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             public void onClick(View view)
             {
 
-                new Thread(new Runnable()
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                    buildAlertMessageNoGps();
+                else
                 {
-                    @Override
-                    public void run()
+                    if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                        getDeviceLocation();
+                }
+
+
+                if (start == true)
+                {
+
+                    locationListener = new LocationListener()
                     {
-                        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-                            buildAlertMessageNoGps();
-                        else
-                            getDeviceLocation();
-
-                        if (start == true)
+                        @Override
+                        public void onLocationChanged(Location location)
                         {
 
-                            locationListener = new LocationListener()
+                            if (mLastKnownLocation != null && location != null)
                             {
-                                @Override
-                                public void onLocationChanged(Location location)
+                                distanceInMeters += mLastKnownLocation.distanceTo(location);
+                                float one_mile = 0.000621371f;
+
+                                //TODO update directions when Goal is chosen/
+                                /*
+                                if (goal != null)
                                 {
-                                    if (mLastKnownLocation != null && location != null)
-                                    {
-                                        distanceInMeters += mLastKnownLocation.distanceTo(location);
-                                        float one_mile = 0.000621371f;
-                                        mLastKnownLocation = location;
-                                        if (goal != null)
-                                        {
-                                            //refresh map
-                                            mMap.clear();
-                                            addHeatMap();
-                                            mMap.addMarker(goal);
-                                            String url = getDirectionsUrl(new LatLng(location.getLatitude(), location.getLongitude()), goal.getPosition());
-                                            new DownloadTask().execute(url);
-                                        }
-                                        sendLocation(location);
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
-                                        //update burnedcalories
-                                        time = (SystemClock.elapsedRealtime() - chrono.getBase());
-
-                                        if (distanceInMeters >= 1.60934f)
-                                        {
-                                            float mile = distanceInMeters * 0.621371f;
-                                            mCalories = ((0.63f * 136.687f) * mile) / 1000;
-                                            calories.setText(String.valueOf(Utility.round(mCalories, 0)) + " Kcal");
-                                        } else
-                                            calories.setText("Run at least 2km");
-
-                                        distance.setText(String.valueOf(Utility.round(distanceInMeters, 0)) + " m");
-                                        Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
-                                    }
+                                    //refresh map
+                                    mMap.clear();
+                                    addHeatMap();
+                                    mMap.addMarker(goal);
+                                    String url = getDirectionsUrl(new LatLng(location.getLatitude(), location.getLongitude()), goal.getPosition());
+                                    new DownloadTask().execute(url);
                                 }
-
-                                @Override
-                                public void onStatusChanged(String s, int i, Bundle bundle)
+                                */
+                                sendLocation(location);
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
+                                //update burnedcalories
+                                time = (SystemClock.elapsedRealtime() - chrono.getBase());
+                                if (time > ONE_MINUTE)
                                 {
-
+                                    mCalories = (0.2f * distanceInMeters) + 3.5f;
+                                    plus_one_minute++;
+                                    if (mCalories < 1000f)
+                                        calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " cal");
+                                    else
+                                        calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " kcal");
                                 }
+                                if (distanceInMeters < 1000f)
+                                    distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)) + " m");
+                                else
+                                    distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)) + " km");
 
-                                @Override
-                                public void onProviderEnabled(String s)
-                                {
+                                Log.d("Location Updates", "Calories: " + String.valueOf(mCalories) + " Distance: " + String.valueOf(distanceInMeters));
+                            }
+                        }
 
-                                }
-
-                                @Override
-                                public void onProviderDisabled(String s)
-                                {
-
-                                }
-                            };
-
-
-                            handler.post(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 100, locationListener);
-                                    btnStart.setText("Stop");
-                                    btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
-                                    btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_alizarin));
-                                    chrono.start();
-                                    btnPause.setEnabled(true);
-                                    start = false;
-                                }
-                            });
-
-                        } else
+                        @Override
+                        public void onStatusChanged(String s, int i, Bundle bundle)
                         {
-                            locationManager.removeUpdates(locationListener);
-                            chrono.stop();
-                            time = (SystemClock.elapsedRealtime() - chrono.getBase());
-
-                            start = true;
-
-                            timeWhenStopped = 0;
-                            //set variable last_id
-                            ++last_id;
-                            Statistiek statistiek = new Statistiek("Session", last_id, time, (int) mCalories, distanceInMeters, Utility.getTime());
-                            handler.post(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    chrono.setBase(SystemClock.elapsedRealtime() - offset);
-                                    btnStart.setText("Start");
-                                    btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_turquoise));
-                                    btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_emerald));
-                                    btnPause.setEnabled(false);
-                                    distance.setText("0 m");
-                                    calories.setText("0");
-                                }
-                            });
-
-                            mCalories = 0f;
-                            distanceInMeters = 0f;
-                            database.push().setValue(statistiek);
-
 
                         }
 
+                        @Override
+                        public void onProviderEnabled(String s)
+                        {
 
-                    }
-                }).start();
+                        }
+
+                        @Override
+                        public void onProviderDisabled(String s)
+                        {
+
+                        }
+                    };
+
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 100, locationListener);
+                    btnStart.setText("Stop");
+                    btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
+                    btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_alizarin));
+                    chrono.start();
+                    btnPause.setEnabled(true);
+                    start = false;
+                    //clearLists();
+
+                } else
+                {
+                    locationManager.removeUpdates(locationListener);
+                    if (mLastKnownLocation != null)
+                        sendLocation(mLastKnownLocation);
+
+                    chrono.stop();
+                    time = (SystemClock.elapsedRealtime() - chrono.getBase());
+                    start = true;
+                    timeWhenStopped = 0;
+                    //set variable last_id
+                    ++last_id;
+                    Statistiek statistiek = new Statistiek("Session", last_id, time, (int) mCalories, distanceInMeters, Utility.getTime());
+                    chrono.setBase(SystemClock.elapsedRealtime() - offset);
+                    btnStart.setText("Start");
+                    btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_turquoise));
+                    btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_emerald));
+                    btnPause.setEnabled(false);
+                    distance.setText("0 m");
+                    calories.setText("0");
+
+                    mCalories = 0f;
+                    distanceInMeters = 0f;
+                    mLastKnownLocation = Utility.getLastKnownLocation(getContext());
+                    database.push().setValue(statistiek);
+
+
+                }
+
 
             }
+
 
         });
 
         btnPause.setOnClickListener(new View.OnClickListener()
+
         {
             @Override
             public void onClick(View v)
@@ -402,8 +402,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     {
         // Put a marker on the map for every friend of the user
         loadFriendList_onMap();
+
         // Set a heatmap layer on the map
         addHeatMap();
+
     }
 
     private void setLAstSessionId()
@@ -447,6 +449,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private void addHeatMap()
     {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("DataMap");
+        userlocations_list = new ArrayList<>();
         reference.addChildEventListener(new ChildEventListener()
         {
             @Override
@@ -457,6 +460,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                 // Get the data: latitude/longitude positions of all users.
                 LatLng location = new LatLng(user_location.getLatitude(), user_location.getLongitude());
+
                 userlocations_list.add(location);
 
                 if (userlocations_list != null && !userlocations_list.isEmpty())
@@ -687,6 +691,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     {
         mMap = map;
 
+
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter()
@@ -746,6 +751,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                 //Log.d("ZOOM LEVEL", "zoom leve is " + zoom);
             }
         });
+
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener()
         {
@@ -970,10 +976,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private void loadFriendList_onMap()
     {
 
-        new Thread(new Runnable()
+        class loadFriendList_onMapAsync extends AsyncTask<String, Void, String>
         {
+
+
             @Override
-            public void run()
+            protected String doInBackground(String... strings)
             {
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
 
@@ -1003,46 +1011,57 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                     {
                                         bitmap = Bitmap.createScaledBitmap(_default, 100, 100, true);
                                         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
+                                        mMap.addMarker(markerOptions);
 
                                     } else
                                     {
                                         avatar_url = myFriend.getUser().getAvatar();
+                                        helper_thread = new Thread(new Runnable()
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                try
+                                                {
+                                                    URL _url = new URL(avatar_url);
+                                                    connection = (HttpURLConnection) _url.openConnection();
+                                                    connection.setDoInput(true);
+                                                    connection.connect();
+                                                    InputStream input = connection.getInputStream();
+                                                    Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                                                    Bitmap resized_bitmap = Bitmap.createScaledBitmap(myBitmap, 100, 100, true);
+                                                    if (myBitmap != null)
+                                                    {
+                                                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resized_bitmap));
 
-                                        URL _url = null;
+                                                    }
+                                                    //return myBitmap;
+                                                } catch (IOException e)
+                                                {
+                                                    // Log exception
+                                                    //return null;
+                                                }
+                                            }
+
+                                        });
+                                        helper_thread.start();
                                         try
                                         {
-                                            _url = new URL(avatar_url);
-                                            connection = (HttpURLConnection) _url.openConnection();
-                                            connection.setDoInput(true);
-                                            connection.connect();
-                                            InputStream input = connection.getInputStream();
-                                            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-                                            Bitmap resized_bitmap = Bitmap.createScaledBitmap(myBitmap, 100, 100, true);
-
-                                            if (myBitmap != null)
-                                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resized_bitmap));
-                                            myBitmap = null;
-                                            resized_bitmap = null;
-                                        } catch (MalformedURLException e)
-                                        {
-                                            e.printStackTrace();
-                                        } catch (IOException e)
+                                            helper_thread.join();
+                                        } catch (InterruptedException e)
                                         {
                                             e.printStackTrace();
                                         }
 
-
+                                        mMap.addMarker(markerOptions);
                                     }
-                                    markers.add(markerOptions);
+
                                 }
                             }
 
                         }
-                        if (mMap != null)
-                            for (MarkerOptions mo : markers)
-                            {
-                                mMap.addMarker(mo);
-                            }
+
+
                     }
 
                     @Override
@@ -1052,8 +1071,18 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     }
 
                 });
+
+
+                return "Executed";
             }
-        }).start();
+
+            @Override
+            protected void onPostExecute(String s)
+            {
+
+            }
+        }
+        new loadFriendList_onMapAsync().execute();
 
     }
 
@@ -1062,34 +1091,19 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
      * this function will update the current location of the user to all his friends
      * source used => https://stackoverflow.com/questions/33315353/update-specific-values-using-firebase-for-android
      */
-    private void sendLocation(final Location currentLocation)
+    private void sendLocation(Location currentLocation)
     {
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
+
+
+        if (friendsList != null && !friendsList.isEmpty())
+            for (Friends friend : friendsList)
             {
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
-                reference.addValueEventListener(new ValueEventListener()
-                {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        for (DataSnapshot dss : dataSnapshot.getChildren())
-                        {
-                            dss.getRef().child("adress").child("latitude").setValue(currentLocation.getLatitude());
-                            dss.getRef().child("adress").child("longitude").setValue(currentLocation.getLongitude());
-                        }
-                    }
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(friend.getUser().getUserId());
+                reference.child(auth.getUid()).child("adress").child("latitude").setValue(currentLocation.getLatitude());
+                reference.child(auth.getUid()).child("adress").child("longitude").setValue(currentLocation.getLongitude());
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-
-                    }
-                });
             }
-        }).start();
+        loadFriendList_onMap();
 
     }
 
@@ -1273,7 +1287,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         }
 
     }
-    /**  --- End --- */
+/**
+ * --- End ---
+ */
 
 
 }
