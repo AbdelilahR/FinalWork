@@ -140,7 +140,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     public TextView distance;
     public TextView calories;
     public LatLng myCurrentPosition;
-    public ArrayList<LatLng> userlocations_list = new ArrayList<>();
+    public ArrayList<LatLng> userlocations_list = null;
     //Custom
     long time = 0;
     float mCalories = 0f;
@@ -164,13 +164,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private String current_user;
     private int last_id;
     private boolean position_enable;
-    private ArrayList<Friends> friendsList = new ArrayList<>();
+    private ArrayList<Friends> friendsList = null;
     private Friends friend = new Friends();
     private MarkerOptions markerOptions = new MarkerOptions();
     private User added_user;
     private Bitmap _default;
     private Bitmap bitmap;
-    private ArrayList<MarkerOptions> markers = new ArrayList<MarkerOptions>();
+    private ArrayList<MarkerOptions> markers = null;
     private SupportMapFragment mapFragment;
     private HttpURLConnection connection;
     private Thread helper_thread;
@@ -320,6 +320,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                     chrono.start();
                                     btnPause.setEnabled(true);
                                     start = false;
+                                    clearLists();
                                 }
                             });
 
@@ -410,6 +411,18 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         addHeatMap();
     }
 
+    private void clearLists()
+    {
+        friendsList.clear();
+        friendsList.trimToSize();
+
+        markers.clear();
+        markers.trimToSize();
+
+        userlocations_list.clear();
+        userlocations_list.trimToSize();
+    }
+
     private void setLAstSessionId()
     {
 
@@ -451,6 +464,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private void addHeatMap()
     {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("DataMap");
+        userlocations_list = new ArrayList<>();
         reference.addChildEventListener(new ChildEventListener()
         {
             @Override
@@ -461,6 +475,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                 // Get the data: latitude/longitude positions of all users.
                 LatLng location = new LatLng(user_location.getLatitude(), user_location.getLongitude());
+
                 userlocations_list.add(location);
 
                 if (userlocations_list != null && !userlocations_list.isEmpty())
@@ -759,6 +774,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                 User user = null;
                 String user_name;
                 String friend_name = marker.getTitle();
+                friendsList = new ArrayList<>();
                 if (friendsList != null)
                     for (Friends friends : friendsList)
                     {
@@ -987,6 +1003,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot)
                     {
+                        friendsList = new ArrayList<>();
                         for (DataSnapshot dsp : dataSnapshot.getChildren())
                         {
                             added_user = dsp.getValue(User.class);
