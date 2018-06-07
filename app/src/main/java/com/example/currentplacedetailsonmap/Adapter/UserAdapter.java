@@ -1,12 +1,8 @@
 package com.example.currentplacedetailsonmap.Adapter;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -16,23 +12,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.currentplacedetailsonmap.MainActivity;
 import com.example.currentplacedetailsonmap.Model.User;
 import com.example.currentplacedetailsonmap.Model.UserViewHolder;
 import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.squareup.picasso.Picasso;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static android.content.Context.LOCATION_SERVICE;
-import static com.example.currentplacedetailsonmap.R.drawable.online_icon;
 
 /**
  * Created by Abdel-Portable on 18-04-18.
@@ -100,10 +88,10 @@ public class UserAdapter extends ArrayAdapter<User> {
 
         String online = user.getStatus();
         if (online.equals("online"))
-            userVH.status.setImageResource(R.drawable.online_icon);
+            userVH.status.setImageResource(R.drawable.vert);
 
         else
-            userVH.status.setImageResource(R.drawable.offline_icon);
+            userVH.status.setImageResource(R.drawable.rouge);
         return convertView;
     }
 

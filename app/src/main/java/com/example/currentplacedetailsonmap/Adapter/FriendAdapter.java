@@ -16,15 +16,9 @@ import android.widget.TextView;
 import com.example.currentplacedetailsonmap.Model.Address;
 import com.example.currentplacedetailsonmap.Model.Friends;
 import com.example.currentplacedetailsonmap.Model.FriendsViewHolder;
-import com.example.currentplacedetailsonmap.Model.User;
-import com.example.currentplacedetailsonmap.Model.UserViewHolder;
 import com.example.currentplacedetailsonmap.Model.Utility;
 import com.example.currentplacedetailsonmap.R;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
@@ -106,10 +100,10 @@ public class FriendAdapter extends ArrayAdapter<Friends>
 
         String online = friends.getUser().getStatus();
         if (online.equals("online"))
-            friendsVH.status.setImageResource(R.drawable.online_icon);
+            friendsVH.status.setImageResource(R.drawable.vert);
 
         else
-            friendsVH.status.setImageResource(R.drawable.offline_icon);
+            friendsVH.status.setImageResource(R.drawable.rouge);
 
         if (friends.getRequest().equals("sent"))
         {

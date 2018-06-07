@@ -13,7 +13,7 @@
     <!--android:id="@+id/userList"-->
 
     <ListView
-        android:background="@color/fbutton_color_belize_hole"
+        android:background="#ffff"
         android:id="@+id/userList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

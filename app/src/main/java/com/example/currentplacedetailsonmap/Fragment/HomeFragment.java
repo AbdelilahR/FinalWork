@@ -136,6 +136,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     public float[] results = new float[1];
     public float correctedDistance = 0;
     public TextView distance;
+    public TextView metric;
+    public TextView kcal;
     public TextView calories;
     public LatLng myCurrentPosition;
     private long ONE_MINUTE = plus_one_minute * 60 * 1000;
@@ -221,6 +223,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
         stepSensor = sManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         distance = (TextView) view.findViewById(R.id.distance);
+        metric = (TextView) view.findViewById(R.id.metre);
+        kcal = (TextView) view.findViewById(R.id.kcal);
         calories = (TextView) view.findViewById(R.id.calories);
 
         final DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("Stats").child(current_user);
@@ -284,18 +288,29 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                     mCalories = (0.2f * distanceInMeters) + 3.5f;
                                     plus_one_minute++;
                                     if (mCalories < 1000f)
-                                        calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " cal");
+                                    {
+                                        calories.setText(String.valueOf(Utility.round(mCalories, 2)));
+                                        kcal.setText("cal");
+                                    }
                                     else
+                                    {
                                         calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " kcal");
+                                        kcal.setText("kcal");
+                                    }
                                 } else
                                 {
-                                    calories.setText("Run at least 1m");
+                                    Toast.makeText(getContext(), "Run at least 1m", Toast.LENGTH_SHORT).show();
+
                                 }
                                 if (distanceInMeters < 1000f)
-                                    distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)) + " m");
+                                {
+                                    distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)));
+                                    kcal.setText("m");
+                                }
                                 else
                                 {
-                                    distance.setText(String.valueOf(Utility.round((distanceInMeters / 1000), 2)) + " km");
+                                    distance.setText(String.valueOf(Utility.round((distanceInMeters / 1000), 2)));
+                                    kcal.setText("km");
                                 }
 
 
@@ -324,8 +339,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 100, locationListener);
                     btnStart.setText("Stop");
-                    btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_pomegranate));
-                    btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_alizarin));
+                    btnStart.setButtonColor(getResources().getColor(R.color.stopcolor));
                     chrono.start();
                     btnPause.setEnabled(true);
                     start = false;

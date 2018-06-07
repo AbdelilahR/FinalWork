@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/fbutton_color_midnight_blue"
+    android:background="@color/bg_main"
 
     tools:context=".Fragment.StatsFragment">
 
@@ -111,7 +111,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/fbutton_color_belize_hole"
+            android:background="#ffff"
 
             app:layout_constraintVertical_bias="0.0">
 

@@ -4,65 +4,90 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/fbutton_color_belize_hole"
+    android:background="@color/bg_main"
     tools:context=".Fragment.HomeFragment">
 
     <info.hoang8f.widget.FButton
         android:id="@+id/btn_start"
-        android:layout_width="184dp"
-        android:layout_height="wrap_content"
+        android:layout_width="144dp"
+        android:layout_height="34dp"
         android:layout_above="@+id/map"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="36dp"
         android:text="Start"
         android:textColor="@color/white"
-        fbutton:cornerRadius="50dp"
-        fbutton:fButtonColor="@color/fbutton_color_turquoise"
-        fbutton:shadowColor="@color/fbutton_color_emerald"
-        fbutton:shadowEnabled="true" />
+        fbutton:cornerRadius="5dp"
+        fbutton:fButtonColor="#91bcd2"
+        fbutton:shadowEnabled="false" />
 
     <info.hoang8f.widget.FButton
         android:id="@+id/btn2"
-        android:layout_width="194dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/map"
-        android:layout_toEndOf="@+id/btn_start"
+        android:layout_width="150dp"
+        android:layout_height="34dp"
+
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/btn_start"
+        android:layout_marginEnd="36dp"
         android:text="Pause"
         android:textColor="@color/white"
-        fbutton:cornerRadius="50dp"
-        fbutton:fButtonColor="@color/fbutton_color_orange"
-        fbutton:shadowColor="@color/fbutton_color_sun_flower"
-        fbutton:shadowEnabled="true" />
+        fbutton:cornerRadius="5dp"
+        fbutton:fButtonColor="#91bcd2"
+        fbutton:shadowEnabled="false" />
 
     <Chronometer
         android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/calories"
-        android:layout_alignTop="@+id/distance"
-        android:textColor="@color/fbutton_color_turquoise"
+
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:textColor="#ffff"
         android:textSize="15pt" />
 
     <TextView
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/calories"
+
+
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/chronometer"
+        android:layout_marginStart="94dp"
+        android:text="0"
+        android:textColor="#ffff"
+        android:textSize="15pt" />
+
+    <TextView
+        android:id="@+id/metre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="-115dp"
-        android:layout_marginEnd="35dp"
-        android:text="0 m"
-        android:textColor="@color/fbutton_color_turquoise"
-        android:textSize="25pt" />
+        android:layout_below="@+id/chronometer"
+        android:layout_marginEnd="94dp"
+        android:text="m"
+        android:textColor="@color/colorPrimary"
+        android:textSize="15pt" />
 
     <TextView
         android:id="@+id/calories"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="39dp"
-        android:layout_marginTop="102dp"
-        android:text="0 Kcal"
-        android:textColor="@color/fbutton_color_turquoise"
+
+        android:layout_alignEnd="@+id/distance"
+        android:layout_below="@+id/distance"
+        android:text="0"
+        android:textColor="#ffff"
+        android:textSize="20pt" />
+
+    <TextView
+        android:id="@+id/kcal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/calories"
+        android:layout_alignEnd="@+id/metre"
+        android:text="Kcal"
+        android:textColor="@color/colorPrimary"
         android:textSize="15pt" />
 
     <fragment
