@@ -106,14 +106,11 @@ import info.hoang8f.widget.FButton;
  * https://fitness.stackexchange.com/questions/15608/energy-expenditure-calories-burned-equation-for-running
  * World avg = 62 => https://en.wikipedia.org/wiki/Human_body_weight
  */
-public class HomeFragment extends Fragment implements OnMapReadyCallback
-{
+public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int DEFAULT_ZOOM = 15;
-    private long plus_one_minute = 1;
-    public ArrayList<LatLng> userlocations_list = null;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -125,6 +122,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     // A default location (Sydney, Australia) and default zoom to use when location permission is
     // not granted. test
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+    public ArrayList<LatLng> userlocations_list = null;
     //Speedometer
     public SensorManager sManager;
     public Sensor stepSensor;
@@ -140,10 +138,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     public TextView kcal;
     public TextView calories;
     public LatLng myCurrentPosition;
-    private long ONE_MINUTE = plus_one_minute * 60 * 1000;
     //Custom
     long time = 0;
     float mCalories = 0f;
+    private long plus_one_minute = 1;
+    private long ONE_MINUTE = plus_one_minute * 60 * 1000;
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
     // The entry points to the Places API.
@@ -182,16 +181,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     private LocationListener locationListener;
     private boolean locationHasChanger;
     private String metric_symbol;
+    private LocationManager manager;
 
-    public HomeFragment()
-    {
+    public HomeFragment() {
         // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_google_maps, container, false);
         // Build the map.
@@ -200,7 +198,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         //Check if GPS is enabled
-        final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             buildAlertMessageNoGps();
         else
@@ -241,29 +239,23 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
             @SuppressLint("MissingPermission")
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
 
                 if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                     buildAlertMessageNoGps();
-                else
-                {
+                else {
                     if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER))
                         getDeviceLocation();
                 }
 
 
-                if (start == true)
-                {
+                if (start == true) {
 
-                    locationListener = new LocationListener()
-                    {
+                    locationListener = new LocationListener() {
                         @Override
-                        public void onLocationChanged(Location location)
-                        {
+                        public void onLocationChanged(Location location) {
 
-                            if (mLastKnownLocation != null && location != null)
-                            {
+                            if (mLastKnownLocation != null && location != null) {
                                 distanceInMeters += mLastKnownLocation.distanceTo(location);
                                 float one_mile = 0.000621371f;
 
@@ -283,32 +275,24 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM));
                                 //update burnedcalories
                                 time = (SystemClock.elapsedRealtime() - chrono.getBase());
-                                if (time > ONE_MINUTE)
-                                {
+                                if (time > ONE_MINUTE) {
                                     mCalories = (0.2f * distanceInMeters) + 3.5f;
                                     plus_one_minute++;
-                                    if (mCalories < 1000f)
-                                    {
+                                    if (mCalories < 1000f) {
                                         calories.setText(String.valueOf(Utility.round(mCalories, 2)));
                                         kcal.setText("cal");
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         calories.setText(String.valueOf(Utility.round(mCalories, 2)) + " kcal");
                                         kcal.setText("kcal");
                                     }
-                                } else
-                                {
+                                } else {
                                     Toast.makeText(getContext(), "Run at least 1m", Toast.LENGTH_SHORT).show();
 
                                 }
-                                if (distanceInMeters < 1000f)
-                                {
+                                if (distanceInMeters < 1000f) {
                                     distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)));
                                     kcal.setText("m");
-                                }
-                                else
-                                {
+                                } else {
                                     distance.setText(String.valueOf(Utility.round((distanceInMeters / 1000), 2)));
                                     kcal.setText("km");
                                 }
@@ -319,20 +303,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                         }
 
                         @Override
-                        public void onStatusChanged(String s, int i, Bundle bundle)
-                        {
+                        public void onStatusChanged(String s, int i, Bundle bundle) {
 
                         }
 
                         @Override
-                        public void onProviderEnabled(String s)
-                        {
+                        public void onProviderEnabled(String s) {
 
                         }
 
                         @Override
-                        public void onProviderDisabled(String s)
-                        {
+                        public void onProviderDisabled(String s) {
 
                         }
                     };
@@ -345,8 +326,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     start = false;
                     //clearLists();
 
-                } else
-                {
+                } else {
                     locationManager.removeUpdates(locationListener);
                     if (mLastKnownLocation != null)
                         sendLocation(mLastKnownLocation);
@@ -384,11 +364,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
         {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
 
-                if (pause == true)
-                {
+                if (pause == true) {
 
                     timeWhenStopped = chrono.getBase() - SystemClock.elapsedRealtime();
                     chrono.stop();
@@ -398,8 +376,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     btnPause.setShadowColor(getResources().getColor(R.color.fbutton_color_pumpkin));
 
                     pause = false;
-                } else
-                {
+                } else {
                     chrono.setBase(SystemClock.elapsedRealtime() + (int) timeWhenStopped);
                     chrono.start();
                     btnPause.setText("Pause");
@@ -418,8 +395,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Put a marker on the map for every friend of the user
         loadFriendList_onMap();
 
@@ -428,33 +404,26 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
     }
 
-    private void setLAstSessionId()
-    {
+    private void setLAstSessionId() {
 
-        class loadLastId extends AsyncTask<String, Void, String>
-        {
+        class loadLastId extends AsyncTask<String, Void, String> {
 
             @Override
-            protected String doInBackground(String... strings)
-            {
+            protected String doInBackground(String... strings) {
                 final int[] get_id = {0};
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Stats").child(current_user);
                 Query lastQuery = reference.orderByKey().limitToLast(1);
-                lastQuery.addListenerForSingleValueEvent(new ValueEventListener()
-                {
+                lastQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        for (DataSnapshot dss : dataSnapshot.getChildren())
-                        {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot dss : dataSnapshot.getChildren()) {
                             get_id[0] = dss.child("id").getValue(int.class);
                             setLast_id(get_id[0]);
                         }
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
@@ -466,15 +435,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     }
 
 
-    private void addHeatMap()
-    {
+    private void addHeatMap() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("DataMap");
         userlocations_list = new ArrayList<>();
-        reference.addChildEventListener(new ChildEventListener()
-        {
+        reference.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
                 Address user_location = dataSnapshot.getValue(Address.class);
 
@@ -483,8 +449,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                 userlocations_list.add(location);
 
-                if (userlocations_list != null && !userlocations_list.isEmpty())
-                {
+                if (userlocations_list != null && !userlocations_list.isEmpty()) {
                     // Create a heat map tile provider, passing it the latlngs of the police stations.
                     mProvider = new HeatmapTileProvider.Builder().data(userlocations_list).build();
 
@@ -495,26 +460,22 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
@@ -523,8 +484,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         //https://stackoverflow.com/questions/30847096/android-getmenuinflater-in-a-fragment-subclass-cannot-resolve-method
         //https://stackoverflow.com/questions/15653737/oncreateoptionsmenu-inside-fragments
         inflater.inflate(R.menu.current_place_menu, menu);
@@ -534,8 +494,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
     @SuppressLint("ResourceType")
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         getActivity().setTitle("Home");
@@ -553,8 +512,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         setLAstSessionId();
 
         // Retrieve location and camera position from saved instance state + last id.
-        if (savedInstanceState != null)
-        {
+        if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mNewLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
@@ -578,10 +536,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
      * Saves the state of the map when the activity is paused.
      */
     @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        if (mMap != null)
-        {
+    public void onSaveInstanceState(Bundle outState) {
+        if (mMap != null) {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
             outState.putParcelable(KEY_LOCATION, mNewLocation);
@@ -605,98 +561,92 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
      * @return Boolean.
      */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
 
 
-        if (item.getItemId() == R.id.option_get_place)
-        {
-            getDeviceLocation();
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            LinearLayout layout = new LinearLayout(getActivity());
-            builder.setTitle("Chose your end Goal");
+        if (item.getItemId() == R.id.option_get_place) {
+            if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 
 
-            try
-            {
-                popup = inflater.inflate(R.layout.custom_popup, layout);
+                getDeviceLocation();
+                LayoutInflater inflater = LayoutInflater.from(getActivity());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                LinearLayout layout = new LinearLayout(getActivity());
+                builder.setTitle("Chose your end Goal");
 
 
-            } catch (InflateException e)
-            {
-                e.getMessage();
+                try {
+                    popup = inflater.inflate(R.layout.custom_popup, layout);
 
-            }
-            // final EditText input = (EditText) popup.findViewById(R.id.editText1);
-            //final EditText input2 = (EditText) popup.findViewById(R.id.editText2);
 
-            final TextView txt1 = new TextView(getActivity());
-            final TextView txt2 = new TextView(getActivity());
-            txt1.setText("Point A");
-            txt2.setText("Point B");
-
-            PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                    getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
-            AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
-                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
-                    .build();
-            autocompleteFragment.setFilter(typeFilter);
-            mMap.clear();
-            addHeatMap();
-            autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener()
-            {
-                @Override
-                public void onPlaceSelected(final Place place)
-                {
-                    Log.i(TAG, "Place: " + place.getName());//get place details here
-                    getDeviceLocation();
-                    myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                    String url = getDirectionsUrl(myCurrentPosition, place.getLatLng());
-                    new DownloadTask().execute(url);
-                    goal = new MarkerOptions().title("Goal").position(place.getLatLng());
-                    mMap.addMarker(goal);
+                } catch (InflateException e) {
+                    e.getMessage();
 
                 }
+                // final EditText input = (EditText) popup.findViewById(R.id.editText1);
+                //final EditText input2 = (EditText) popup.findViewById(R.id.editText2);
 
-                @Override
-                public void onError(Status status)
-                {
-                    Log.i(TAG, "An error occurred: " + status);
-                }
-            });
+                final TextView txt1 = new TextView(getActivity());
+                final TextView txt2 = new TextView(getActivity());
+                txt1.setText("Point A");
+                txt2.setText("Point B");
 
-            if (popup.getParent() != null)
-                ((ViewGroup) popup.getParent()).removeView(popup);
+                PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                        getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-            builder.setView(popup);
+                AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                        .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                        .build();
+                autocompleteFragment.setFilter(typeFilter);
+                mMap.clear();
+                addHeatMap();
+                autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                    @Override
+                    public void onPlaceSelected(final Place place) {
+                        Log.i(TAG, "Place: " + place.getName());//get place details here
+                        getDeviceLocation();
+                        myCurrentPosition = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                        String url = getDirectionsUrl(myCurrentPosition, place.getLatLng());
+                        new DownloadTask().execute(url);
+                        goal = new MarkerOptions().title("Goal").position(place.getLatLng());
+                        mMap.addMarker(goal);
 
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    // String m_Text = input.getText().toString();
-                    //String m_Text2 = input2.getText().toString();
+                    }
 
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    dialog.cancel();
+                    @Override
+                    public void onError(Status status) {
+                        Log.i(TAG, "An error occurred: " + status);
+                    }
+                });
 
-                }
-            });
+                if (popup.getParent() != null)
+                    ((ViewGroup) popup.getParent()).removeView(popup);
+
+                builder.setView(popup);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // String m_Text = input.getText().toString();
+                        //String m_Text2 = input2.getText().toString();
+
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+
+                    }
+                });
             /*
 
              */
-            builder.show();
-
+                builder.show();
+            }
+            else
+                buildAlertMessageNoGps();
         }
 
         return true;
@@ -707,26 +657,22 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
      * This callback is triggered when the map is ready to be used.
      */
     @Override
-    public void onMapReady(final GoogleMap map)
-    {
+    public void onMapReady(final GoogleMap map) {
         mMap = map;
 
 
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter()
-        {
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
             @Override
             // Return null here, so that getInfoContents() is called next.
-            public View getInfoWindow(Marker arg0)
-            {
+            public View getInfoWindow(Marker arg0) {
                 return null;
             }
 
             @Override
-            public View getInfoContents(Marker marker)
-            {
+            public View getInfoContents(Marker marker) {
                 // Inflate the layouts for the info window, title and snippet.
                 View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
                         (FrameLayout) getActivity().findViewById(R.id.map), false);
@@ -751,16 +697,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
 //        getDeviceLocation();
 
-        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener()
-        {
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
-            public void onCameraMove()
-            {
+            public void onCameraMove() {
                 if (mOverlay != null)
                     mOverlay.clearTileCache();
 
-                if (mProvider != null)
-                {
+                if (mProvider != null) {
                     if (map.getCameraPosition().zoom >= 10)
                         mProvider.setRadius(150);
                     else
@@ -773,23 +716,19 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         });
 
 
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener()
-        {
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
-            public void onInfoWindowClick(Marker marker)
-            {
+            public void onInfoWindowClick(Marker marker) {
                 User user = null;
                 String user_name;
                 String friend_name = marker.getTitle();
                 if (friendsList != null)
-                    for (Friends friends : friendsList)
-                    {
+                    for (Friends friends : friendsList) {
                         user_name = friends.getUser().getVoornaam() + " " + friends.getUser().getAchternaam();
                         if (user_name.equals(friend_name))
                             user = friends.getUser();
                     }
-                if (user != null)
-                {
+                if (user != null) {
                     Intent intent = new Intent(getActivity(), ChatActivity.class);
                     intent.putExtra("selectedUser", user);
                     startActivity(intent);
@@ -801,33 +740,26 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
-    public void getDeviceLocation()
-    {
+    public void getDeviceLocation() {
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
-        try
-        {
-            if (mLocationPermissionGranted)
-            {
+        try {
+            if (mLocationPermissionGranted) {
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
 
 
-                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>()
-                {
+                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
                     @Override
-                    public void onComplete(@NonNull Task<Location> task)
-                    {
-                        if (task.isSuccessful())
-                        {
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                        } else
-                        {
+                        } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
                             mMap.moveCamera(CameraUpdateFactory
@@ -839,8 +771,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
             }
 
-        } catch (SecurityException e)
-        {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -848,8 +779,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     /**
      * Prompts the user for permission to use the device location.
      */
-    private void getLocationPermission()
-    {
+    private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
          * device. The result of the permission request is handled by a callback,
@@ -857,11 +787,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
          */
         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED)
-        {
+                == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-        } else
-        {
+        } else {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
@@ -874,17 +802,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
-                                           @NonNull int[] grantResults)
-    {
+                                           @NonNull int[] grantResults) {
         mLocationPermissionGranted = false;
-        switch (requestCode)
-        {
-            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
-            {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mLocationPermissionGranted = true;
                 }
             }
@@ -896,36 +820,29 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
-    private void updateLocationUI()
-    {
-        if (mMap == null)
-        {
+    private void updateLocationUI() {
+        if (mMap == null) {
             return;
         }
-        try
-        {
-            if (mLocationPermissionGranted)
-            {
+        try {
+            if (mLocationPermissionGranted) {
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            } else
-            {
+            } else {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setMyLocationButtonEnabled(false);
                 mLastKnownLocation = null;
                 mNewLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)
-        {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
 
 
     //get distance in meters
-    public double getDistanceRun(long steps)
-    {
+    public double getDistanceRun(long steps) {
         //float distance = ((float) (steps * 78) / (float) 100000) * 1000;
         //int round =(int) distance;
         return steps * 0.762;
@@ -941,8 +858,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
     /**
      * Function to show settings alert dialog
      */
-    public void buildAlertMessageNoGps()
-    {
+    public void buildAlertMessageNoGps() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
 
         // Setting Dialog Title
@@ -955,10 +871,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         //alertDialog.setIcon(R.drawable.delete);
 
         // On pressing Settings button
-        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int which)
-            {
+        alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
                 position_enable = true;
@@ -967,10 +881,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         });
 
         // on pressing cancel button
-        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int which)
-            {
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
                 position_enable = false;
                 dialog.cancel();
             }
@@ -980,69 +892,54 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         alertDialog.show();
     }
 
-    public int getLast_id()
-    {
+    public int getLast_id() {
         return last_id;
     }
 
-    public void setLast_id(int last_id)
-    {
+    public void setLast_id(int last_id) {
         this.last_id = last_id;
     }
 
     /**
      * This function will show all the friends of the user on Google map
      */
-    private void loadFriendList_onMap()
-    {
+    private void loadFriendList_onMap() {
 
-        class loadFriendList_onMapAsync extends AsyncTask<String, Void, String>
-        {
+        class loadFriendList_onMapAsync extends AsyncTask<String, Void, String> {
 
 
             @Override
-            protected String doInBackground(String... strings)
-            {
+            protected String doInBackground(String... strings) {
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(auth.getUid());
 
                 reference.addListenerForSingleValueEvent(new ValueEventListener()
 
                 {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        for (DataSnapshot dsp : dataSnapshot.getChildren())
-                        {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot dsp : dataSnapshot.getChildren()) {
                             added_user = dsp.getValue(User.class);
                             String request_type = dsp.child("request_type").getValue().toString();
                             friend = new Friends(request_type, added_user);
                             friendsList.add(friend);
                         }
-                        if (friendsList != null)
-                        {
-                            for (Friends myFriend : new ArrayList<Friends>(friendsList))
-                            {
-                                if (myFriend.getRequest().equals("Accepted"))
-                                {
+                        if (friendsList != null) {
+                            for (Friends myFriend : new ArrayList<Friends>(friendsList)) {
+                                if (myFriend.getRequest().equals("Accepted")) {
                                     markerOptions.position(new LatLng(myFriend.getUser().getAdress().getLatitude(), myFriend.getUser().getAdress().getLongitude()));
                                     markerOptions.title(myFriend.getUser().getVoornaam() + " " + myFriend.getUser().getAchternaam());
                                     String url = myFriend.getUser().getAvatar();
-                                    if (url.equals("default"))
-                                    {
+                                    if (url.equals("default")) {
                                         bitmap = Bitmap.createScaledBitmap(_default, 100, 100, true);
                                         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
                                         mMap.addMarker(markerOptions);
 
-                                    } else
-                                    {
+                                    } else {
                                         avatar_url = myFriend.getUser().getAvatar();
-                                        helper_thread = new Thread(new Runnable()
-                                        {
+                                        helper_thread = new Thread(new Runnable() {
                                             @Override
-                                            public void run()
-                                            {
-                                                try
-                                                {
+                                            public void run() {
+                                                try {
                                                     URL _url = new URL(avatar_url);
                                                     connection = (HttpURLConnection) _url.openConnection();
                                                     connection.setDoInput(true);
@@ -1050,14 +947,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                                                     InputStream input = connection.getInputStream();
                                                     Bitmap myBitmap = BitmapFactory.decodeStream(input);
                                                     Bitmap resized_bitmap = Bitmap.createScaledBitmap(myBitmap, 100, 100, true);
-                                                    if (myBitmap != null)
-                                                    {
+                                                    if (myBitmap != null) {
                                                         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resized_bitmap));
 
                                                     }
                                                     //return myBitmap;
-                                                } catch (IOException e)
-                                                {
+                                                } catch (IOException e) {
                                                     // Log exception
                                                     //return null;
                                                 }
@@ -1065,11 +960,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
                                         });
                                         helper_thread.start();
-                                        try
-                                        {
+                                        try {
                                             helper_thread.join();
-                                        } catch (InterruptedException e)
-                                        {
+                                        } catch (InterruptedException e) {
                                             e.printStackTrace();
                                         }
 
@@ -1085,8 +978,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
 
@@ -1097,8 +989,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             }
 
             @Override
-            protected void onPostExecute(String s)
-            {
+            protected void onPostExecute(String s) {
 
             }
         }
@@ -1111,13 +1002,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
      * this function will update the current location of the user to all his friends
      * source used => https://stackoverflow.com/questions/33315353/update-specific-values-using-firebase-for-android
      */
-    private void sendLocation(Location currentLocation)
-    {
+    private void sendLocation(Location currentLocation) {
 
 
         if (friendsList != null && !friendsList.isEmpty())
-            for (Friends friend : friendsList)
-            {
+            for (Friends friend : friendsList) {
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Friends").child(friend.getUser().getUserId());
                 reference.child(auth.getUid()).child("adress").child("latitude").setValue(currentLocation.getLatitude());
                 reference.child(auth.getUid()).child("adress").child("longitude").setValue(currentLocation.getLongitude());
@@ -1132,8 +1021,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
      * --- Start ---
      */
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest)
-    {
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -1159,8 +1047,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         return url;
     }
 
-    private String downloadUrl(final String strUrl) throws IOException
-    {
+    private String downloadUrl(final String strUrl) throws IOException {
 
 
         String data = "";
@@ -1168,8 +1055,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
 
-        try
-        {
+        try {
             URL url = new URL(strUrl);
 
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -1185,8 +1071,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
             StringBuffer sb = new StringBuffer();
 
             String line = "";
-            while ((line = br.readLine()) != null)
-            {
+            while ((line = br.readLine()) != null) {
                 sb.append(line);
             }
 
@@ -1194,16 +1079,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
 
             br.close();
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Log.d(TAG, "Exception" + e.toString());
-        } finally
-        {
-            try
-            {
+        } finally {
+            try {
                 iStream.close();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             urlConnection.disconnect();
@@ -1211,28 +1092,23 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         return data;
     }
 
-    public class DownloadTask extends AsyncTask<String, Void, String>
-    {
+    public class DownloadTask extends AsyncTask<String, Void, String> {
 
 
         @Override
-        public String doInBackground(String... url)
-        {
+        public String doInBackground(String... url) {
             String data = "";
 
-            try
-            {
+            try {
                 data = downloadUrl(url[0]);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
             return data;
         }
 
 
-        public void onPostExecute(String result)
-        {
+        public void onPostExecute(String result) {
             super.onPostExecute(result);
 
             ParserTask parserTask = new ParserTask();
@@ -1243,46 +1119,39 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback
         }
     }
 
-    public class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>>
-    {
+    public class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         // Parsing the data in non-ui thread
         @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData)
-        {
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
 
             JSONObject jObject;
             List<List<HashMap<String, String>>> routes = null;
 
-            try
-            {
+            try {
                 jObject = new JSONObject(jsonData[0]);
                 DirectionsJSONParser parser = new DirectionsJSONParser();
 
                 routes = parser.parse(jObject);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return routes;
         }
 
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result)
-        {
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
             ArrayList points = null;
             PolylineOptions lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
 
-            for (int i = 0; i < result.size(); i++)
-            {
+            for (int i = 0; i < result.size(); i++) {
                 points = new ArrayList();
                 lineOptions = new PolylineOptions();
 
                 List<HashMap<String, String>> path = result.get(i);
 
-                for (int j = 0; j < path.size(); j++)
-                {
+                for (int j = 0; j < path.size(); j++) {
                     HashMap point = path.get(j);
 
                     double lat = Double.parseDouble((String) point.get("lat"));
