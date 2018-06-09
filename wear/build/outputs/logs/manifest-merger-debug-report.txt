@@ -1,0 +1,186 @@
+-- Merging decision tree log ---
+manifest
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+MERGED from [com.google.android.support:wearable:2.3.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wearable-2.3.0.aar\bab1c5e41bd661ab26c6750abb26e01d\AndroidManifest.xml:2:1-15:12
+MERGED from [com.google.android.gms:play-services-wearable:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-wearable-15.0.1.aar\5436c03d38175bf01b1a352b908207c4\AndroidManifest.xml:17:1-24:12
+MERGED from [com.android.support:percent:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\percent-27.1.1.aar\b74a8661a65a24334846ffe06e1544ae\AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:17:1-29:12
+MERGED from [com.google.android.gms:play-services-tasks:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-tasks-15.0.1.aar\d178a9aca63ef01eea3e27bf17b45623\AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.gms:play-services-basement:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-basement-15.0.1.aar\06ca6ebcb684108e5f2a7fdbac369d00\AndroidManifest.xml:17:1-28:12
+MERGED from [com.android.support:support-v4:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-v4-27.1.1.aar\a259270a23771f0f171893c32fef35e6\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:wear:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wear-27.1.1.aar\ebf698cd0343fc33863df2838b4cc798\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:recyclerview-v7:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\recyclerview-v7-27.1.1.aar\cc3b6674872052ef413e5e0ce20da69a\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-fragment-27.1.1.aar\f2ee16749aa3618a33f7528d2f4eb385\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.1.1.aar\d54fee9cbe1f393815f172fde35b878d\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.1.1.aar\d3c4062a9e64eea892731a94a65627f4\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-media-compat:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-media-compat-27.1.1.aar\120df941c03f2bb0d12b7ebb837a96d5\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-compat-27.1.1.aar\67473fd3dbbc1d2d1bda8d58b5c6ea73\AndroidManifest.xml:17:1-22:12
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\ef861b6b259898428312895bc7b0874c\AndroidManifest.xml:2:1-11:12
+MERGED from [android.arch.lifecycle:livedata-core:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\livedata-core-1.1.0.aar\0adbb55315f0144de01e70c2722f0699\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:viewmodel:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\viewmodel-1.1.0.aar\a9fcd2769fa7ebd17a12c803c21d32bb\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.lifecycle:runtime:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\e8850695bf6629c987832f15019922cf\AndroidManifest.xml:17:1-22:12
+MERGED from [android.arch.core:runtime:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\f130cd6fe54596d58a1a3f8a6bfe65ef\AndroidManifest.xml:17:1-22:12
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+	package
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:3:5-51
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:1-41:12
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:2:11-69
+uses-feature#android.hardware.type.watch
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:5:5-64
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:5:19-61
+uses-permission#android.permission.WAKE_LOCK
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:7:5-68
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:7:22-65
+application
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:9:5-39:19
+MERGED from [com.google.android.support:wearable:2.3.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wearable-2.3.0.aar\bab1c5e41bd661ab26c6750abb26e01d\AndroidManifest.xml:9:5-13:19
+MERGED from [com.google.android.support:wearable:2.3.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wearable-2.3.0.aar\bab1c5e41bd661ab26c6750abb26e01d\AndroidManifest.xml:9:5-13:19
+MERGED from [com.google.android.gms:play-services-wearable:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-wearable-15.0.1.aar\5436c03d38175bf01b1a352b908207c4\AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-wearable:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-wearable-15.0.1.aar\5436c03d38175bf01b1a352b908207c4\AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:22:5-27:19
+MERGED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:22:5-27:19
+MERGED from [com.google.android.gms:play-services-tasks:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-tasks-15.0.1.aar\d178a9aca63ef01eea3e27bf17b45623\AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-tasks:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-tasks-15.0.1.aar\d178a9aca63ef01eea3e27bf17b45623\AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-basement:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-basement-15.0.1.aar\06ca6ebcb684108e5f2a7fdbac369d00\AndroidManifest.xml:22:5-26:19
+MERGED from [com.google.android.gms:play-services-basement:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-basement-15.0.1.aar\06ca6ebcb684108e5f2a7fdbac369d00\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\ef861b6b259898428312895bc7b0874c\AndroidManifest.xml:9:5-20
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\ef861b6b259898428312895bc7b0874c\AndroidManifest.xml:9:5-20
+	android:supportsRtl
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:13:9-35
+	android:label
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:12:9-41
+	android:icon
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:11:9-43
+	android:allowBackup
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:10:9-35
+	android:theme
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:14:9-59
+uses-library#com.google.android.wearable
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:15:9-17:39
+MERGED from [com.google.android.support:wearable:2.3.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wearable-2.3.0.aar\bab1c5e41bd661ab26c6750abb26e01d\AndroidManifest.xml:10:9-12:40
+MERGED from [com.google.android.support:wearable:2.3.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wearable-2.3.0.aar\bab1c5e41bd661ab26c6750abb26e01d\AndroidManifest.xml:10:9-12:40
+	android:required
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:17:13-36
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:16:13-55
+meta-data#com.google.android.wearable.standalone
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:22:9-24:36
+	android:value
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:24:13-33
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:23:13-66
+activity#com.example.currentplacedetailsonmap.MainWearActivity
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:26:9-36:20
+	android:label
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:28:13-45
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:27:13-45
+intent-filter#action:name:android.intent.action.MAIN+action:name:com.google.android.gms.wearable.DATA_CHANGED+action:name:com.google.android.gms.wearable.MESSAGE_RECEIVED+category:name:android.intent.category.LAUNCHER+data:host:*+data:pathPrefix:/FirstExample+data:scheme:wear
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:29:13-35:29
+action#android.intent.action.MAIN
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:30:17-69
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:30:25-66
+action#com.google.android.gms.wearable.DATA_CHANGED
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:31:17-87
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:31:25-84
+action#com.google.android.gms.wearable.MESSAGE_RECEIVED
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:32:17-91
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:32:25-88
+data
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:33:17-99
+	android:host
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:33:45-61
+	android:scheme
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:33:23-44
+	android:pathPrefix
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:33:62-96
+category#android.intent.category.LAUNCHER
+ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:34:17-77
+	android:name
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml:34:27-74
+uses-sdk
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+MERGED from [com.google.android.support:wearable:2.3.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wearable-2.3.0.aar\bab1c5e41bd661ab26c6750abb26e01d\AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.android.support:wearable:2.3.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wearable-2.3.0.aar\bab1c5e41bd661ab26c6750abb26e01d\AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.android.gms:play-services-wearable:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-wearable-15.0.1.aar\5436c03d38175bf01b1a352b908207c4\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-wearable:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-wearable-15.0.1.aar\5436c03d38175bf01b1a352b908207c4\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:percent:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\percent-27.1.1.aar\b74a8661a65a24334846ffe06e1544ae\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:percent:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\percent-27.1.1.aar\b74a8661a65a24334846ffe06e1544ae\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-tasks:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-tasks-15.0.1.aar\d178a9aca63ef01eea3e27bf17b45623\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-tasks:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-tasks-15.0.1.aar\d178a9aca63ef01eea3e27bf17b45623\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-basement:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-basement-15.0.1.aar\06ca6ebcb684108e5f2a7fdbac369d00\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-basement:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-basement-15.0.1.aar\06ca6ebcb684108e5f2a7fdbac369d00\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-v4-27.1.1.aar\a259270a23771f0f171893c32fef35e6\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-v4-27.1.1.aar\a259270a23771f0f171893c32fef35e6\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:wear:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wear-27.1.1.aar\ebf698cd0343fc33863df2838b4cc798\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:wear:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\wear-27.1.1.aar\ebf698cd0343fc33863df2838b4cc798\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\recyclerview-v7-27.1.1.aar\cc3b6674872052ef413e5e0ce20da69a\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\recyclerview-v7-27.1.1.aar\cc3b6674872052ef413e5e0ce20da69a\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-fragment-27.1.1.aar\f2ee16749aa3618a33f7528d2f4eb385\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-fragment:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-fragment-27.1.1.aar\f2ee16749aa3618a33f7528d2f4eb385\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.1.1.aar\d54fee9cbe1f393815f172fde35b878d\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-ui:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-core-ui-27.1.1.aar\d54fee9cbe1f393815f172fde35b878d\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.1.1.aar\d3c4062a9e64eea892731a94a65627f4\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-core-utils:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-core-utils-27.1.1.aar\d3c4062a9e64eea892731a94a65627f4\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-media-compat:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-media-compat-27.1.1.aar\120df941c03f2bb0d12b7ebb837a96d5\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-media-compat:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-media-compat-27.1.1.aar\120df941c03f2bb0d12b7ebb837a96d5\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-compat-27.1.1.aar\67473fd3dbbc1d2d1bda8d58b5c6ea73\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-compat:27.1.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\support-compat-27.1.1.aar\67473fd3dbbc1d2d1bda8d58b5c6ea73\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\ef861b6b259898428312895bc7b0874c\AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\constraint-layout-1.0.2.aar\ef861b6b259898428312895bc7b0874c\AndroidManifest.xml:5:5-7:41
+MERGED from [android.arch.lifecycle:livedata-core:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\livedata-core-1.1.0.aar\0adbb55315f0144de01e70c2722f0699\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:livedata-core:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\livedata-core-1.1.0.aar\0adbb55315f0144de01e70c2722f0699\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\viewmodel-1.1.0.aar\a9fcd2769fa7ebd17a12c803c21d32bb\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:viewmodel:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\viewmodel-1.1.0.aar\a9fcd2769fa7ebd17a12c803c21d32bb\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\e8850695bf6629c987832f15019922cf\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.lifecycle:runtime:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\e8850695bf6629c987832f15019922cf\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\f130cd6fe54596d58a1a3f8a6bfe65ef\AndroidManifest.xml:20:5-44
+MERGED from [android.arch.core:runtime:1.1.0] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\runtime-1.1.0.aar\f130cd6fe54596d58a1a3f8a6bfe65ef\AndroidManifest.xml:20:5-44
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+		ADDED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+		INJECTED from E:\Final Work\CurrentPlaceDetailsOnMap\wear\src\main\AndroidManifest.xml
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:23:9-26:75
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:25:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:26:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-base-15.0.1.aar\dca32eb3bbbcaf76245c1bdb9ebbce8d\AndroidManifest.xml:24:13-79
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-basement-15.0.1.aar\06ca6ebcb684108e5f2a7fdbac369d00\AndroidManifest.xml:23:9-25:69
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-basement-15.0.1.aar\06ca6ebcb684108e5f2a7fdbac369d00\AndroidManifest.xml:25:13-66
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:15.0.1] C:\Users\Abdel\.gradle\caches\transforms-1\files-1.1\play-services-basement-15.0.1.aar\06ca6ebcb684108e5f2a7fdbac369d00\AndroidManifest.xml:24:13-58

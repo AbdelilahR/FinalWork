@@ -35,11 +35,10 @@
 
     <ImageView
         android:id="@+id/status"
-        android:layout_width="45dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_toEndOf="@+id/pseudo"
         android:layout_alignTop="@+id/avatar"
-        android:layout_marginEnd="25dp"
-        android:adjustViewBounds="true"
+        android:paddingLeft="1dp"
         android:scaleType="fitXY" />
 </RelativeLayout>
