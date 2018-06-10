@@ -291,10 +291,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                 }
                                 if (distanceInMeters < 1000f) {
                                     distance.setText(String.valueOf(Utility.round(distanceInMeters, 2)));
-                                    kcal.setText("m");
+                                    metric.setText("m");
                                 } else {
                                     distance.setText(String.valueOf(Utility.round((distanceInMeters / 1000), 2)));
-                                    kcal.setText("km");
+                                    metric.setText("km");
                                 }
 
 
@@ -343,7 +343,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                     btnStart.setButtonColor(getResources().getColor(R.color.fbutton_color_turquoise));
                     btnStart.setShadowColor(getResources().getColor(R.color.fbutton_color_emerald));
                     btnPause.setEnabled(false);
-                    distance.setText("0 m");
+                    distance.setText("0");
                     calories.setText("0");
 
                     mCalories = 0f;
