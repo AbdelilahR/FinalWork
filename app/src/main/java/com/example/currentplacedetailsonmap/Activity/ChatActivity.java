@@ -83,7 +83,6 @@ public class ChatActivity extends AppCompatActivity
     private TextView mLastSeenView;
     private CircleImageView mProfileImage;
     private String mCurrentUserId;
-    private ImageButton mChatAddBtn;
     private ImageButton mChatSendBtn;
     private EditText mChatMessageView;
     private RecyclerView mMessagesList;
@@ -276,8 +275,6 @@ public class ChatActivity extends AppCompatActivity
         mTitleView = (TextView) findViewById(R.id.custom_bar_title);
         mLastSeenView = (TextView) findViewById(R.id.custom_bar_seen);
         mProfileImage = (CircleImageView) findViewById(R.id.custom_bar_image);
-
-        mChatAddBtn = (ImageButton) findViewById(R.id.chat_add_btn);
         mChatSendBtn = (ImageButton) findViewById(R.id.chat_send_btn);
         mChatMessageView = (EditText) findViewById(R.id.chat_message_view);
 
@@ -401,19 +398,6 @@ public class ChatActivity extends AppCompatActivity
 
             }
         });
-
-
-        mChatAddBtn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                openOptionsMenu();
-
-
-            }
-        });
-
 
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
         {
